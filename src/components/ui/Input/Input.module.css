@@ -1,0 +1,97 @@
+@layer components {
+  .control {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .input {
+    inline-size: 100%;
+    min-block-size: var(--tap-min);
+    padding: var(--space-2) var(--space-4);
+    border: var(--border-width-strong) solid var(--border-2);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-1);
+    font-size: var(--text-md);
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out);
+
+    &:hover:not(:disabled, :focus) {
+      border-color: color-mix(in oklch, var(--border-2), var(--text-1) 25%);
+    }
+
+    &:focus-visible {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 4px color-mix(in oklch, var(--color-primary) 25%, transparent);
+    }
+
+    &[aria-invalid='true'] {
+      border-color: var(--color-danger);
+    }
+
+    &:disabled {
+      background: var(--surface-2);
+      color: var(--text-3);
+      cursor: not-allowed;
+    }
+  }
+
+  .withIcon {
+    padding-inline-start: calc(var(--space-4) + 1.75rem);
+  }
+
+  .icon {
+    position: absolute;
+    inset-inline-start: var(--space-4);
+    color: var(--text-3);
+    pointer-events: none;
+  }
+
+  /* O ícone acende quando o campo está em foco. */
+  .control:has(.input:focus-visible) .icon {
+    color: var(--color-primary-text);
+  }
+
+  .suffix {
+    position: absolute;
+    inset-inline-end: var(--space-4);
+    color: var(--text-2);
+    font-weight: var(--weight-bold);
+    pointer-events: none;
+  }
+
+  .control:has(.suffix) .input {
+    padding-inline-end: calc(var(--space-4) + 2.5rem);
+  }
+
+  .select {
+    appearance: none;
+    padding-inline-end: calc(var(--space-4) + 1.75rem);
+    cursor: pointer;
+  }
+
+  /* Seta desenhada em CSS para manter a aparência entre navegadores. */
+  .selectControl::after {
+    content: '';
+    position: absolute;
+    inset-inline-end: var(--space-4);
+    inline-size: 0.6rem;
+    aspect-ratio: 1;
+    border-inline-end: 2.5px solid var(--text-2);
+    border-block-end: 2.5px solid var(--text-2);
+    rotate: 45deg;
+    translate: 0 -25%;
+    pointer-events: none;
+  }
+
+  .textarea {
+    min-block-size: calc(var(--tap-min) * 2);
+    padding-block: var(--space-3);
+    resize: vertical;
+    field-sizing: content;
+    max-block-size: 12rem;
+  }
+}

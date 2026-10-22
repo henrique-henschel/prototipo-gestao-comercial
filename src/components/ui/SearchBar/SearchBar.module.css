@@ -1,0 +1,59 @@
+@layer components {
+  .search {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .icon {
+    position: absolute;
+    inset-inline-start: var(--space-4);
+    color: var(--text-3);
+    pointer-events: none;
+    transition: color var(--dur-fast) var(--ease-out);
+  }
+
+  .search:has(.input:focus-visible) .icon {
+    color: var(--color-primary-text);
+  }
+
+  .input {
+    inline-size: 100%;
+    min-block-size: var(--tap-min);
+    padding-inline: calc(var(--space-4) + 2rem) calc(var(--space-2) + var(--tap-min));
+    border: var(--border-width-strong) solid var(--border-1);
+    border-radius: var(--radius-pill);
+    background: var(--surface-1);
+    color: var(--text-1);
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out);
+
+    /* O "x" nativo do type=search é substituído pelo botão próprio, maior. */
+    &::-webkit-search-cancel-button {
+      appearance: none;
+    }
+
+    &:focus-visible {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 4px color-mix(in oklch, var(--color-primary) 25%, transparent);
+    }
+  }
+
+  .clear {
+    position: absolute;
+    inset-inline-end: var(--space-1);
+    display: grid;
+    place-items: center;
+    inline-size: calc(var(--tap-min) - var(--space-2));
+    aspect-ratio: 1;
+    border-radius: 50%;
+    color: var(--text-2);
+
+    &:hover {
+      background: var(--surface-2);
+      color: var(--text-1);
+    }
+  }
+}

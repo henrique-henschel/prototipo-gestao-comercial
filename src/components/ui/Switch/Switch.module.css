@@ -1,0 +1,83 @@
+@layer components {
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    min-block-size: var(--tap-min);
+  }
+
+  .text {
+    display: grid;
+    gap: var(--space-1);
+    cursor: pointer;
+  }
+
+  .label {
+    font-weight: var(--weight-bold);
+  }
+
+  .description {
+    font-size: var(--text-sm);
+    color: var(--text-2);
+  }
+
+  .switch {
+    --track-w: 3.5rem;
+    --track-h: 2rem;
+    --thumb: calc(var(--track-h) - 0.5rem);
+
+    appearance: none;
+    position: relative;
+    flex-shrink: 0;
+    inline-size: var(--track-w);
+    block-size: var(--track-h);
+    border: var(--border-width-strong) solid var(--border-2);
+    border-radius: var(--radius-pill);
+    background: var(--surface-3);
+    cursor: pointer;
+    transition:
+      background-color var(--dur-base) var(--ease-out),
+      border-color var(--dur-base) var(--ease-out);
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset-block-start: 50%;
+      inset-inline-start: 0.125rem;
+      inline-size: var(--thumb);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: var(--surface-1);
+      box-shadow: var(--shadow-1);
+      translate: 0 -50%;
+      transition: translate var(--dur-base) var(--ease-spring);
+    }
+
+    &:checked {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+
+      &::before {
+        translate: calc(var(--track-w) - var(--thumb) - 0.25rem - 2 * var(--border-width-strong)) -50%;
+      }
+    }
+
+    &:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+  }
+
+  /* Texto do rótulo esmaece junto quando desabilitado. */
+  .row:has(.switch:disabled) .text {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  @media (forced-colors: active) {
+    .switch:checked {
+      background: Highlight;
+    }
+  }
+}

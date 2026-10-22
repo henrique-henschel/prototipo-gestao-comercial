@@ -1,0 +1,8 @@
+# Força LF no repositório e na cópia de trabalho (Prettier usa endOfLine: lf).
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.webp binary
+*.woff binary
+*.woff2 binary

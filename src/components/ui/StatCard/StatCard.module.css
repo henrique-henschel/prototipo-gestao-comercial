@@ -1,0 +1,123 @@
+@layer components {
+  .stat {
+    --stat-soft: var(--color-primary-soft);
+    --stat-text: var(--color-primary-text);
+
+    container: stat / inline-size;
+    display: block;
+    min-inline-size: 0;
+    padding: var(--space-4);
+    border: var(--border-width) solid var(--border-1);
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+    box-shadow: var(--shadow-1);
+    color: inherit;
+    text-align: start;
+    text-decoration: none;
+  }
+
+  .accent {
+    --stat-soft: var(--color-accent-soft);
+    --stat-text: var(--color-accent-text);
+  }
+
+  .success {
+    --stat-soft: var(--color-success-soft);
+    --stat-text: var(--color-success-text);
+  }
+
+  .warning {
+    --stat-soft: var(--color-warning-soft);
+    --stat-text: var(--color-warning-text);
+  }
+
+  .danger {
+    --stat-soft: var(--color-danger-soft);
+    --stat-text: var(--color-danger-text);
+  }
+
+  .info {
+    --stat-soft: var(--color-info-soft);
+    --stat-text: var(--color-info-text);
+  }
+
+  .inner {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  /* Card largo: ícone ao lado do conteúdo. */
+  @container stat (inline-size > 17rem) {
+    .inner {
+      grid-template-columns: auto 1fr;
+      align-items: start;
+      gap: var(--space-4);
+    }
+
+    .value {
+      font-size: var(--text-2xl);
+    }
+  }
+
+  .icon {
+    display: grid;
+    place-items: center;
+    inline-size: 2.75rem;
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    background: var(--stat-soft);
+    color: var(--stat-text);
+  }
+
+  .body {
+    display: grid;
+    gap: var(--space-1);
+    min-inline-size: 0;
+  }
+
+  .label {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    color: var(--text-2);
+  }
+
+  .value {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    color: var(--text-1);
+    overflow-wrap: anywhere;
+  }
+
+  .footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-3);
+    margin-block-start: var(--space-1);
+    font-size: var(--text-sm);
+  }
+
+  .delta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-weight: var(--weight-bold);
+  }
+
+  .good {
+    color: var(--color-success-text);
+  }
+
+  .bad {
+    color: var(--color-danger-text);
+  }
+
+  .flat {
+    color: var(--text-2);
+  }
+
+  .hint {
+    color: var(--text-2);
+  }
+}

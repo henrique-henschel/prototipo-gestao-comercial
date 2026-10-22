@@ -1,0 +1,56 @@
+@layer components {
+  .empty {
+    --art-bg: var(--color-primary-soft);
+    --art-fg: var(--color-primary-text);
+
+    display: grid;
+    justify-items: center;
+    gap: var(--space-3);
+    padding: var(--space-10) var(--space-4);
+    text-align: center;
+  }
+
+  .danger {
+    --art-bg: var(--color-danger-soft);
+    --art-fg: var(--color-danger-text);
+  }
+
+  .compact {
+    padding-block: var(--space-6);
+  }
+
+  .art {
+    display: grid;
+    place-items: center;
+    inline-size: 5.5rem;
+    aspect-ratio: 1;
+    margin-block-end: var(--space-2);
+    border-radius: 50%;
+    background: var(--art-bg);
+    color: var(--art-fg);
+    animation: pop var(--dur-slow) var(--ease-out);
+  }
+
+  .compact .art {
+    inline-size: 4rem;
+  }
+
+  .emoji {
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+
+  .title {
+    font-size: var(--text-lg);
+    max-inline-size: 28ch;
+  }
+
+  .description {
+    max-inline-size: 38ch;
+    color: var(--text-2);
+  }
+
+  .action {
+    margin-block-start: var(--space-3);
+  }
+}

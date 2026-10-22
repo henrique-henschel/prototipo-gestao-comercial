@@ -61,6 +61,9 @@ docs/            regras-de-negocio.md, design-system.md
 
 O import com alias `@/` aponta para `src/` (ex.: `import { APP_NAME } from '@/app/config.js'`).
 
+- Primitivos de UI sempre pelo índice: `import { Button, MoneyInput } from '@/components/ui';`. O catálogo vivo de todos eles fica em `/design-system` (`src/features/design-system/`). Componente novo em `ui/` entra no índice **e** ganha exemplo no catálogo.
+- Contextos seguem três arquivos (exigência do Fast Refresh, que não aceita componente e não-componente no mesmo módulo): `store/x-context.js` (createContext + tipos), `store/XProvider.jsx` (estado) e `hooks/useX.js` (consumo). Exemplos: `ToastProvider`/`useToast` e `PreferencesProvider`/`usePreferences`.
+
 ## Regras de arquitetura (obrigatórias)
 
 1. **Regra de negócio só em `src/domain/rules/`**, como funções puras com testes. Componentes e serviços chamam essas funções e nunca recalculam regra por conta própria (troco, status de fiado, margem, lucro...).
@@ -74,7 +77,7 @@ O import com alias `@/` aponta para `src/` (ex.: `import { APP_NAME } from '@/ap
 ## Convenções de CSS
 
 - Ordem das camadas declarada em `src/styles/index.css`: `reset, tokens, base, components, utilities, overrides`. Todo `*.module.css` envolve suas regras em `@layer components { ... }`.
-- **Nenhum valor mágico**: cores, espaçamentos, raios, sombras, fontes e durações vêm dos tokens (`var(--...)`) definidos em `styles/tokens.css`. (Na Fase 1 ainda há literais provisórios em `base.css`/`App.module.css`.)
+- **Nenhum valor mágico**: cores, espaçamentos, raios, sombras, fontes e durações vêm dos tokens (`var(--...)`) definidos em `styles/tokens.css`.
 - Cores em `oklch()`; variações com `color-mix()`; temas com `light-dark()` + `[data-theme]` (claro, escuro, alto contraste).
 - Mobile-first (a partir de 360px), sem rolagem horizontal. Preferir **container queries** para componentes e media queries só para o layout da página.
 - Usar CSS moderno com intenção: nesting nativo, `:has()`, `@starting-style`, View Transitions, `scroll-snap`, propriedades lógicas (`inline-size`, `margin-inline`...), `@property`.

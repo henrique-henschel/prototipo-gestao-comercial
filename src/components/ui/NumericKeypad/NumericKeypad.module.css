@@ -1,0 +1,52 @@
+@layer components {
+  .keypad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+    inline-size: 100%;
+    max-inline-size: 24rem;
+    margin-inline: auto;
+  }
+
+  .key {
+    display: grid;
+    place-items: center;
+    min-block-size: var(--tap-hero);
+    border: var(--border-width) solid var(--border-1);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-1);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-bold);
+    font-variant-numeric: tabular-nums;
+    box-shadow: 0 2px 0 var(--border-1);
+    touch-action: manipulation;
+    user-select: none;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      translate var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out);
+
+    &:hover {
+      background: var(--surface-2);
+    }
+
+    /* Tecla "afunda" ao toque, como um botão físico. */
+    &:active {
+      translate: 0 2px;
+      box-shadow: 0 0 0 var(--border-1);
+      background: var(--color-primary-soft);
+    }
+  }
+
+  .backspace {
+    background: var(--surface-2);
+    color: var(--text-2);
+  }
+
+  @media (forced-colors: active) {
+    .key {
+      border-color: ButtonText;
+    }
+  }
+}

@@ -1,18 +1,18 @@
 # Design system
 
-Referência visual e de interação da Caderneta. A versão viva, com todos os componentes renderizados, fica na rota `/design-system` (Fase 2).
+Referência visual e de interação da Caderneta. A versão viva, com todos os componentes renderizados e interativos, fica na rota `/design-system`. Até a Fase 4, ela é a página inicial do app.
 
-> **Status:** Fase 1 concluída (reset, ordem das camadas e fonte). Os tokens e os componentes descritos abaixo são implementados na Fase 2. Ao implementar, mantenha este documento sincronizado com `src/styles/tokens.css` e com `src/components/ui/`.
+> Mantenha este documento sincronizado com `src/styles/tokens.css` e `src/components/ui/`.
 
 ## Princípios
 
 1. **Entendível antes de bonito, e bonito também.** Quem usa pode ter pouca leitura e pouca prática com celular. Cada tela precisa ser compreendida em poucos segundos.
 2. **Uma ação principal por tela**, grande e na zona do polegar (parte de baixo, no celular).
 3. **Ícone + texto, sempre.** Palavras do dia a dia, frases curtas, sem jargão ("Quem me deve", não "Contas a receber").
-4. **Números são protagonistas.** Valores em dinheiro grandes, com espaçamento tabular e alto contraste.
+4. **Números são protagonistas.** Valores em dinheiro grandes, legíveis e alinhados.
 5. **Errar é barato.** "Desfazer" em vez de confirmações; mensagens de erro que dizem o que fazer.
 6. **Completo sem ser poluído.** Recursos avançados ficam um toque adiante (menu "Mais", seções recolhíveis), nunca escondidos de verdade.
-7. **Acessível por padrão**: WCAG 2.2 AA, teclado, leitor de tela, movimento reduzido, texto ampliável.
+7. **Acessível por padrão**: WCAG 2.2 AA, teclado, leitor de tela, movimento reduzido, texto ampliável e alto contraste.
 
 ## Camadas CSS
 
@@ -22,72 +22,112 @@ Declaradas em `src/styles/index.css`:
 @layer reset, tokens, base, components, utilities, overrides;
 ```
 
-| Camada       | Conteúdo                                                                |
-| ------------ | ----------------------------------------------------------------------- |
-| `reset`      | normalização mínima (`reset.css`)                                       |
-| `tokens`     | custom properties de tema (`tokens.css`)                                |
-| `base`       | fonte, elementos HTML, foco (`base.css`)                                |
-| `components` | todos os `*.module.css`                                                 |
-| `utilities`  | classes utilitárias pontuais (`.visually-hidden`, `.stack`, `.cluster`) |
-| `overrides`  | exceções raras e documentadas                                           |
+| Camada       | Arquivo(s)                   | Conteúdo                                                                                      |
+| ------------ | ---------------------------- | --------------------------------------------------------------------------------------------- |
+| `reset`      | `reset.css`                  | normalização mínima, movimento reduzido                                                       |
+| `tokens`     | `tokens.css`                 | custom properties e temas                                                                     |
+| `base`       | `base.css`, `animations.css` | elementos HTML, foco, fonte, keyframes, `@property --progress`                                |
+| `components` | `**/*.module.css`            | todo CSS Module envolve suas regras em `@layer components`                                    |
+| `utilities`  | `utilities.css`              | `.visually-hidden`, `.stack`, `.cluster`, `.container`, `.tabular`, `.text-muted`, `.text-sm` |
+| `overrides`  | n/a                          | exceções raras e documentadas                                                                 |
 
-## Tokens (planejados)
+## Temas
 
-### Cor (`oklch`)
+- **Padrão:** segue o sistema (`color-scheme: light dark`). Todo token de cor usa `light-dark(claro, escuro)`.
+- **Forçado:** `<html data-theme="light|dark|contrast">`, aplicado pelo `PreferencesProvider` (`src/store/PreferencesProvider.jsx`).
+- **Alto contraste:** preto sobre branco, bordas de 2px, cores semânticas escurecidas e sem sombras. Também é aplicado de forma parcial quando o sistema pede `prefers-contrast: more` e nenhum tema foi escolhido.
+- **Cores forçadas** (Windows): componentes com estado ganham bordas e `Highlight` via `@media (forced-colors: active)`.
 
-| Papel                                       | Uso                              | Significado                                  |
-| ------------------------------------------- | -------------------------------- | -------------------------------------------- |
-| `--color-primary`                           | ações principais, marca          | verde-esmeralda: dinheiro, confiança         |
-| `--color-accent`                            | fiado, destaques                 | âmbar                                        |
-| `--color-success`                           | pago, quitado, ok                | verde                                        |
-| `--color-warning`                           | vence em breve, estoque acabando | âmbar                                        |
-| `--color-danger`                            | atrasado, acabou, cancelar       | vermelho                                     |
-| `--color-info`                              | dicas, informação                | azul                                         |
-| `--surface-0..3`, `--text-1..3`, `--border` | neutros de superfície e texto    | n/a                                          |
-| `--chart-1..6`                              | séries do Recharts               | paleta categórica validada para claro/escuro |
+## Tokens
 
-- Estados de hover e pressionado derivados com `color-mix(in oklch, ...)`.
-- Temas: `light-dark()` com `color-scheme`, mais `[data-theme="light" | "dark" | "contrast"]` na raiz.
-- Cores semânticas **nunca** aparecem sozinhas: sempre com ícone e texto.
+### Cor
+
+Cada papel semântico tem quatro tokens: base (preenchimento), `on-*` (texto sobre a base), `*-soft` (fundo suave) e `*-text` (texto ou ícone sobre fundo neutro ou suave).
+
+| Papel      | Tokens                                                                                                                         | Significado                               |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------- |
+| Primária   | `--color-primary`, `-on-primary`, `-primary-soft`, `-primary-text`                                                             | ações principais, marca (verde-esmeralda) |
+| Destaque   | `--color-accent*`                                                                                                              | fiado, chamadas especiais (âmbar)         |
+| Sucesso    | `--color-success*`                                                                                                             | pago, quitado, deu certo                  |
+| Atenção    | `--color-warning*`                                                                                                             | vence logo, acabando                      |
+| Perigo     | `--color-danger*`                                                                                                              | atrasado, acabou, cancelar                |
+| Informação | `--color-info*`                                                                                                                | dicas e ajuda                             |
+| Neutros    | `--surface-page`, `--surface-1..3`, `--surface-inverse`, `--surface-overlay`, `--text-1..3`, `--text-inverse`, `--border-1..2` | superfícies, textos e bordas              |
+| Foco       | `--focus-ring`                                                                                                                 | contorno de foco (azul, contraste ≥ 3:1)  |
+
+Hover e pressionado são derivados com `color-mix(in oklch, …)`.
+
+### Gráficos
+
+`--chart-1` a `--chart-8`, com a paleta categórica de referência da skill dataviz, validada para daltonismo em claro e escuro, mais `--chart-grid`, `--chart-axis` e `--chart-label`.
+
+- A ordem é fixa e nunca ciclada. **Cada entidade tem um slot fixo** (por exemplo, cada forma de pagamento sempre com a mesma cor), e filtros não repintam as séries.
+- Gráficos em que qualquer par de marcas pode ficar lado a lado (dispersão, pequenos múltiplos) usam no máximo os 3 primeiros slots.
+- Os slots 3, 4 e 5 ficam abaixo de 3:1 no tema claro. Por isso, gráficos sempre mostram rótulos diretos ou uma tabela com os valores.
+- As cores de status (sucesso, atenção, perigo) **não** são usadas como série.
 
 ### Tipografia
 
-- Fonte: **Atkinson Hyperlegible** (400 e 700), criada para máxima distinção entre caracteres (1/l/I, 0/O).
-- Base de 18px (`font-size: 112.5%`), multiplicada por `--font-scale` (1 a 1,5) em Ajustes.
-- Escala fluida com `clamp()`: `--text-sm`, `--text-md`, `--text-lg`, `--text-xl`, `--text-2xl`, `--text-money` (valores de destaque).
-- Dinheiro: `font-variant-numeric: tabular-nums`.
+- Fonte **Atkinson Hyperlegible** (400 e 700, self-hosted via `@fontsource`), criada para distinguir 1/l/I e 0/O. O zero cortado é proposital.
+- Raiz em `calc(112.5% * var(--font-scale))`: 18px na escala 1. `--font-scale` vai de 1 (Normal) a 1,5 (Enorme).
+- Escala: `--text-xs` (0,78rem), `--text-sm`, `--text-md` (1rem), `--text-lg`, e as fluidas com `clamp()`: `--text-xl`, `--text-2xl`, `--text-3xl` e `--text-money`.
+- Alinhamento numérico (`tabular-nums`) em colunas, teclado, quantidades e valores em lista.
 
 ### Espaço, forma e movimento
 
-- Espaçamento em base 4px: `--space-1` (4px) a `--space-12` (48px).
-- Raios: `--radius-sm` 8px, `--radius-md` 14px, `--radius-lg` 20px, `--radius-pill`.
-- Sombras em camadas: `--shadow-1..3`.
-- Alvos de toque: `--tap-min` 48px, `--tap-primary` 56px, `--tap-hero` 64px.
-- Durações e curvas: `--dur-fast` 120ms, `--dur-base` 200ms, `--dur-slow` 320ms, `--ease-out`, `--ease-spring`.
+Tudo em `rem`: quando o texto cresce, espaços e áreas de toque crescem junto.
+
+| Grupo     | Tokens                                                                                                     |
+| --------- | ---------------------------------------------------------------------------------------------------------- |
+| Espaço    | `--space-1` (0,25rem) … `--space-16` (4rem); `--gutter` fluido; `--content-max`                            |
+| Toque     | `--tap-min` (2,75rem ≈ 50px), `--tap-primary` (≈ 58px), `--tap-hero` (≈ 68px)                              |
+| Raios     | `--radius-xs`, `-sm`, `-md`, `-lg`, `-xl`, `-pill`                                                         |
+| Bordas    | `--border-width` (1px; 2px no alto contraste), `--border-width-strong`                                     |
+| Sombras   | `--shadow-1..3` (em camadas; contorno sólido no alto contraste)                                            |
+| Movimento | `--dur-fast` 120ms, `--dur-base` 200ms, `--dur-slow` 320ms; `--ease-out`, `--ease-in-out`, `--ease-spring` |
+| Camadas   | `--z-sticky`, `--z-nav`, `--z-overlay`, `--z-toast`                                                        |
+| Layout    | `--sidebar-width`, `--bottomnav-height`, `--topbar-height`                                                 |
 
 ## Componentes (`src/components/ui/`)
 
-| Componente                                                                      | Notas de uso                                                                                               |
-| ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `Button`                                                                        | variantes `primary`, `secondary`, `ghost`, `danger`; tamanhos `md`, `lg`, `hero`; ícone à esquerda + texto |
-| `IconButton`                                                                    | só para ações secundárias óbvias; `aria-label` obrigatório                                                 |
-| `Card`, `StatCard`                                                              | StatCard com valor, rótulo, variação e ícone; responsivo por container query                               |
-| `Field`, `Input`, `Select`                                                      | rótulo sempre visível, ajuda e erro abaixo do campo                                                        |
-| `MoneyInput` + `NumericKeypad`                                                  | entrada de valores estilo calculadora; digita centavos da direita para a esquerda                          |
-| `QuantityStepper`                                                               | − / quantidade / +, botões de 48px                                                                         |
-| `Chip`, `SegmentedControl`, `Tabs`                                              | filtros e alternâncias; chips com `scroll-snap`                                                            |
-| `Badge`, `StatusPill`                                                           | StatusPill traduz os status de fiado e de estoque em cor + ícone + texto                                   |
-| `Dialog`, `BottomSheet`                                                         | `<dialog>` nativo; animação de entrada com `@starting-style`                                               |
-| `Toast` / `Toaster`                                                             | `aria-live`, ação "Desfazer", fecha sozinho                                                                |
-| `EmptyState`, `Skeleton`                                                        | vazio que ensina o próximo passo; skeleton no formato do conteúdo real                                     |
-| `Avatar`, `ProgressBar`, `SearchBar`, `DateShortcuts`, `HelpTip`, `SpeakButton` | n/a                                                                                                        |
+Importe sempre pelo índice: `import { Button, MoneyInput } from '@/components/ui';`
 
-## Layout
+| Componente                                   | Uso e decisões                                                                                                                                                                                                        |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Button`                                     | Variantes `primary`, `secondary`, `ghost`, `accent`, `danger`; tamanhos `sm`, `md`, `lg`, `hero`; `icon`, `loading` (spinner + `aria-busy`), `fullWidth`, `as` (para `Link`).                                         |
+| `IconButton`                                 | Só para ações óbvias (fechar, +/−). `label` obrigatório (vira `aria-label` e dica).                                                                                                                                   |
+| `Field`                                      | Moldura com rótulo visível, dica e erro (`role="alert"`). Recebe uma função com as props de acessibilidade do controle.                                                                                               |
+| `Input`, `Select`, `Textarea`                | Baseados em `Field`. `Input` aceita `icon` e `suffix`. O `Select` é nativo, melhor no celular, e o `Textarea` cresce com `field-sizing: content`.                                                                     |
+| `Switch`                                     | Checkbox nativo com `role="switch"`.                                                                                                                                                                                  |
+| `MoneyInput`                                 | Dinheiro estilo calculadora: os dígitos entram pela direita, sem vírgula. Funciona com teclado físico, do celular ou com `keypad` próprio (`inputMode="none"`). Valor em **centavos**.                                |
+| `NumericKeypad`                              | Teclas de 68px que "afundam" ao toque; segure ⌫ para limpar. Não rouba o foco do campo.                                                                                                                               |
+| `QuantityStepper`                            | − / quantidade / +, com passo decimal sem erro de arredondamento (kg).                                                                                                                                                |
+| `Chip`, `ChipGroup`                          | Filtros `aria-pressed`; o grupo rola com `scroll-snap` e bordas esmaecidas por `mask-image`.                                                                                                                          |
+| `SegmentedControl`                           | Rádios nativos com estado visual por `:has(input:checked)`, sem JavaScript de estilo.                                                                                                                                 |
+| `Tabs`                                       | Padrão WAI-ARIA com ←/→/Home/End.                                                                                                                                                                                     |
+| `Badge`                                      | Contadores e rótulos curtos, `soft` ou `solid`.                                                                                                                                                                       |
+| `StatusPill`                                 | Cor + ícone + palavra. Presets de domínio em `statusPresets.js` (`quitado`, `em_dia`, `vence_em_breve`, `vence_hoje`, `atrasado`, `bloqueado`, `ok`, `acabando`, `acabou`, `concluida`, `cancelada`).                 |
+| `Card`, `CardHeader`                         | Superfície padrão; `interactive` para cards tocáveis.                                                                                                                                                                 |
+| `StatCard`                                   | Indicador com variação boa/ruim (`delta.positive`). Muda de layout por **container query**.                                                                                                                           |
+| `Dialog`, `BottomSheet`                      | `<dialog>` nativo: foco preso, Esc e camada superior. Entrada e saída com `@starting-style` + `allow-discrete`. A rolagem da página é travada por `html:has(dialog:modal)`. O `BottomSheet` sobe de baixo no celular. |
+| `Toaster` (via `ToastProvider` + `useToast`) | Avisos em `popover="manual"`, por cima até de modais, e `aria-live`. Ação "Desfazer", pausa com mouse ou foco, até 3 visíveis.                                                                                        |
+| `EmptyState`                                 | Vazio ou erro que ensina o próximo passo, com uma ação.                                                                                                                                                               |
+| `Skeleton`                                   | Carregamento no formato do conteúdo; a região que envolve marca `aria-busy`.                                                                                                                                          |
+| `ProgressBar`                                | `role="progressbar"`; preenchimento animado pela propriedade registrada `--progress`.                                                                                                                                 |
+| `Avatar`                                     | Iniciais com cor estável por nome (matiz derivada em `oklch`).                                                                                                                                                        |
+| `SearchBar`                                  | `type="search"` com botão de limpar grande.                                                                                                                                                                           |
+| `DateShortcuts`                              | Atalhos "Em 7/15/30 dias" + calendário nativo + resumo ("Vence em 30 dias, sexta-feira…").                                                                                                                            |
+| `HelpTip`                                    | "?" com **Popover API** + **CSS Anchor Positioning** (fallback centralizado).                                                                                                                                         |
+| `SpeakButton`                                | "Ouvir" com Web Speech API em pt-BR; some se o navegador não suportar.                                                                                                                                                |
 
-- **Celular** (a partir de 360px): `TopBar` + conteúdo + `BottomNav` com 5 itens (Início, Fiado, **Vender** em destaque no centro, Estoque, Mais).
+Hooks e estado relacionados: `useToast`, `usePreferences`, `useSpeech` (`src/hooks/`); `ToastProvider` e `PreferencesProvider` (`src/store/`).
+
+## Layout (Fase 4)
+
+- **Celular** (a partir de 360px): `TopBar` + conteúdo + `BottomNav` com 5 itens (Início, Fiado, **Vender** em destaque no centro, Estoque, Mais). Os avisos usam `--toast-offset` para ficar acima da navegação.
 - **Tablet e desktop**: `Sidebar` com ícone + rótulo; o PDV fica em duas colunas (produtos | carrinho).
-- Container queries nos componentes; media queries só para o esqueleto da página.
+- Container queries nos componentes; media queries só para o esqueleto da página. Colunas de grid com `minmax(0, 1fr)`, para que conteúdo rolável não alargue a página.
 
-## Gráficos
+## Gráficos (Fase 9)
 
-Recharts com cores de `--chart-*` e textos com os tokens de tipografia. Sempre com título em linguagem simples ("Quanto você vendeu nos últimos 7 dias"), valor principal escrito e tooltip acessível. Nada de gráfico sem o número por extenso ao lado.
+Recharts com cores de `--chart-*` e textos nos tokens de tipografia. Sempre com título em linguagem simples ("Quanto você vendeu nos últimos 7 dias"), valor principal escrito, tooltip ao passar o dedo ou o mouse e tabela alternativa. Nunca usar dois eixos Y.

@@ -1,0 +1,70 @@
+/*
+ * Keyframes compartilhados. O reset já reduz durações quando o usuário
+ * pede menos movimento (prefers-reduced-motion).
+ */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    translate: 0 0.75rem;
+  }
+}
+
+@keyframes pop {
+  0% {
+    scale: 0.6;
+    opacity: 0;
+  }
+  60% {
+    scale: 1.08;
+    opacity: 1;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+@keyframes spin {
+  to {
+    rotate: 1turn;
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+@keyframes shrink-x {
+  from {
+    scale: 1 1;
+  }
+  to {
+    scale: 0 1;
+  }
+}
+
+@keyframes bump {
+  50% {
+    scale: 1.18;
+  }
+}
+
+/*
+ * Propriedade registrada: permite animar o preenchimento de barras de progresso
+ * (custom properties comuns não interpolam).
+ */
+@property --progress {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 0%;
+}

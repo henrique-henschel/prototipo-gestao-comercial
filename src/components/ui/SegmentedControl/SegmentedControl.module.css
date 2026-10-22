@@ -1,0 +1,70 @@
+@layer components {
+  .fieldset {
+    border: 0;
+    padding: 0;
+    min-inline-size: 0;
+  }
+
+  .legend {
+    margin-block-end: var(--space-2);
+    font-weight: var(--weight-bold);
+  }
+
+  .track {
+    display: inline-grid;
+    grid-template-columns: repeat(var(--count), 1fr);
+    gap: var(--space-1);
+    padding: var(--space-1);
+    border-radius: var(--radius-md);
+    background: var(--surface-3);
+  }
+
+  .fullWidth {
+    display: grid;
+    inline-size: 100%;
+  }
+
+  .option {
+    /* Ancora o rádio escondido (absoluto) dentro da opção, sem vazar da trilha. */
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-block-size: calc(var(--tap-min) - var(--space-2));
+    padding-inline: var(--space-4);
+    border-radius: calc(var(--radius-md) - var(--space-1));
+    color: var(--text-2);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-sm);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition:
+      background-color var(--dur-base) var(--ease-out),
+      color var(--dur-base) var(--ease-out),
+      box-shadow var(--dur-base) var(--ease-out);
+
+    &:hover {
+      color: var(--text-1);
+    }
+
+    /* Estado selecionado e foco sem JavaScript, via :has() no rádio interno. */
+    &:has(input:checked) {
+      background: var(--surface-1);
+      color: var(--color-primary-text);
+      box-shadow: var(--shadow-1);
+    }
+
+    &:has(input:focus-visible) {
+      outline: 3px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .option:has(input:checked) {
+      outline: 2px solid Highlight;
+    }
+  }
+}

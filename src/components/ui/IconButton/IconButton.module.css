@@ -1,0 +1,58 @@
+@layer components {
+  .iconButton {
+    --ib-bg: transparent;
+    --ib-fg: var(--text-2);
+
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    inline-size: var(--tap-min);
+    aspect-ratio: 1;
+    border: var(--border-width-strong) solid transparent;
+    border-radius: var(--radius-pill);
+    background: var(--ib-bg);
+    color: var(--ib-fg);
+    touch-action: manipulation;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      scale var(--dur-fast) var(--ease-out);
+
+    &:hover:not(:disabled) {
+      background: color-mix(in oklch, var(--ib-bg), var(--text-1) 9%);
+    }
+
+    &:active:not(:disabled) {
+      scale: 0.92;
+    }
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  .soft {
+    --ib-bg: var(--surface-2);
+    --ib-fg: var(--text-1);
+  }
+
+  .primary {
+    --ib-bg: var(--color-primary);
+    --ib-fg: var(--color-on-primary);
+  }
+
+  .danger {
+    --ib-bg: var(--color-danger-soft);
+    --ib-fg: var(--color-danger-text);
+  }
+
+  .lg {
+    inline-size: var(--tap-primary);
+  }
+
+  @media (forced-colors: active) {
+    .iconButton {
+      border-color: ButtonText;
+    }
+  }
+}

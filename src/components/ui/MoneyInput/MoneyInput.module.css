@@ -1,0 +1,53 @@
+@layer components {
+  .wrapper {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .input {
+    inline-size: 100%;
+    padding: var(--space-3) var(--space-4);
+    border: var(--border-width-strong) solid var(--border-2);
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+    color: var(--text-1);
+    font-weight: var(--weight-bold);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    caret-color: var(--color-primary);
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out);
+
+    &:focus-visible {
+      outline: none;
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 4px color-mix(in oklch, var(--color-primary) 25%, transparent);
+    }
+
+    &[aria-invalid='true'] {
+      border-color: var(--color-danger);
+    }
+  }
+
+  /* R$ 0,00 fica mais apagado para mostrar que ainda não há valor. */
+  .empty {
+    color: var(--text-3);
+  }
+
+  .md {
+    min-block-size: var(--tap-min);
+    font-size: var(--text-lg);
+  }
+
+  .lg {
+    min-block-size: var(--tap-hero);
+    font-size: var(--text-2xl);
+  }
+
+  .hero {
+    min-block-size: calc(var(--tap-hero) * 1.4);
+    font-size: var(--text-money);
+    letter-spacing: -0.01em;
+  }
+}

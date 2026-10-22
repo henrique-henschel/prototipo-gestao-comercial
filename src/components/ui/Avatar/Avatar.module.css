@@ -1,0 +1,33 @@
+@layer components {
+  .avatar {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    inline-size: 2.75rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    /* Cor derivada do nome; claridade fixa garante contraste do texto. */
+    background: light-dark(oklch(90% 0.06 var(--hue)), oklch(36% 0.07 var(--hue)));
+    color: light-dark(oklch(32% 0.09 var(--hue)), oklch(92% 0.05 var(--hue)));
+    font-weight: var(--weight-bold);
+    font-size: var(--text-sm);
+    letter-spacing: 0.02em;
+    user-select: none;
+  }
+
+  .sm {
+    inline-size: 2.25rem;
+    font-size: var(--text-xs);
+  }
+
+  .lg {
+    inline-size: 4rem;
+    font-size: var(--text-lg);
+  }
+
+  @media (forced-colors: active) {
+    .avatar {
+      border: 1px solid CanvasText;
+    }
+  }
+}

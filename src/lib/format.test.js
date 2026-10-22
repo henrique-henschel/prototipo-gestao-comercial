@@ -1,0 +1,38 @@
+import { addDays, diffInDays, toISODate } from './date.js';
+import { formatDate, formatPercent, formatRelativeDay, plural } from './format.js';
+
+describe('date', () => {
+  it('soma dias respeitando a virada de mês e ano', () => {
+    expect(addDays('2026-01-31', 1)).toBe('2026-02-01');
+    expect(addDays('2026-12-31', 1)).toBe('2027-01-01');
+    expect(addDays('2026-03-01', -1)).toBe('2026-02-28');
+  });
+
+  it('calcula a diferença em dias civis', () => {
+    expect(diffInDays('2026-10-21', '2026-10-28')).toBe(7);
+    expect(diffInDays('2026-10-21', '2026-10-18')).toBe(-3);
+    expect(toISODate(new Date(2026, 9, 5))).toBe('2026-10-05');
+  });
+});
+
+describe('format', () => {
+  it('formata datas e percentuais em pt-BR', () => {
+    expect(formatDate('2026-10-05')).toBe('05/10/2026');
+    expect(formatPercent(0.125)).toBe('12,5%');
+  });
+
+  it('descreve o dia relativo em linguagem simples', () => {
+    const ref = '2026-10-21';
+    expect(formatRelativeDay('2026-10-21', ref)).toBe('hoje');
+    expect(formatRelativeDay('2026-10-22', ref)).toBe('amanhã');
+    expect(formatRelativeDay('2026-10-20', ref)).toBe('ontem');
+    expect(formatRelativeDay('2026-10-26', ref)).toBe('em 5 dias');
+    expect(formatRelativeDay('2026-10-18', ref)).toBe('há 3 dias');
+  });
+
+  it('pluraliza', () => {
+    expect(plural(1, 'item', 'itens')).toBe('1 item');
+    expect(plural(3, 'item', 'itens')).toBe('3 itens');
+    expect(plural(2, 'venda')).toBe('2 vendas');
+  });
+});

@@ -1,0 +1,54 @@
+@layer components {
+  .track {
+    --bar-color: var(--color-primary);
+
+    block-size: 0.75rem;
+    border-radius: var(--radius-pill);
+    background: var(--surface-3);
+    overflow: hidden;
+    /* --progress é registrada com @property (animations.css), então interpola. */
+    transition: --progress var(--dur-slow) var(--ease-out);
+  }
+
+  .sm {
+    block-size: 0.4rem;
+  }
+
+  .lg {
+    block-size: 1.1rem;
+  }
+
+  .success {
+    --bar-color: var(--color-success);
+  }
+
+  .warning {
+    --bar-color: var(--color-warning);
+  }
+
+  .danger {
+    --bar-color: var(--color-danger);
+  }
+
+  .info {
+    --bar-color: var(--color-info);
+  }
+
+  .fill {
+    display: block;
+    block-size: 100%;
+    inline-size: var(--progress);
+    border-radius: inherit;
+    background: var(--bar-color);
+  }
+
+  @media (forced-colors: active) {
+    .track {
+      border: 1px solid CanvasText;
+    }
+
+    .fill {
+      background: Highlight;
+    }
+  }
+}

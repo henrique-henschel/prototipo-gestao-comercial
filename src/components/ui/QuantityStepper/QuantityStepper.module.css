@@ -1,0 +1,60 @@
+@layer components {
+  .stepper {
+    --size: var(--tap-min);
+
+    display: inline-flex;
+    align-items: center;
+    border: var(--border-width-strong) solid var(--border-2);
+    border-radius: var(--radius-pill);
+    background: var(--surface-1);
+  }
+
+  .sm {
+    --size: 2.5rem;
+  }
+
+  .button {
+    display: grid;
+    place-items: center;
+    inline-size: var(--size);
+    aspect-ratio: 1;
+    border-radius: var(--radius-pill);
+    color: var(--color-primary-text);
+    touch-action: manipulation;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      scale var(--dur-fast) var(--ease-out);
+
+    &:hover:not(:disabled) {
+      background: var(--color-primary-soft);
+    }
+
+    &:active:not(:disabled) {
+      scale: 0.9;
+    }
+
+    &:disabled {
+      color: var(--text-3);
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .value {
+    min-inline-size: 3ch;
+    padding-inline: var(--space-1);
+    text-align: center;
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sm .value {
+    font-size: var(--text-md);
+  }
+
+  .unit {
+    font-size: var(--text-sm);
+    color: var(--text-2);
+  }
+}

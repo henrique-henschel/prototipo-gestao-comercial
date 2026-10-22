@@ -1,0 +1,79 @@
+@layer components {
+  .badge {
+    --badge-solid: var(--surface-inverse);
+    --badge-on-solid: var(--text-inverse);
+    --badge-soft: var(--surface-3);
+    --badge-text: var(--text-1);
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    min-inline-size: 1.75em;
+    padding: 0.15em 0.6em;
+    border-radius: var(--radius-pill);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-bold);
+    font-variant-numeric: tabular-nums;
+    line-height: var(--leading-snug);
+    white-space: nowrap;
+  }
+
+  .soft {
+    background: var(--badge-soft);
+    color: var(--badge-text);
+  }
+
+  .solid {
+    background: var(--badge-solid);
+    color: var(--badge-on-solid);
+  }
+
+  .primary {
+    --badge-solid: var(--color-primary);
+    --badge-on-solid: var(--color-on-primary);
+    --badge-soft: var(--color-primary-soft);
+    --badge-text: var(--color-primary-text);
+  }
+
+  .accent {
+    --badge-solid: var(--color-accent);
+    --badge-on-solid: var(--color-on-accent);
+    --badge-soft: var(--color-accent-soft);
+    --badge-text: var(--color-accent-text);
+  }
+
+  .success {
+    --badge-solid: var(--color-success);
+    --badge-on-solid: var(--color-on-success);
+    --badge-soft: var(--color-success-soft);
+    --badge-text: var(--color-success-text);
+  }
+
+  .warning {
+    --badge-solid: var(--color-warning);
+    --badge-on-solid: var(--color-on-warning);
+    --badge-soft: var(--color-warning-soft);
+    --badge-text: var(--color-warning-text);
+  }
+
+  .danger {
+    --badge-solid: var(--color-danger);
+    --badge-on-solid: var(--color-on-danger);
+    --badge-soft: var(--color-danger-soft);
+    --badge-text: var(--color-danger-text);
+  }
+
+  .info {
+    --badge-solid: var(--color-info);
+    --badge-on-solid: var(--color-on-info);
+    --badge-soft: var(--color-info-soft);
+    --badge-text: var(--color-info-text);
+  }
+
+  @media (forced-colors: active) {
+    .badge {
+      border: 1px solid CanvasText;
+    }
+  }
+}

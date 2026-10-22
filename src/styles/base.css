@@ -1,19 +1,115 @@
-/*
- * Estilos base provisórios da Fase 1.
- * Na Fase 2 os valores literais abaixo passam a vir de tokens.css.
- */
-:root {
-  color-scheme: light dark;
-  font-family: 'Atkinson Hyperlegible', system-ui, sans-serif;
-  font-size: 112.5%; /* 18px: texto base maior para leitura fácil */
+/* Estilos dos elementos HTML, sempre a partir dos tokens. */
+html {
+  /* 18px de base, multiplicado pela preferência de tamanho do texto. */
+  font-size: calc(112.5% * var(--font-scale));
+  font-family: var(--font-sans);
+  line-height: var(--leading-normal);
+  color: var(--text-1);
+  background: var(--surface-page);
+  accent-color: var(--color-primary);
+  scrollbar-gutter: stable;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 body {
-  background: light-dark(#f6f8f7, #111614);
-  color: light-dark(#17201c, #e9efec);
+  background: var(--surface-page);
+  color: var(--text-1);
+  font-size: var(--text-md);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: var(--leading-tight);
+  font-weight: var(--weight-bold);
+  color: var(--text-1);
+}
+
+h1 {
+  font-size: var(--text-2xl);
+}
+
+h2 {
+  font-size: var(--text-xl);
+}
+
+h3 {
+  font-size: var(--text-lg);
+}
+
+h4 {
+  font-size: var(--text-md);
+}
+
+strong,
+b {
+  font-weight: var(--weight-bold);
+}
+
+small {
+  font-size: var(--text-sm);
+}
+
+a {
+  color: var(--color-primary-text);
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 0.08em;
+
+  &:hover {
+    text-decoration-thickness: 0.14em;
+  }
+}
+
+hr {
+  border: 0;
+  border-block-start: var(--border-width) solid var(--border-1);
+}
+
+::selection {
+  background: color-mix(in oklch, var(--color-primary) 30%, transparent);
 }
 
 :focus-visible {
-  outline: 3px solid light-dark(#0f7a55, #5fd3a4);
+  outline: 3px solid var(--focus-ring);
   outline-offset: 3px;
+  border-radius: var(--radius-xs);
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+::placeholder {
+  color: var(--text-3);
+  opacity: 1;
+}
+
+dialog {
+  color: inherit;
+}
+
+/*
+ * Fundo escurecido só para modais. Popovers (avisos, ajuda) também têm ::backdrop
+ * e não devem escurecer a página.
+ */
+dialog::backdrop {
+  background: var(--surface-overlay);
+}
+
+/* Trava a rolagem da página enquanto houver um modal aberto, sem JavaScript. */
+html:has(dialog:modal) {
+  overflow: hidden;
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline-color: Highlight;
+  }
 }

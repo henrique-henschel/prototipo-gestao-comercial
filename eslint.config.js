@@ -28,6 +28,9 @@ export default defineConfig([
     rules: {
       // Protótipo em JS: contratos de props ficam documentados via JSDoc, não PropTypes.
       'react/prop-types': 'off',
+      // <ul role="list"> é intencional: o Safari/VoiceOver remove a semântica de lista
+      // quando o estilo dos marcadores é zerado (ver reset.css).
+      'jsx-a11y/no-redundant-roles': ['error', { ul: ['list'], ol: ['list'] }],
       'no-unused-vars': ['error', { varsIgnorePattern: '^_', argsIgnorePattern: '^_' }],
     },
   },

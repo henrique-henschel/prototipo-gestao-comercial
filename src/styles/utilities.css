@@ -1,0 +1,50 @@
+/* Utilitários pontuais de layout e acessibilidade. Use com parcimônia. */
+
+/* Esconde visualmente, mas mantém para leitores de tela. */
+.visually-hidden {
+  position: absolute !important;
+  inline-size: 1px !important;
+  block-size: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Pilha vertical com espaçamento uniforme. */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-gap, var(--space-4));
+}
+
+/* Grupo horizontal que quebra linha. */
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cluster-gap, var(--space-3));
+}
+
+/* Largura máxima de conteúdo com respiro lateral. */
+.container {
+  inline-size: 100%;
+  max-inline-size: var(--content-max);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Números alinhados em colunas (tabelas, eixos, valores em lista). */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.text-muted {
+  color: var(--text-2);
+}
+
+.text-sm {
+  font-size: var(--text-sm);
+}

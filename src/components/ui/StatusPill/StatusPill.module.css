@@ -1,0 +1,53 @@
+@layer components {
+  .pill {
+    --pill-bg: var(--surface-3);
+    --pill-fg: var(--text-2);
+
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35em;
+    padding: 0.25em 0.7em 0.25em 0.55em;
+    border-radius: var(--radius-pill);
+    background: var(--pill-bg);
+    color: var(--pill-fg);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+    white-space: nowrap;
+
+    & svg {
+      flex-shrink: 0;
+    }
+  }
+
+  .lg {
+    font-size: var(--text-md);
+    padding: 0.35em 0.85em 0.35em 0.65em;
+  }
+
+  .success {
+    --pill-bg: var(--color-success-soft);
+    --pill-fg: var(--color-success-text);
+  }
+
+  .warning {
+    --pill-bg: var(--color-warning-soft);
+    --pill-fg: var(--color-warning-text);
+  }
+
+  .danger {
+    --pill-bg: var(--color-danger-soft);
+    --pill-fg: var(--color-danger-text);
+  }
+
+  .info {
+    --pill-bg: var(--color-info-soft);
+    --pill-fg: var(--color-info-text);
+  }
+
+  @media (forced-colors: active) {
+    .pill {
+      border: 1px solid CanvasText;
+    }
+  }
+}

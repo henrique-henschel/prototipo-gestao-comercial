@@ -1,0 +1,474 @@
+@layer components {
+  .page {
+    min-block-size: 100dvh;
+  }
+
+  .skipLink {
+    position: absolute;
+    inset-inline-start: var(--space-4);
+    inset-block-start: var(--space-2);
+    z-index: var(--z-toast);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--surface-inverse);
+    color: var(--text-inverse);
+    font-weight: var(--weight-bold);
+    translate: 0 -200%;
+
+    &:focus-visible {
+      translate: 0 0;
+    }
+  }
+
+  /* ---------- Barra superior ---------- */
+  .topbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3) var(--space-6);
+    padding: var(--space-3) var(--gutter);
+    border-block-end: var(--border-width) solid var(--border-1);
+    background: var(--surface-1);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .logo {
+    display: grid;
+    place-items: center;
+    inline-size: 2.5rem;
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  .brandName {
+    font-weight: var(--weight-bold);
+    font-size: var(--text-lg);
+    line-height: var(--leading-tight);
+  }
+
+  .brandSub {
+    font-size: var(--text-sm);
+    color: var(--text-2);
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    max-inline-size: 100%;
+    overflow-x: auto;
+  }
+
+  /* ---------- Layout ---------- */
+  .layout {
+    display: grid;
+    /* minmax(0, …): sem isso a coluna cresce até caber a navegação horizontal inteira. */
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
+    max-inline-size: 90rem;
+    margin-inline: auto;
+    padding: var(--space-6) var(--gutter) var(--space-16);
+  }
+
+  .nav {
+    min-inline-size: 0;
+  }
+
+  .nav ul {
+    display: flex;
+    gap: var(--space-1);
+    overflow-x: auto;
+    padding: 0;
+    scrollbar-width: none;
+  }
+
+  .nav a {
+    display: flex;
+    align-items: center;
+    min-block-size: var(--tap-min);
+    padding-inline: var(--space-3);
+    border-radius: var(--radius-md);
+    color: var(--text-2);
+    font-weight: var(--weight-bold);
+    text-decoration: none;
+    white-space: nowrap;
+
+    &:hover {
+      background: var(--surface-2);
+      color: var(--text-1);
+    }
+  }
+
+  @media (width >= 64rem) {
+    .layout {
+      grid-template-columns: 13rem minmax(0, 1fr);
+      gap: var(--space-10);
+    }
+
+    .nav ul {
+      position: sticky;
+      inset-block-start: var(--space-6);
+      flex-direction: column;
+      overflow: visible;
+    }
+
+    .nav a {
+      min-block-size: 2.5rem;
+    }
+  }
+
+  .main {
+    display: grid;
+    gap: var(--space-12);
+    min-inline-size: 0;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .intro {
+    display: grid;
+    gap: var(--space-3);
+    max-inline-size: 60ch;
+
+    & h1 {
+      font-size: var(--text-3xl);
+    }
+
+    & p {
+      color: var(--text-2);
+      font-size: var(--text-lg);
+    }
+  }
+
+  .code,
+  .intro code {
+    font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+    font-size: 0.85em;
+    color: var(--text-2);
+  }
+
+  /* ---------- Seções e exemplos ---------- */
+  .section {
+    display: grid;
+    gap: var(--space-5);
+    scroll-margin-block-start: var(--space-6);
+  }
+
+  .sectionHeader {
+    display: grid;
+    gap: var(--space-2);
+    padding-block-end: var(--space-3);
+    border-block-end: var(--border-width) solid var(--border-1);
+  }
+
+  .sectionDescription {
+    max-inline-size: 70ch;
+    color: var(--text-2);
+  }
+
+  .exampleGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: var(--space-4);
+    align-items: start;
+  }
+
+  .example {
+    display: grid;
+    gap: var(--space-4);
+    min-inline-size: 0;
+    margin: 0;
+    padding: var(--space-5);
+    border: var(--border-width) solid var(--border-1);
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+  }
+
+  .exampleWide {
+    grid-column: 1 / -1;
+  }
+
+  .exampleCaption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-1) var(--space-3);
+  }
+
+  .exampleTitle {
+    font-weight: var(--weight-bold);
+  }
+
+  .exampleNote {
+    font-size: var(--text-sm);
+    color: var(--text-3);
+  }
+
+  .exampleBody {
+    min-inline-size: 0;
+  }
+
+  /* ---------- Fundamentos ---------- */
+  .principles {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 14rem), 1fr));
+    gap: var(--space-3);
+  }
+
+  .principle {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    background: var(--surface-2);
+  }
+
+  .principleEmoji {
+    font-size: 1.75rem;
+    line-height: 1.2;
+  }
+
+  .roleGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+    gap: var(--space-3);
+  }
+
+  .role {
+    display: grid;
+    overflow: hidden;
+    border: var(--border-width) solid var(--border-1);
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+  }
+
+  .roleSwatch,
+  .roleSoft {
+    display: flex;
+    align-items: center;
+    padding-inline: var(--space-4);
+    font-weight: var(--weight-bold);
+  }
+
+  .roleSwatch {
+    block-size: 4.5rem;
+    font-size: var(--text-2xl);
+  }
+
+  .roleSoft {
+    block-size: 2.75rem;
+    font-size: var(--text-sm);
+  }
+
+  .roleInfo {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-4) var(--space-4);
+  }
+
+  .neutralRow,
+  .chartRow {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+    gap: var(--space-3);
+  }
+
+  .neutral,
+  .chartSlot {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .neutralChip,
+  .chartChip {
+    block-size: 3rem;
+    border: var(--border-width) solid var(--border-1);
+    border-radius: var(--radius-md);
+  }
+
+  .chartChip {
+    border: 0;
+  }
+
+  .typeList {
+    display: grid;
+  }
+
+  .typeRow {
+    display: grid;
+    gap: var(--space-2);
+    padding-block: var(--space-4);
+    border-block-end: var(--border-width) solid var(--border-1);
+
+    &:last-child {
+      border-block-end: 0;
+    }
+  }
+
+  @media (width >= 48rem) {
+    .typeRow {
+      grid-template-columns: 14rem 1fr;
+      align-items: baseline;
+    }
+  }
+
+  .typeMeta {
+    display: grid;
+  }
+
+  .typeSample {
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    overflow-wrap: anywhere;
+  }
+
+  .spaceList {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .spaceRow {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    align-items: center;
+  }
+
+  .spaceBar {
+    block-size: 0.75rem;
+    border-radius: var(--radius-xs);
+    background: var(--color-primary);
+  }
+
+  .radiusRow,
+  .shadowRow,
+  .tapRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    align-items: end;
+  }
+
+  .radiusItem,
+  .tapItem {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-2);
+  }
+
+  .radiusBox {
+    inline-size: 3.5rem;
+    aspect-ratio: 1;
+    border: var(--border-width-strong) solid var(--color-primary);
+    background: var(--color-primary-soft);
+  }
+
+  .shadowBox {
+    display: grid;
+    place-items: center;
+    inline-size: 4.5rem;
+    aspect-ratio: 1;
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+    font-weight: var(--weight-bold);
+  }
+
+  .tapBox {
+    inline-size: 7rem;
+    border-radius: var(--radius-md);
+    background: var(--color-primary-soft);
+    border: var(--border-width-strong) dashed var(--color-primary);
+  }
+
+  /* ---------- Demonstrações ---------- */
+  .inlineRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    font-weight: var(--weight-bold);
+  }
+
+  .statGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+    gap: var(--space-3);
+  }
+
+  .paymentList {
+    display: grid;
+    gap: var(--space-3);
+
+    & li {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      color: var(--text-2);
+    }
+
+    & strong {
+      margin-inline-start: auto;
+      color: var(--text-1);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  .personCard {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .personText {
+    display: grid;
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  .personAmount {
+    display: grid;
+    justify-items: end;
+    gap: var(--space-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .skeletonRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .skeletonText {
+    display: grid;
+    flex: 1;
+    gap: var(--space-2);
+  }
+
+  .helpLine {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-weight: var(--weight-bold);
+  }
+
+  .searchList {
+    display: grid;
+    gap: var(--space-2);
+
+    & li {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      min-block-size: var(--tap-min);
+    }
+  }
+}
