@@ -135,12 +135,15 @@ Responsiva de 360px a desktop · tema claro, escuro e alto contraste · texto a 
 - **Fast Refresh:** um arquivo `.jsx` exporta apenas componentes. Contextos, constantes e hooks ficam em arquivos `.js` separados.
 - **Atkinson Hyperlegible tem o zero cortado** ("Ø"). É proposital, para distinguir 0 de O, e não é bug.
 - **Line endings:** `.gitattributes` força LF, porque o Git do Windows convertia para CRLF e quebrava o `prettier --check`.
+- **Refs nas ações do store:** o lint do React Compiler (`react-hooks/refs`) recusa passar uma ref a uma função durante a renderização, mesmo que ela só seja lida depois. Por isso as ações de dados dependem só de `dispatch`, e o rollback das atualizações otimistas fica no próprio reducer (`pending`).
+- **Dia civil × UTC:** registros guardam o instante em ISO (UTC), mas "dia" é sempre o dia civil local. Use `dateOf(iso)` (`lib/date.js`) para saber o dia de um instante; `iso.slice(0, 10)` devolve o dia em UTC e erra à noite no Brasil.
+- **Roteiro de fiado do seed:** pagamentos roteirizados abatem em FIFO tudo o que estiver aberto naquele dia, então um pagamento "tudo" depois de uma compra nova quita as duas. Ao mexer no `FIADO_SCRIPT`, confira o status final de cada cliente (o teste do seed exige todos os status).
 
 ## Estado atual e próximos passos
 
-- **Concluído:** Fases 1 (fundação) e 2 (design system), com o catálogo vivo renderizado direto pelo `App.jsx` (ainda sem roteador).
-- **Próxima:** Fase 3, domínio e dados (constants, models, regras com testes, seed determinístico, db em memória, serviços e DataProvider). Depois, a Fase 4 (roteador, layout e login simulado), em que `/design-system` vira uma rota.
-- **Já pronto para reaproveitar:** `domain/rules/money.js`, `lib/date.js`, `lib/format.js`, `lib/cx.js`, os presets de status em `components/ui/StatusPill/statusPresets.js` (chaves devem bater com `domain/constants.js`), `useToast`, `usePreferences` e `useSpeech`.
+- **Concluído:** Fases 1 (fundação), 2 (design system) e 3 (domínio e dados). O catálogo vivo ainda é renderizado direto pelo `App.jsx`, sem roteador.
+- **Próxima:** Fase 4 (roteador, layout, sessão e login simulado), em que `/design-system` vira uma rota e o `DataProvider` passa a envolver a área logada.
+- **Já pronto para reaproveitar:** regras em `domain/rules/` (mapa em `docs/regras-de-negocio.md`), constantes em `domain/constants.js`, serviços em `services/` (com `ApiError` e `configureApi`), o `DataProvider` e os hooks `useSales`, `useProducts`, `useCustomers`, `useFiado`, `useCash`, `useSettings` e `useDataStatus`; `lib/date.js`, `lib/format.js`, `lib/id.js`, `lib/cx.js`, os presets de status em `components/ui/StatusPill/statusPresets.js`, `useToast`, `usePreferences` e `useSpeech`.
 - Ao concluir cada fase: atualize esta seção, o status em `docs/plano-de-implementacao.md` e o Roadmap do `README.md`, e faça **um commit por fase**.
 
 ## Documentação relacionada

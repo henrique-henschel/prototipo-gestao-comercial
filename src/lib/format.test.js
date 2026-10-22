@@ -1,4 +1,4 @@
-import { addDays, diffInDays, toISODate } from './date.js';
+import { addDays, dateOf, diffInDays, eachDay, endOfMonth, startOfMonth, toISODate } from './date.js';
 import { formatDate, formatPercent, formatRelativeDay, plural } from './format.js';
 
 describe('date', () => {
@@ -6,6 +6,15 @@ describe('date', () => {
     expect(addDays('2026-01-31', 1)).toBe('2026-02-01');
     expect(addDays('2026-12-31', 1)).toBe('2027-01-01');
     expect(addDays('2026-03-01', -1)).toBe('2026-02-28');
+  });
+
+  it('acha o dia civil local, os limites do mês e a lista de dias', () => {
+    expect(dateOf(new Date(2026, 9, 21, 23, 30).toISOString())).toBe('2026-10-21');
+    expect(dateOf('2026-10-21')).toBe('2026-10-21');
+    expect(startOfMonth('2026-02-17')).toBe('2026-02-01');
+    expect(endOfMonth('2026-02-17')).toBe('2026-02-28');
+    expect(endOfMonth('2028-02-03')).toBe('2028-02-29');
+    expect(eachDay('2026-10-30', '2026-11-01')).toEqual(['2026-10-30', '2026-10-31', '2026-11-01']);
   });
 
   it('calcula a diferença em dias civis', () => {

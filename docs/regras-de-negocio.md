@@ -22,7 +22,7 @@ Este documento é o **contrato funcional** do produto. As regras são implementa
    - dá baixa no estoque dos produtos com controle de estoque;
    - registra os pagamentos e, se houver, as contas de fiado;
    - a venda entra no caixa do dia e nos relatórios.
-7. **Desfazer**: por 5 segundos após concluir, um toast oferece "Desfazer", que reverte todos os efeitos como se a venda não tivesse existido (ela não fica no histórico).
+7. **Desfazer**: por 5 segundos após concluir, um toast oferece "Desfazer", que reverte todos os efeitos como se a venda não tivesse existido (ela não fica no histórico). O prazo vale para o **toque** em "Desfazer" (a latência da rede não conta), e o aviso fica na tela exatamente esses 5 segundos (`UNDO_WINDOW_MS`).
 8. **Cancelar** (depois do prazo de desfazer, no histórico): exige um motivo (lista simples + "outro").
    - Estorna o estoque e as contas de fiado geradas por essa venda.
    - A venda continua no histórico com o status **Cancelada** e sai do faturamento, do lucro e do caixa.
@@ -54,7 +54,7 @@ Formas: `dinheiro`, `pix`, `debito`, `credito`, `fiado`. Cada forma pode ser des
    | `vence_hoje`     | vence hoje                                      | âmbar forte, alerta   |
    | `atrasado`       | vencimento já passou (exibe "N dias de atraso") | vermelho, alerta      |
 
-5. **Saldo do cliente** = soma dos saldos das contas abertas − crédito do cliente.
+5. **Saldo do cliente** = soma dos saldos das contas abertas − crédito do cliente. O crédito é usado automaticamente no próximo recebimento: o valor recebido **mais** o crédito abatem as contas (regra 8), e o que sobrar continua como crédito.
 6. **Status do cliente** = o pior status entre as suas contas abertas, na ordem atrasado > vence hoje > vence em breve > em dia.
 7. **Limite de crédito** (opcional, por cliente) e opção **"Não vender fiado para este cliente"**. Ao escolher fiado na venda, a interface **alerta** quando:
    - o novo saldo ultrapassaria o limite;
@@ -72,7 +72,7 @@ Formas: `dinheiro`, `pix`, `debito`, `credito`, `fiado`. Cada forma pode ser des
 
 ## 4. Clientes
 
-- Campos: nome (obrigatório), WhatsApp (opcional, mas exigido para a cobrança), apelido/observação, limite de crédito, bloqueio para fiado.
+- Campos: nome (obrigatório), WhatsApp (opcional, mas exigido para a cobrança; DDD + 8 ou 9 dígitos, guardado só com os dígitos), apelido/observação, limite de crédito, bloqueio para fiado.
 - O **cadastro rápido** dentro da venda pede só nome e WhatsApp.
 - Um cliente com saldo em aberto não pode ser excluído, apenas arquivado.
 
@@ -103,14 +103,15 @@ Formas: `dinheiro`, `pix`, `debito`, `credito`, `fiado`. Cada forma pode ser des
 
 1. O **caixa do dia** é aberto com um **troco inicial** (opcional, padrão R$ 0,00) na primeira venda do dia ou manualmente.
 2. **Entradas**: vendas por forma de pagamento (fiado aparece separado, como "vendido a receber") e recebimentos de fiado.
-3. **Despesas**: descrição, categoria (mercadoria, transporte/gasolina, alimentação, ponto/aluguel, taxas, outros), valor e forma (dinheiro ou outra). Só as despesas pagas em dinheiro saem da gaveta.
+3. **Despesas**: descrição, categoria (mercadoria, transporte/gasolina, alimentação, ponto/aluguel, taxas, outros), valor e forma (dinheiro ou outra). Só as despesas pagas em dinheiro saem da gaveta. Sem descrição, a despesa leva o nome da categoria.
+   - **Compra de mercadoria para revender é entrada de estoque, não despesa**: o custo dela já entra no lucro quando o produto é vendido (seção 7). A categoria "mercadoria" é para insumos que não viram estoque (gelo, sacolas, gás); lançar a compra também como despesa contaria o custo duas vezes.
 4. **Dinheiro esperado na gaveta** = troco inicial + vendas em dinheiro (já descontado o troco) + recebimentos de fiado em dinheiro − despesas em dinheiro.
 5. **Fechar o dia**: o vendedor informa quanto contou. Diferença = contado − esperado, exibida como "sobrou" ou "faltou". Um dia fechado pode ser reaberto.
 
 ## 7. Métricas e lucro
 
 - **Faturamento (vendido)** = soma dos totais das vendas não canceladas no período, inclusive a parte em fiado.
-- **Recebido** = vendido − fiado ainda em aberto + recebimentos de fiado do período.
+- **Recebido** = vendido − parte em fiado das vendas do período + recebimentos de fiado do período. (Descontar só o fiado "ainda em aberto" contaria duas vezes um fiado vendido e pago dentro do mesmo período.)
 - **Custo das mercadorias** = soma de `custo × quantidade` dos itens vendidos (itens sem custo contam como zero e a interface avisa que o lucro é estimado).
 - **Taxas** = soma das taxas da maquininha das parcelas em cartão.
 - **Lucro estimado** = faturamento − custo das mercadorias − taxas − despesas.
@@ -127,6 +128,8 @@ Formas: `dinheiro`, `pix`, `debito`, `credito`, `fiado`. Cada forma pode ser des
 
 ## 9. Ajustes que alteram regras
 
+Pelo menos uma forma de pagamento precisa ficar ativa.
+
 | Ajuste                                                           | Padrão    | Regra afetada |
 | ---------------------------------------------------------------- | --------- | ------------- |
 | Formas de pagamento ativas                                       | todas     | 2             |
@@ -135,3 +138,22 @@ Formas: `dinheiro`, `pix`, `debito`, `credito`, `fiado`. Cada forma pode ser des
 | Vencimento padrão do fiado                                       | 30 dias   | 3.2           |
 | Bloquear venda sem estoque                                       | desligado | 1.9, 5.5      |
 | Troco inicial padrão                                             | R$ 0,00   | 6.1           |
+
+## Onde cada regra está implementada
+
+Funções puras em `src/domain/rules/`, cada uma com testes ao lado (`*.test.js`) que citam o número da regra.
+
+| Seção         | Arquivo        | Principais funções                                                                                                                                   |
+| ------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dinheiro      | `money.js`     | `toCents`, `formatBRL`, `parseCentsFromDigits`, `sumCents`, `percentOf`                                                                              |
+| 1. Vendas     | `sales.js`     | `calcSaleTotals`, `calcDiscount`, `validateSale`, `canUndoSale`, `validateCancellation`, `activeSales`                                               |
+| 2. Pagamentos | `payments.js`  | `calcChange`, `suggestCashAmounts`, `paymentProgress`, `validatePayments`, `calcFee`, `finalizePayments`                                             |
+| 3. Fiado      | `fiado.js`     | `accountStatus`, `customerFiadoSummary`, `fiadoAlerts`, `allocatePayment`, `receiveFiado`, `cancelSaleAccounts`, `compareUrgency`, `fiadoIndicators` |
+| 4. Clientes   | `customers.js` | `validateCustomer`, `normalizePhone`, `canDeleteCustomer`                                                                                            |
+| 5. Estoque    | `stock.js`     | `stockStatus`, `calcMargin`, `isSellingAtLoss`, `validateProduct`, `applyMovement`, `findStockShortages`, `stockValue`                               |
+| 6. Caixa      | `cash.js`      | `summarizeCashDay`, `expectedCash`, `closingDifference`, `validateExpense`                                                                           |
+| 7. Métricas   | `metrics.js`   | `periodMetrics`, `compareWithPrevious`, `dailySeries`, `paymentMix`, `topProducts`                                                                   |
+| 8. Períodos   | `period.js`    | `periodFromPreset`, `previousPeriod`, `filterByPeriod`                                                                                               |
+| 9. Ajustes    | `settings.js`  | `mergeSettings`, `validateSettings`                                                                                                                  |
+
+Os serviços (`src/services/`) aplicam essas regras antes de gravar e devolvem erros com códigos (`soma_diferente`, `cliente_obrigatorio`...) e mensagens em linguagem simples (`ERROR_MESSAGES` em `services/api.js`).

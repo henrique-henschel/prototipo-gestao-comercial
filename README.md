@@ -29,7 +29,7 @@ Para quem vende na rua, na feira, na barraca, no carrinho ou numa lojinha, e pre
 | **Relatórios**         | Por período e por tipo; exportação em Excel (CSV), PDF (impressão) e compartilhamento                                                                          |
 | **Ajustes**            | Dados do negócio, chave Pix, taxas da maquininha, regras de estoque, acessibilidade, modo demonstração                                                         |
 
-> As funcionalidades são entregues em fases (veja o [Roadmap](#roadmap)). As Fases 1 (fundação) e 2 (design system) estão concluídas: rode `npm run dev` para ver o catálogo vivo de componentes.
+> As funcionalidades são entregues em fases (veja o [Roadmap](#roadmap)). As Fases 1 (fundação), 2 (design system) e 3 (domínio e dados: regras testadas, dados de exemplo, serviços e estado global) estão concluídas: rode `npm run dev` para ver o catálogo vivo de componentes.
 
 ## Como rodar
 
@@ -109,7 +109,7 @@ O detalhamento de cada fase está em [`docs/plano-de-implementacao.md`](./docs/p
 | ---- | -------------------------------------------------------------------- | ------------ |
 | 1    | Fundação: Vite, React, ESLint, Prettier, Vitest, fonte, documentação | ✅ Concluída |
 | 2    | Design system: tokens, componentes `ui/`, página `/design-system`    | ✅ Concluída |
-| 3    | Domínio e dados: modelos, regras + testes, seed, serviços, store     | ⏳           |
+| 3    | Domínio e dados: modelos, regras + testes, seed, serviços, store     | ✅ Concluída |
 | 4    | Shell e navegação: layout, rotas, login simulado, boas-vindas        | ⏳           |
 | 5    | Vender: PDV, carrinho, pagamentos, venda concluída, histórico        | ⏳           |
 | 6    | Fiado e clientes                                                     | ⏳           |

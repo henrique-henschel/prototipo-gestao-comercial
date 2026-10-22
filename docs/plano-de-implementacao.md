@@ -24,8 +24,8 @@ Decisões fechadas com o dono do produto:
 | ---- | ------------------------------------- | ------------ |
 | 1    | Fundação                              | ✅ `6a60070` |
 | 2    | Design system                         | ✅ `590c2e6` |
-| 3    | Domínio e dados                       | ⏳ próxima   |
-| 4    | Shell e navegação                     | ⏳           |
+| 3    | Domínio e dados                       | ✅           |
+| 4    | Shell e navegação                     | ⏳ próxima   |
 | 5    | Vender                                | ⏳           |
 | 6    | Fiado e clientes                      | ⏳           |
 | 7    | Estoque                               | ⏳           |
@@ -79,14 +79,15 @@ src/
     settings/     (Fase 11)
     help/         (Fase 11)
   domain/
-    models.js     @typedef JSDoc de todas as entidades (Fase 3)
-    constants.js  formas de pagamento, status, unidades, categorias (Fase 3)
-    rules/        money.js ✅; sales, payments, fiado, stock, metrics (Fase 3)
-  mocks/          seed.js, db.js (Fase 3)
-  services/       *.service.js (Fase 3)
-  store/          ToastProvider ✅, PreferencesProvider ✅; DataProvider, SessionProvider (Fases 3–4)
-  hooks/          useToast ✅, usePreferences ✅, useSpeech ✅; useMediaQuery, useUndo, useVibrate...
-  lib/            cx ✅, date ✅, format ✅; csv, whatsapp, share, id, viewTransition
+    models.js     ✅ @typedef JSDoc de todas as entidades
+    constants.js  ✅ formas de pagamento, status, unidades, categorias, motivos, ajustes padrão
+    rules/        ✅ money, sales, payments, fiado, customers, stock, cash, period, metrics, settings
+  mocks/          ✅ random.js (mulberry32), seed.js, db.js
+  services/       ✅ api.js + auth, products, sales, customers, fiado, cash, reports, settings
+  store/          ToastProvider ✅, PreferencesProvider ✅, DataProvider ✅; SessionProvider (Fase 4)
+  hooks/          useToast ✅, usePreferences ✅, useSpeech ✅, useData/useSales/useProducts/useCustomers/
+                  useFiado/useCash/useSettings ✅; useMediaQuery, useUndo, useVibrate...
+  lib/            cx ✅, date ✅, format ✅, id ✅; csv, whatsapp, share, viewTransition
 scripts/          screenshot.mjs ✅ (verificação visual)
 ```
 
@@ -94,10 +95,12 @@ scripts/          screenshot.mjs ✅ (verificação visual)
 
 - **Dinheiro sempre em centavos inteiros.** `src/domain/rules/money.js` já existe e tem testes: `toCents`, `fromCents`, `formatBRL`, `formatDecimal`, `parseCentsFromDigits`, `sumCents` e `percentOf`.
 - **Datas:** `src/lib/date.js` (`today`, `toISODate`, `parseISODate`, `addDays`, `diffInDays`) e `src/lib/format.js` (`formatDate`, `formatDateLong`, `formatDayMonth`, `formatTime`, `formatNumber`, `formatPercent`, `formatRelativeDay`, `plural`) já existem e têm testes.
-- `mocks/seed.js`: cerca de 90 dias de histórico, gerados com PRNG de semente fixa (ex.: mulberry32) e datas **relativas a hoje**. Inclui ~25 produtos com emoji, cor e categoria, ~15 clientes, ~400 vendas, fiados em todos os status, despesas e movimentações de estoque. Deve ser **determinístico** para os testes, aceitando a data de referência como parâmetro.
-- `mocks/db.js`: objeto em memória inicializado pelo seed, com `resetDemo()`.
-- `services/*.service.js`: funções `async` sobre o `db`, com latência simulada de 150–400 ms. As assinaturas espelham uma API REST futura e são documentadas em JSDoc. A latência é configurável e zerada nos testes, e há os modos "simular lentidão" e "simular erro" (ligados em Ajustes > Modo demonstração, na Fase 11).
-- `store/DataProvider`: Context + `useReducer` com ações (`sale/created`, `sale/cancelled`, `fiado/paid`, `stock/adjusted`...) que chamam os serviços. Atualizações otimistas com rollback em erro. Seguir o padrão de três arquivos (`x-context.js`, `XProvider.jsx`, `hooks/useX.js`).
+- `mocks/seed.js`: `createSeed({ now, seed })` gera 90 dias da "Barraca da Rosa" com PRNG de semente fixa (`mocks/random.js`, mulberry32) e datas **relativas a `now`**: 27 produtos (um inativo, dois sem controle de estoque, dois sem custo), 15 clientes com perfis de pagamento, ~440 vendas (inclusive canceladas, divididas e com desconto), contas de fiado e recebimentos, ~120 despesas, ~800 movimentações e o caixa de cada dia (os passados fechados, o de hoje aberto). Os dados nascem das próprias regras de `domain/rules`, então são coerentes: o estoque é a soma das movimentações, e o pago de cada conta é a soma dos abatimentos. Um roteiro (`FIADO_SCRIPT`) e os produtos com `scenario` garantem que hoje existam **todos** os status de fiado e de estoque. Hoje, os registros ficam entre as 6h (ou 8 horas atrás) e o horário atual, sem nada no futuro. `createEmptyData()` cria um negócio vazio ("começar do zero").
+- `mocks/db.js`: o objeto `db`, inicializado pelo seed, e `resetDemo({ empty, user })`, que troca o conteúdo sem trocar a referência.
+- `services/api.js`: `request(handler)` simula a rede, com latência de 150–400 ms (zero nos testes), `configureApi({ slow, failing })` para os modos "simular lentidão" (1,5–3 s) e "simular erro" (Fase 11), `ApiError` com `code`, `codes` e mensagem pronta em `ERROR_MESSAGES`, e cópia profunda do resultado (a interface nunca compartilha objetos com o banco). Os handlers validam tudo antes de alterar o banco.
+- `services/*.service.js`: funções `async` documentadas com o endpoint REST equivalente (`POST /sales`, `POST /customers/:id/fiado-payments`...). As listas voltam em ordem cronológica, e as telas ordenam como precisarem. Operações compostas devolvem tudo o que mudou (ex.: `createSale` → `{ sale, products, movements, fiadoAccounts, cashDay }`).
+- `store/DataProvider`: Context + `useReducer`, com estado e ações em contextos separados (`DataStateContext` e `DataActionsContext`, em `store/data-context.js`). O reducer (`data-reducer.js`) e as ações (`data-actions.js`) são JavaScript puro. Ações que dependem de números definidos pelo serviço (venda, recebimento de fiado, movimentos) são **confirmadas**: o estado muda quando a resposta chega. Edições, arquivamentos, exclusões e ajustes são **otimistas**: `optimistic/applied` guarda no próprio estado como desfazer, e `optimistic/reverted` faz o rollback se o serviço falhar. O provider carrega tudo ao montar e oferece `reload()`.
+- Hooks de consumo (`src/hooks/`): `useDataStatus` (carregando, erro e "Tentar de novo"), `useSales`, `useProducts`, `useCustomers`, `useFiado` (com "Quem me deve" já ordenado e os indicadores), `useCash` (com o resumo do caixa de hoje) e `useSettings`.
 - Regras de negócio **somente** em `domain/rules`, como funções puras e testadas.
 
 ## 4. Regras de negócio
@@ -155,7 +158,9 @@ Vite, React, alias, ESLint, Prettier, Vitest, fonte e documentação (`CLAUDE.md
 
 Tokens, temas (claro, escuro e alto contraste), escala de texto, 25 componentes, `PreferencesProvider`, `ToastProvider`, `money.js`, `lib/date.js` e `lib/format.js` com testes, e o catálogo `/design-system`.
 
-### Fase 3: Domínio e dados
+### ✅ Fase 3: Domínio e dados
+
+Entregue conforme abaixo e detalhado na seção 3. Decisões tomadas durante a fase: a fórmula do "Recebido" foi corrigida (regra 7), a compra de mercadoria para revender é entrada de estoque e não despesa (regra 6.3), o crédito do cliente é usado automaticamente no próximo recebimento (regra 3.5) e o "Desfazer" vale pelo instante do toque (regra 1.7). Também foram criadas regras de cadastro (`customers.js`, `validateProduct`, `validateExpense`) e de ajustes (`settings.js`).
 
 1. `domain/constants.js`: formas de pagamento (com o slot de cor `--chart-n` fixo de cada uma), status de fiado, estoque e venda, unidades, categorias de produto e de despesa, e motivos de cancelamento.
 2. `domain/models.js`: `@typedef` de Negocio, Produto, Venda, ItemVenda, Pagamento, Cliente, ContaFiado, Abatimento, MovimentoEstoque, Despesa, Caixa e Ajustes.
@@ -171,6 +176,8 @@ Tokens, temas (claro, escuro e alto contraste), escala de texto, 25 componentes,
 ### Fase 5: Vender (fluxo crítico)
 
 PDV (grade, busca, categorias e valor avulso), carrinho (quantidade, desconto e observação), pagamento (todas as formas, dividido e troco com "Ouvir"), venda concluída (animação, recibo por WhatsApp e "Desfazer"), histórico, detalhe e cancelamento com motivo. Testes de integração: venda em dinheiro com troco, venda dividida e cancelamento estornando o estoque.
+
+Notas da Fase 3 para esta fase: use `useSales().createSale` e trate `ApiError` (`error.message` já é o texto da tela, e `error.codes` traz todos os problemas). Antes de cobrar, mostre o aviso de estoque com `findStockShortages` e o de fiado com `fiadoAlerts`; o serviço só recusa a falta de estoque quando o bloqueio está ligado. O aviso de "Desfazer" deve usar `duration: UNDO_WINDOW_MS`, porque o `ToastProvider` usa 8 s por padrão em avisos com ação.
 
 ### Fase 6: Fiado e clientes
 

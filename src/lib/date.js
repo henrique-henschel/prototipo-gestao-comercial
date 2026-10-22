@@ -48,3 +48,42 @@ export function diffInDays(a, b) {
 export function today() {
   return toISODate(new Date());
 }
+
+/**
+ * Dia civil local de um instante ISO completo: "2026-10-21T02:30:00.000Z" vira o dia
+ * no fuso do aparelho. Strings só com a data (`AAAA-MM-DD`) voltam como estão.
+ * @param {string} iso
+ * @returns {string} `AAAA-MM-DD`
+ */
+export function dateOf(iso) {
+  return iso.length <= 10 ? iso : toISODate(new Date(iso));
+}
+
+/**
+ * Primeiro dia do mês de uma data.
+ * @param {string} iso `AAAA-MM-DD`
+ */
+export function startOfMonth(iso) {
+  return `${iso.slice(0, 7)}-01`;
+}
+
+/**
+ * Último dia do mês de uma data.
+ * @param {string} iso `AAAA-MM-DD`
+ */
+export function endOfMonth(iso) {
+  const date = parseISODate(startOfMonth(iso));
+  return toISODate(new Date(date.getFullYear(), date.getMonth() + 1, 0));
+}
+
+/**
+ * Todos os dias de `start` a `end`, inclusive.
+ * @param {string} start `AAAA-MM-DD`
+ * @param {string} end `AAAA-MM-DD`
+ * @returns {string[]}
+ */
+export function eachDay(start, end) {
+  const days = [];
+  for (let day = start; day <= end; day = addDays(day, 1)) days.push(day);
+  return days;
+}
