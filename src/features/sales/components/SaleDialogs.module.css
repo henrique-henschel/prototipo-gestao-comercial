@@ -1,0 +1,113 @@
+@layer components {
+  .list {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    line-height: var(--leading-snug);
+
+    & > svg {
+      flex-shrink: 0;
+      margin-block-start: 0.1em;
+    }
+  }
+
+  .danger {
+    color: var(--color-danger-text);
+  }
+
+  .warning {
+    color: var(--color-warning-text);
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(8rem, 100%), 1fr));
+    gap: var(--space-3);
+    margin-block-start: var(--space-5);
+
+    & > div {
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-md);
+      background: var(--surface-2);
+    }
+
+    & dt {
+      color: var(--text-2);
+      font-size: var(--text-sm);
+    }
+
+    & dd {
+      font-size: var(--text-lg);
+      font-weight: var(--weight-bold);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  .reasons {
+    display: grid;
+    gap: var(--space-2);
+    min-inline-size: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+  }
+
+  .reasonsLegend {
+    margin-block-end: var(--space-2);
+    font-weight: var(--weight-bold);
+  }
+
+  .reason {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-block-size: var(--tap-min);
+    padding: var(--space-2) var(--space-4);
+    border: var(--border-width-strong) solid var(--border-1);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+
+    &:has(input:checked) {
+      border-color: var(--color-danger);
+      background: var(--color-danger-soft);
+    }
+
+    &:has(input:focus-visible) {
+      outline: 3px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+
+    & input {
+      inline-size: 1.25rem;
+      block-size: 1.25rem;
+      accent-color: var(--color-danger);
+      flex-shrink: 0;
+    }
+  }
+
+  .form {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .notice {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--color-info-soft);
+    color: var(--text-1);
+
+    & > svg {
+      flex-shrink: 0;
+      color: var(--color-info-text);
+    }
+  }
+}

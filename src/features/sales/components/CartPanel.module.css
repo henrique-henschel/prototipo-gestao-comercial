@@ -1,0 +1,145 @@
+@layer components {
+  .panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .count {
+    color: var(--text-2);
+    font-weight: var(--weight-bold);
+  }
+
+  .lines {
+    display: grid;
+    container-type: inline-size;
+  }
+
+  .line {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-2) var(--space-3);
+    padding-block: var(--space-3);
+    border-block-end: var(--border-width) solid var(--border-1);
+
+    &:first-child {
+      padding-block-start: 0;
+    }
+  }
+
+  .emoji {
+    display: grid;
+    place-items: center;
+    inline-size: 2.5rem;
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    font-size: 1.4rem;
+  }
+
+  .info {
+    min-inline-size: 0;
+  }
+
+  .name {
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+    overflow-wrap: break-word;
+  }
+
+  .unitPrice {
+    color: var(--text-2);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .shortage {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-block-start: var(--space-1);
+    color: var(--color-warning-text);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+  }
+
+  /* Quantidade e valor da linha: embaixo do nome, ocupando a largura toda. */
+  .controls {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .lineTotal {
+    margin-inline-start: auto;
+    font-weight: var(--weight-bold);
+    font-size: var(--text-lg);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Com espaço, a quantidade e o valor sobem para o lado do nome. */
+  @container (width >= 24rem) {
+    .line {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center;
+    }
+
+    .controls {
+      grid-column: auto;
+    }
+  }
+
+  .extras {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .totals {
+    display: grid;
+    gap: var(--space-2);
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-width-strong) solid var(--border-1);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .totalRow {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    color: var(--text-2);
+  }
+
+  .discount {
+    color: var(--color-success-text);
+    font-weight: var(--weight-bold);
+  }
+
+  .grandTotal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    font-weight: var(--weight-bold);
+
+    & dt {
+      font-size: var(--text-lg);
+    }
+
+    & dd {
+      font-size: var(--text-2xl);
+    }
+  }
+}

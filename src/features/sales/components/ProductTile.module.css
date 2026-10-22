@@ -1,0 +1,150 @@
+@layer components {
+  .tile {
+    --tile-color: var(--product-cinza);
+
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-1);
+    min-inline-size: 0;
+    min-block-size: 100%;
+    padding: var(--space-2) var(--space-2) var(--space-3);
+    border: var(--border-width-strong) solid var(--border-1);
+    border-radius: var(--radius-lg);
+    background: var(--surface-1);
+    box-shadow: var(--shadow-1);
+    color: var(--text-1);
+    text-align: start;
+    touch-action: manipulation;
+    user-select: none;
+    transition:
+      border-color var(--dur-fast) var(--ease-out),
+      scale var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-base) var(--ease-out);
+
+    &:hover {
+      border-color: var(--border-2);
+      box-shadow: var(--shadow-2);
+    }
+
+    &:active {
+      scale: 0.96;
+    }
+  }
+
+  .tile[data-color='verde'] {
+    --tile-color: var(--product-verde);
+  }
+  .tile[data-color='azul'] {
+    --tile-color: var(--product-azul);
+  }
+  .tile[data-color='amarelo'] {
+    --tile-color: var(--product-amarelo);
+  }
+  .tile[data-color='laranja'] {
+    --tile-color: var(--product-laranja);
+  }
+  .tile[data-color='vermelho'] {
+    --tile-color: var(--product-vermelho);
+  }
+  .tile[data-color='rosa'] {
+    --tile-color: var(--product-rosa);
+  }
+  .tile[data-color='roxo'] {
+    --tile-color: var(--product-roxo);
+  }
+
+  /* Já está no carrinho: borda na cor da marca e o contador no canto. */
+  .selected {
+    border-color: var(--color-primary);
+
+    &:hover {
+      border-color: var(--color-primary);
+    }
+  }
+
+  .art {
+    display: grid;
+    place-items: center;
+    block-size: 4.25rem;
+    margin-block-end: var(--space-1);
+    border-radius: var(--radius-md);
+    background: var(--tile-color);
+  }
+
+  .emoji {
+    font-size: 2.4rem;
+    line-height: 1;
+  }
+
+  .name {
+    padding-inline: var(--space-1);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+    overflow-wrap: break-word;
+  }
+
+  .price {
+    margin-block-start: auto;
+    padding-inline: var(--space-1);
+    color: var(--color-primary-text);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-lg);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .unit {
+    color: var(--text-2);
+    font-size: var(--text-sm);
+  }
+
+  .hint {
+    margin-block-start: auto;
+    padding-inline: var(--space-1);
+    color: var(--text-2);
+    font-size: var(--text-sm);
+  }
+
+  .status {
+    align-self: flex-start;
+    margin-inline-start: var(--space-1);
+  }
+
+  .count {
+    position: absolute;
+    inset-block-start: calc(var(--space-2) * -1);
+    inset-inline-end: calc(var(--space-2) * -1);
+    display: grid;
+    place-items: center;
+    min-inline-size: 2rem;
+    block-size: 2rem;
+    padding-inline: var(--space-2);
+    border: 3px solid var(--surface-page);
+    border-radius: var(--radius-pill);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    font-weight: var(--weight-bold);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    animation: pop var(--dur-slow) var(--ease-spring);
+  }
+
+  /* Valor avulso: borda tracejada, para parecer "um espaço em branco para preencher". */
+  .custom {
+    border-style: dashed;
+    border-color: var(--border-2);
+    box-shadow: none;
+    background: var(--surface-2);
+
+    & .art {
+      background: var(--surface-1);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .selected {
+      border-color: Highlight;
+    }
+  }
+}

@@ -66,6 +66,19 @@
 
   --focus-ring: light-dark(oklch(51% 0.16 255), oklch(78% 0.13 250));
 
+  /* ---------- Cor: cards de produto ----------
+   * Fundo suave da área do emoji, uma cor por chave de PRODUCT_COLORS (domain/constants.js).
+   * Claras o bastante para texto escuro no tema claro e o contrário no escuro.
+   */
+  --product-verde: light-dark(oklch(92% 0.06 150), oklch(33% 0.06 150));
+  --product-azul: light-dark(oklch(92% 0.05 245), oklch(33% 0.06 245));
+  --product-amarelo: light-dark(oklch(94% 0.08 95), oklch(35% 0.06 95));
+  --product-laranja: light-dark(oklch(92% 0.06 60), oklch(34% 0.06 55));
+  --product-vermelho: light-dark(oklch(92% 0.05 25), oklch(33% 0.06 25));
+  --product-rosa: light-dark(oklch(93% 0.05 350), oklch(33% 0.06 350));
+  --product-roxo: light-dark(oklch(92% 0.05 300), oklch(33% 0.06 300));
+  --product-cinza: light-dark(oklch(92% 0.01 165), oklch(32% 0.01 165));
+
   /* ---------- Cor: gráficos ----------
    * Paleta categórica validada (skill dataviz, referência): ordem fixa, nunca ciclada.
    * Cada entidade tem um slot fixo (ex.: forma de pagamento) e não muda de cor com filtros.
@@ -151,6 +164,7 @@
   /* ---------- Layout ---------- */
   --sidebar-width: 16rem;
   --bottomnav-height: 4.5rem;
+  --cart-bar-height: 4.5rem; /* barra do carrinho na tela de vender (celular e tablet) */
   --topbar-height: 3.75rem;
 }
 

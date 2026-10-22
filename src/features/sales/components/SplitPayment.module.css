@@ -1,0 +1,107 @@
+@layer components {
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .progress {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .progressText {
+    font-size: var(--text-lg);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .done {
+    color: var(--color-success-text);
+  }
+
+  .parts {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .part {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+    border: var(--border-width) solid var(--border-1);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+  }
+
+  .partIcon {
+    flex-shrink: 0;
+    color: var(--color-primary-text);
+  }
+
+  .partText {
+    display: grid;
+    flex: 1 1 7rem;
+    min-inline-size: 0;
+  }
+
+  .partLabel {
+    font-weight: var(--weight-bold);
+    overflow-wrap: break-word;
+  }
+
+  .partChange {
+    color: var(--text-2);
+    font-size: var(--text-sm);
+  }
+
+  .partValue {
+    font-weight: var(--weight-bold);
+    font-size: var(--text-lg);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .method {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    min-block-size: var(--tap-hero);
+    padding: var(--space-2);
+    border: var(--border-width-strong) solid var(--border-1);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    color: var(--text-1);
+    font-weight: var(--weight-bold);
+    text-align: center;
+
+    &:hover {
+      border-color: var(--border-2);
+      background: var(--surface-2);
+    }
+  }
+
+  .methodSelected {
+    border-color: var(--color-primary);
+    background: var(--color-primary-soft);
+    color: var(--color-primary-text);
+
+    &:hover {
+      border-color: var(--color-primary);
+      background: var(--color-primary-soft);
+    }
+  }
+
+  .error {
+    color: var(--color-danger-text);
+    font-weight: var(--weight-bold);
+  }
+
+  @media (forced-colors: active) {
+    .methodSelected {
+      border-color: Highlight;
+    }
+  }
+}

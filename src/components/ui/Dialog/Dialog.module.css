@@ -2,10 +2,12 @@
   .dialog {
     --dialog-width: 34rem;
     --enter-from: 0 1rem;
+    /* Altura máxima em unidade de tela: a superfície interna precisa de um valor que se resolva. */
+    --dialog-max-block: min(90dvh, 100dvh - 2 * var(--space-4));
 
     inline-size: min(var(--dialog-width), 100% - 2 * var(--space-4));
     max-inline-size: none;
-    max-block-size: min(90dvh, 100% - 2 * var(--space-4));
+    max-block-size: var(--dialog-max-block);
     padding: 0;
     margin: auto;
     border: var(--border-width) solid var(--border-1);
@@ -66,7 +68,7 @@
   .surface {
     display: flex;
     flex-direction: column;
-    max-block-size: inherit;
+    max-block-size: var(--dialog-max-block);
   }
 
   .header {
@@ -98,6 +100,8 @@
 
   .body {
     flex: 1;
+    /* Sem isto o corpo não encolhe na coluna flexível, e o rodapé sai da tela. */
+    min-block-size: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
     padding: var(--space-2) var(--space-5) var(--space-5);
@@ -124,9 +128,9 @@
   @media (width < 48rem) {
     .sheet {
       --enter-from: 0 100%;
+      --dialog-max-block: 92dvh;
 
       inline-size: 100%;
-      max-block-size: 92dvh;
       margin: auto 0 0;
       border-radius: var(--radius-xl) var(--radius-xl) 0 0;
       border-block-end: 0;

@@ -29,7 +29,7 @@ Para quem vende na rua, na feira, na barraca, no carrinho ou numa lojinha, e pre
 | **Relatórios**         | Por período e por tipo; exportação em Excel (CSV), PDF (impressão) e compartilhamento                                                                          |
 | **Ajustes**            | Dados do negócio, chave Pix, taxas da maquininha, regras de estoque, acessibilidade, modo demonstração                                                         |
 
-> As funcionalidades são entregues em fases (veja o [Roadmap](#roadmap)). As Fases 1 a 4 estão concluídas: fundação, design system, domínio e dados (regras testadas, dados de exemplo, serviços e estado global) e a navegação (entrar, criar conta, boas-vindas, menus do celular e do computador). As telas de cada área chegam a partir da Fase 5; o catálogo vivo de componentes fica em `/design-system`.
+> As funcionalidades são entregues em fases (veja o [Roadmap](#roadmap)). As Fases 1 a 5 estão concluídas: fundação, design system, domínio e dados (regras testadas, dados de exemplo, serviços e estado global), a navegação (entrar, criar conta, boas-vindas, menus do celular e do computador) e o fluxo de vender (PDV, carrinho, todas as formas de pagamento, venda concluída com "Desfazer", histórico e cancelamento). As telas das outras áreas chegam a partir da Fase 6; o catálogo vivo de componentes fica em `/design-system`.
 
 ## Como rodar
 
@@ -111,7 +111,7 @@ O detalhamento de cada fase está em [`docs/plano-de-implementacao.md`](./docs/p
 | 2    | Design system: tokens, componentes `ui/`, página `/design-system`    | ✅ Concluída |
 | 3    | Domínio e dados: modelos, regras + testes, seed, serviços, store     | ✅ Concluída |
 | 4    | Shell e navegação: layout, rotas, login simulado, boas-vindas        | ✅ Concluída |
-| 5    | Vender: PDV, carrinho, pagamentos, venda concluída, histórico        | ⏳           |
+| 5    | Vender: PDV, carrinho, pagamentos, venda concluída, histórico        | ✅ Concluída |
 | 6    | Fiado e clientes                                                     | ⏳           |
 | 7    | Estoque                                                              | ⏳           |
 | 8    | Caixa e despesas                                                     | ⏳           |

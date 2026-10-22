@@ -1,7 +1,9 @@
 @layer components {
+  /* Contêiner: o valor cresce com o texto, mas nunca passa da largura do campo. */
   .wrapper {
     display: grid;
     gap: var(--space-4);
+    container-type: inline-size;
   }
 
   .input {
@@ -42,12 +44,12 @@
 
   .lg {
     min-block-size: var(--tap-hero);
-    font-size: var(--text-2xl);
+    font-size: min(var(--text-2xl), 11cqi);
   }
 
   .hero {
     min-block-size: calc(var(--tap-hero) * 1.4);
-    font-size: var(--text-money);
+    font-size: min(var(--text-money), 14cqi);
     letter-spacing: -0.01em;
   }
 }

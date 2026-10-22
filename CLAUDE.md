@@ -85,9 +85,9 @@ src/
     rules/       regras de negócio PURAS e testadas (money, sales, payments, fiado, stock, metrics)
   mocks/         seed.js (dados determinísticos relativos a "hoje"), db.js (banco em memória)
   services/      *.service.js — funções async sobre o db com latência simulada
-  store/         Context + useReducer (DataProvider, Session, Preferences, Toast)
-  hooks/         hooks reutilizáveis (useMediaQuery, useUndo, useSpeech...)
-  lib/           format (Intl pt-BR), date, id, cx; csv, whatsapp, share (fases seguintes)
+  store/         Context + useReducer (DataProvider, Cart, Session, Preferences, Toast)
+  hooks/         hooks reutilizáveis (useCart, useMediaQuery, useVibrate, useSpeech...)
+  lib/           format (Intl pt-BR), date, id, cx, whatsapp; csv, share (fases seguintes)
   test/          setup do Vitest e renderApp.js (app inteiro num roteador em memória)
 docs/            plano-de-implementacao.md, regras-de-negocio.md, design-system.md
 scripts/         screenshot.mjs (verificação visual: npm run shot)
@@ -96,7 +96,7 @@ scripts/         screenshot.mjs (verificação visual: npm run shot)
 O import com alias `@/` aponta para `src/` (ex.: `import { APP_NAME } from '@/app/config.js'`).
 
 - Primitivos de UI sempre pelo índice: `import { Button, MoneyInput } from '@/components/ui';`. O catálogo vivo de todos eles fica em `/design-system` (`src/features/design-system/`). Componente novo em `ui/` entra no índice **e** ganha exemplo no catálogo.
-- Contextos seguem três arquivos (exigência do Fast Refresh, que não aceita componente e não-componente no mesmo módulo): `store/x-context.js` (createContext + tipos), `store/XProvider.jsx` (estado) e `hooks/useX.js` (consumo). Exemplos: `ToastProvider`/`useToast` e `PreferencesProvider`/`usePreferences`.
+- Contextos seguem três arquivos (exigência do Fast Refresh, que não aceita componente e não-componente no mesmo módulo): `store/x-context.js` (createContext + tipos), `store/XProvider.jsx` (estado) e `hooks/useX.js` (consumo). Exemplos: `ToastProvider`/`useToast`, `PreferencesProvider`/`usePreferences` e `CartProvider`/`useCart`.
 
 ## Regras de arquitetura (obrigatórias)
 
@@ -153,13 +153,17 @@ Responsiva de 360px a desktop · tema claro, escuro e alto contraste · texto a 
 - **Foco ao trocar de tela:** o `<main>` (`tabIndex={-1}`) recebe o foco, sem contorno. Nas boas-vindas, quem recebe o foco é a pergunta de cada passo.
 - **Refs em objeto:** o lint do React Compiler acusa `ref={refs.email}` vindo de um objeto criado na renderização. Use uma `useRef` por campo.
 - **`window.scrollTo` no jsdom:** não existe; o `ScrollRestoration` o chama a cada tela, e `src/test/setup.js` o substitui por uma função vazia.
+- **Navegação do roteador é uma transição:** `setSearchParams`/`navigate` atualizam a tela depois das atualizações urgentes (mesmo com `await navigate`). Ao concluir a venda, esvaziar o carrinho renderizava o pagamento vazio, que redirecionava para os produtos. Não dependa da ordem: guarde o estado de que a tela precisa (o `justSold` da `SellPage`).
+- **`<dialog>` e popover nos testes:** o jsdom não tem `showModal`; `src/test/setup.js` o substitui por alternar o atributo `open` (diálogos fechados ficam fora das consultas por papel). Os avisos ficam num popover que o jsdom não abre: procure as ações deles com `{ hidden: true }`.
+- **`max-block-size: inherit` com porcentagem não se resolve** num filho de altura automática. A superfície do `Dialog` usa `--dialog-max-block` em `dvh`; sem isso o corpo não rola e o rodapé sai da tela.
+- **Nome acessível com vários `<span>`:** o cálculo pode juntar os textos sem espaço. Nos testes, procure por parte do nome (`/Ver carrinho/`) e confira o resto com `toHaveTextContent`.
 - **Roteiro de fiado do seed:** pagamentos roteirizados abatem em FIFO tudo o que estiver aberto naquele dia, então um pagamento "tudo" depois de uma compra nova quita as duas. Ao mexer no `FIADO_SCRIPT`, confira o status final de cada cliente (o teste do seed exige todos os status).
 
 ## Estado atual e próximos passos
 
-- **Concluído:** Fases 1 (fundação), 2 (design system), 3 (domínio e dados) e 4 (shell e navegação). O app tem roteador, sessão simulada (entrar, demonstração, criar conta, sair), boas-vindas, layout do celular e do computador, "Mais", 404 e tela de erro. As áreas das fases seguintes já têm rota e arquivo em `features/<área>/pages/`, com o conteúdo provisório `ComingSoon`.
-- **Próxima:** Fase 5 (Vender): substituir `SellPage`, `SalesPage` e `SaleDetailPage` (em `features/sales/pages/`) pelas telas reais. Leia as "Notas da Fase 3 para esta fase" no plano.
-- **Já pronto para reaproveitar:** regras em `domain/rules/` (mapa em `docs/regras-de-negocio.md`), constantes em `domain/constants.js`, serviços em `services/` (com `ApiError` e `configureApi`), o `DataProvider` e os hooks `useSales`, `useProducts`, `useCustomers`, `useFiado`, `useCash`, `useSettings`, `useDataStatus`, `useSession` e `useLogout`; `ROUTES` (`app/routes.js`); o layout (`PageHeader`, `CenteredLayout`...); `lib/date.js`, `lib/format.js`, `lib/id.js`, `lib/cx.js`, os presets de status em `components/ui/StatusPill/statusPresets.js`, `useToast`, `usePreferences` e `useSpeech`.
+- **Concluído:** Fases 1 (fundação), 2 (design system), 3 (domínio e dados), 4 (shell e navegação) e 5 (vender). O app tem roteador, sessão simulada, boas-vindas, layout do celular e do computador, "Mais", 404, tela de erro e o fluxo completo de venda: `/vender` (produtos, carrinho, pagamento em todas as formas e venda concluída), `/vendas` e `/vendas/:id` (cancelamento). As áreas das fases seguintes já têm rota e arquivo em `features/<área>/pages/`, com o conteúdo provisório `ComingSoon`.
+- **Próxima:** Fase 6 (Fiado e clientes): substituir `FiadoPage`, `CustomerAccountPage` e `CustomersPage`. Reaproveite `useFiado` ("Quem me deve" e indicadores), `whatsappLink` (`lib/whatsapp.js`) para a cobrança, o `CustomerPicker` e o `FiadoAlertDialog` (`features/sales/components/`) e os ícones de `features/sales/paymentIcons.js`.
+- **Já pronto para reaproveitar:** `useCart`, `useMediaQuery`, `useVibrate`, o `ProductTile` (prévia do card na Fase 7), regras em `domain/rules/` (mapa em `docs/regras-de-negocio.md`), constantes em `domain/constants.js`, serviços em `services/` (com `ApiError` e `configureApi`), o `DataProvider` e os hooks `useSales`, `useProducts`, `useCustomers`, `useFiado`, `useCash`, `useSettings`, `useDataStatus`, `useSession` e `useLogout`; `ROUTES` (`app/routes.js`); o layout (`PageHeader`, `CenteredLayout`...); `lib/date.js`, `lib/format.js`, `lib/id.js`, `lib/cx.js`, os presets de status em `components/ui/StatusPill/statusPresets.js`, `useToast`, `usePreferences` e `useSpeech`.
 - Ao concluir cada fase: atualize esta seção, o status em `docs/plano-de-implementacao.md` e o Roadmap do `README.md`, e faça **um commit por fase**.
 
 ## Documentação relacionada

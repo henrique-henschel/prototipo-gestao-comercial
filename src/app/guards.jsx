@@ -1,11 +1,12 @@
 import { Navigate, Outlet, useLocation } from 'react-router';
 import { useSession } from '@/hooks/useSession.js';
+import { CartProvider } from '@/store/CartProvider.jsx';
 import { DataProvider } from '@/store/DataProvider.jsx';
 import { RETURN_PARAM, ROUTES, safeReturnPath } from './routes.js';
 
 /**
  * Área logada: sem sessão, manda para "Entrar" lembrando a tela pedida (`?voltar=`).
- * É aqui que os dados do negócio são carregados; sair descarta tudo.
+ * É aqui que os dados do negócio são carregados (e o carrinho da venda vive); sair descarta tudo.
  */
 export function RequireAuth() {
   const { isAuthenticated } = useSession();
@@ -19,7 +20,9 @@ export function RequireAuth() {
 
   return (
     <DataProvider>
-      <Outlet />
+      <CartProvider>
+        <Outlet />
+      </CartProvider>
     </DataProvider>
   );
 }

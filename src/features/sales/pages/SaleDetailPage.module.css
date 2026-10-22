@@ -1,0 +1,135 @@
+@layer components {
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-4);
+  }
+
+  @media (width >= 64rem) {
+    .layout {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    }
+  }
+
+  .side {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .card {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .items,
+  .payments {
+    display: grid;
+  }
+
+  .item,
+  .payment {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-block: var(--space-3);
+    border-block-end: var(--border-width) solid var(--border-1);
+
+    &:first-child {
+      padding-block-start: 0;
+    }
+
+    &:last-child {
+      border-block-end: 0;
+    }
+  }
+
+  .emoji {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    inline-size: 2.5rem;
+    aspect-ratio: 1;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    font-size: 1.4rem;
+  }
+
+  .paymentIcon {
+    flex-shrink: 0;
+    color: var(--color-primary-text);
+  }
+
+  .itemText {
+    display: grid;
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  .itemName {
+    font-weight: var(--weight-bold);
+    overflow-wrap: break-word;
+  }
+
+  .itemQty {
+    color: var(--text-2);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .value {
+    font-weight: var(--weight-bold);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .totals {
+    display: grid;
+    gap: var(--space-2);
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-width-strong) solid var(--border-1);
+    font-variant-numeric: tabular-nums;
+
+    & > div {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-3);
+      color: var(--text-2);
+    }
+  }
+
+  .discount {
+    color: var(--color-success-text);
+    font-weight: var(--weight-bold);
+  }
+
+  .grandTotal {
+    align-items: baseline;
+    font-weight: var(--weight-bold);
+
+    & dt {
+      color: var(--text-1);
+      font-size: var(--text-lg);
+    }
+
+    & dd {
+      color: var(--text-1);
+      font-size: var(--text-2xl);
+    }
+  }
+
+  .cancelledTotal {
+    text-decoration: line-through;
+  }
+
+  .customer {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-inline-size: 0;
+  }
+
+  .muted {
+    color: var(--text-2);
+  }
+}

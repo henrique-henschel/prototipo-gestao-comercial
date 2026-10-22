@@ -25,9 +25,9 @@ Decisões fechadas com o dono do produto:
 | 1    | Fundação                              | ✅ `6a60070` |
 | 2    | Design system                         | ✅ `590c2e6` |
 | 3    | Domínio e dados                       | ✅ `7794f72` |
-| 4    | Shell e navegação                     | ✅           |
-| 5    | Vender                                | ⏳ próxima   |
-| 6    | Fiado e clientes                      | ⏳           |
+| 4    | Shell e navegação                     | ✅ `4a01170` |
+| 5    | Vender                                | ✅           |
+| 6    | Fiado e clientes                      | ⏳ próxima   |
 | 7    | Estoque                               | ⏳           |
 | 8    | Caixa e despesas                      | ⏳           |
 | 9    | Dashboard                             | ⏳           |
@@ -73,7 +73,7 @@ src/
     more/         ✅ MorePage ("Mais" do celular)
     errors/       ✅ NotFoundPage, RouteErrorPage
     dashboard/    (Fase 9)
-    sales/        Vender, Carrinho, Pagamento, VendaConcluida, HistoricoVendas, DetalheVenda (Fase 5)
+    sales/        ✅ SellPage (produtos, carrinho, pagamento, concluída), SalesPage, SaleDetailPage
     fiado/        QuemDeve, ContaCliente, ReceberPagamento (Fase 6)
     customers/    (Fase 6)
     inventory/    Produtos, ProdutoForm, Movimentacoes (Fase 7)
@@ -87,10 +87,10 @@ src/
     rules/        ✅ money, sales, payments, fiado, customers, stock, cash, period, metrics, settings
   mocks/          ✅ random.js (mulberry32), seed.js, db.js
   services/       ✅ api.js + auth, products, sales, customers, fiado, cash, reports, settings
-  store/          ✅ ToastProvider, PreferencesProvider, DataProvider, SessionProvider
+  store/          ✅ ToastProvider, PreferencesProvider, DataProvider, SessionProvider, CartProvider
   hooks/          useToast ✅, usePreferences ✅, useSpeech ✅, useData/useSales/useProducts/useCustomers/
-                  useFiado/useCash/useSettings ✅, useSession/useLogout ✅; useMediaQuery, useUndo, useVibrate...
-  lib/            cx ✅, date ✅, format ✅, id ✅; csv, whatsapp, share
+                  useFiado/useCash/useSettings ✅, useSession/useLogout ✅, useCart/useMediaQuery/useVibrate ✅
+  lib/            cx ✅, date ✅, format ✅, id ✅, whatsapp ✅; csv, share
 scripts/          screenshot.mjs ✅ (verificação visual)
 ```
 
@@ -186,7 +186,21 @@ Decisões tomadas durante a fase:
 - **Boas-vindas**: o último passo pergunta se a pessoa quer começar com os dados de exemplo; desligado, o negócio começa vazio (`createEmptyData`). Uma conta nova começa sem nome de negócio e sem categorias.
 - **Foco na troca de tela**: o `<main>` recebe o foco (sem contorno), para o leitor de tela anunciar a tela nova; nas boas-vindas, o foco vai para a pergunta de cada passo.
 
-### Fase 5: Vender (fluxo crítico)
+### ✅ Fase 5: Vender (fluxo crítico)
+
+Entregue: `/vender` com grade de produtos (os mais vendidos dos últimos 30 dias primeiro), busca sem acento, chips de categoria e "Valor avulso"; carrinho com quantidade, desconto em R$ ou % (teclado próprio), observação e "Desfazer" ao tirar itens; aviso de estoque antes de cobrar (ou bloqueio, conforme o ajuste); pagamento em dinheiro (atalhos de cédulas, troco em destaque e "Ouvir"), Pix (QR simulado e chave), débito, crédito (à vista ou parcelado, com a taxa da maquininha explicada), fiado (cliente, vencimento e alerta de bloqueio, atraso e limite) e dividido (barra do que falta; o dinheiro acima do que falta vira troco); venda concluída com recibo pelo WhatsApp (`lib/whatsapp.js`, `features/sales/receipt.js`) e "Desfazer" no aviso; `/vendas` agrupado por dia, com filtros na URL e busca; `/vendas/:id` com cancelamento por motivo. Testes: reducer do carrinho, recibo, link do WhatsApp e integração (dinheiro com troco, desfazer, dividida, fiado, cliente bloqueado, histórico e cancelamento estornando o estoque).
+
+Decisões tomadas durante a fase:
+
+- **Carrinho no `CartProvider`** (padrão de três arquivos, dentro do `RequireAuth`): a venda montada não se perde ao abrir outra tela. O reducer (`store/cart-reducer.js`) guarda só a escolha do vendedor; nome, preço e estoque vêm sempre do produto atual, e os totais de `calcSaleTotals`.
+- **Etapas na URL**: `/vender?etapa=pagamento` e `/vender?venda=<id>`, para o "voltar" do celular voltar uma etapa. A venda desfeita some do histórico, e a tela concluída volta sozinha para os produtos, com os itens de volta no carrinho (só se nenhuma venda nova começou).
+- **Um só "Desfazer" da venda**, no aviso (5 s, `UNDO_WINDOW_MS`): ele continua valendo depois de tocar em "Nova venda". Um botão repetido na tela concluída confundia e cobria o troco junto com o aviso.
+- **Duas colunas a partir de 64rem** (`useMediaQuery`, porque muda a estrutura): produtos | carrinho e pagamento | resumo. Abaixo disso, a barra fixa do carrinho (`--cart-bar-height`) e o carrinho numa janela de baixo.
+- **Botão de concluir no fluxo, não fixo**: com texto grande, um botão fixo cobria o teclado numérico.
+- **Cores dos cards de produto** viraram tokens (`--product-<cor>`), um por chave de `PRODUCT_COLORS`; a Fase 7 reaproveita o `ProductTile` na prévia do formulário.
+- **Correções no design system** encontradas aqui: o `Dialog` não rolava o corpo (o rodapé saía da tela), o aviso espremia o texto até quebrar palavras e o `MoneyInput` cortava o valor com texto grande (agora limitado pela largura com `cqi`).
+
+Plano original da fase:
 
 PDV (grade, busca, categorias e valor avulso), carrinho (quantidade, desconto e observação), pagamento (todas as formas, dividido e troco com "Ouvir"), venda concluída (animação, recibo por WhatsApp e "Desfazer"), histórico, detalhe e cancelamento com motivo. Testes de integração: venda em dinheiro com troco, venda dividida e cancelamento estornando o estoque.
 
