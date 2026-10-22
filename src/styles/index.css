@@ -1,0 +1,12 @@
+/*
+ * Ponto de entrada dos estilos globais.
+ * A ordem das camadas é declarada uma única vez aqui: camadas posteriores
+ * vencem as anteriores, independentemente da especificidade dos seletores.
+ * CSS Modules dos componentes devem envolver suas regras em `@layer components`.
+ */
+@layer reset, tokens, base, components, utilities, overrides;
+
+@import '@fontsource/atkinson-hyperlegible/latin-400.css' layer(base);
+@import '@fontsource/atkinson-hyperlegible/latin-700.css' layer(base);
+@import './reset.css' layer(reset);
+@import './base.css' layer(base);

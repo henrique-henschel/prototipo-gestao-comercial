@@ -1,0 +1,19 @@
+/*
+ * Estilos base provisórios da Fase 1.
+ * Na Fase 2 os valores literais abaixo passam a vir de tokens.css.
+ */
+:root {
+  color-scheme: light dark;
+  font-family: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  font-size: 112.5%; /* 18px: texto base maior para leitura fácil */
+}
+
+body {
+  background: light-dark(#f6f8f7, #111614);
+  color: light-dark(#17201c, #e9efec);
+}
+
+:focus-visible {
+  outline: 3px solid light-dark(#0f7a55, #5fd3a4);
+  outline-offset: 3px;
+}
