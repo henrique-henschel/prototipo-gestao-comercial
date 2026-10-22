@@ -33,7 +33,7 @@ Para quem vende na rua, na feira, na barraca, no carrinho ou numa lojinha, e pre
 
 ## Como rodar
 
-Pré-requisito: **Node.js 20 ou superior**.
+Pré-requisito: **Node.js 22 ou superior**.
 
 ```bash
 npm install
@@ -44,14 +44,15 @@ Acesse `http://localhost:5173`. Quando a autenticação simulada existir (Fase 4
 
 ### Scripts
 
-| Comando                                   | Descrição                                 |
-| ----------------------------------------- | ----------------------------------------- |
-| `npm run dev`                             | Servidor de desenvolvimento               |
-| `npm run build`                           | Build de produção (`dist/`)               |
-| `npm run preview`                         | Serve o build localmente                  |
-| `npm test` / `npm run test:watch`         | Testes com Vitest + Testing Library       |
-| `npm run lint`                            | ESLint (React, Hooks, acessibilidade JSX) |
-| `npm run format` / `npm run format:check` | Prettier                                  |
+| Comando                                   | Descrição                                                                        |
+| ----------------------------------------- | -------------------------------------------------------------------------------- |
+| `npm run dev`                             | Servidor de desenvolvimento                                                      |
+| `npm run build`                           | Build de produção (`dist/`)                                                      |
+| `npm run preview`                         | Serve o build localmente                                                         |
+| `npm test` / `npm run test:watch`         | Testes com Vitest + Testing Library                                              |
+| `npm run lint`                            | ESLint (React, Hooks, acessibilidade JSX)                                        |
+| `npm run format` / `npm run format:check` | Prettier                                                                         |
+| `npm run shot -- <arquivo.png> [rota]`    | Captura de tela headless para verificação visual (veja `scripts/screenshot.mjs`) |
 
 ## Tecnologias
 
@@ -77,7 +78,8 @@ src/
 ├─ store/        estado global (Context + useReducer)
 ├─ hooks/        hooks reutilizáveis
 └─ lib/          formatação, CSV, WhatsApp, compartilhamento
-docs/            regras de negócio e design system
+docs/            plano de implementação, regras de negócio e design system
+scripts/         screenshot.mjs (capturas de tela para verificação visual)
 ```
 
 Os detalhes e as convenções estão no [`CLAUDE.md`](./CLAUDE.md).
@@ -100,6 +102,8 @@ O protótipo foi organizado para que a troca por uma API real seja localizada:
 4. **Regras puras**: `src/domain/rules` pode continuar no front para feedback imediato (troco, totais, status) e ser espelhado no servidor.
 
 ## Roadmap
+
+O detalhamento de cada fase está em [`docs/plano-de-implementacao.md`](./docs/plano-de-implementacao.md).
 
 | Fase | Entrega                                                              | Status       |
 | ---- | -------------------------------------------------------------------- | ------------ |

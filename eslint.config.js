@@ -7,9 +7,9 @@ import jsxA11y from 'eslint-plugin-jsx-a11y';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
-  globalIgnores(['dist', 'coverage', 'node_modules']),
+  globalIgnores(['dist', 'coverage', 'node_modules', 'shots']),
   {
-    files: ['**/*.{js,jsx}'],
+    files: ['**/*.{js,jsx,mjs}'],
     extends: [
       js.configs.recommended,
       react.configs.flat.recommended,
@@ -39,7 +39,7 @@ export default defineConfig([
     languageOptions: { globals: { ...globals.browser, ...globals.vitest } },
   },
   {
-    files: ['vite.config.js', 'eslint.config.js'],
+    files: ['vite.config.js', 'eslint.config.js', 'scripts/**/*.mjs'],
     languageOptions: { globals: { ...globals.node } },
   },
 ]);

@@ -4,6 +4,9 @@ dist
 coverage
 *.local
 
+# Capturas de tela da verificação visual (npm run shot)
+shots
+
 # Logs
 npm-debug.log*
 yarn-debug.log*

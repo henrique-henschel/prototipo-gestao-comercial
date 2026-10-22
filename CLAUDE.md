@@ -11,22 +11,44 @@ Guia de contexto para agentes e desenvolvedores que trabalham neste repositório
 - Este código é a **base definitiva** que uma empresa vai evoluir até o SaaS real. Qualidade, clareza e contratos explícitos importam mais que atalhos.
 - **Público-alvo**: pessoas com baixa escolaridade e pouca familiaridade com tecnologia. Toda decisão de UI passa pelo checklist de UX abaixo.
 
-As fases de entrega e o status de cada uma estão no `README.md` (seção Roadmap). Atualize o status ao concluir uma fase.
+O plano mestre, com o detalhamento de cada fase, está em **`docs/plano-de-implementacao.md`**. Para retomar o trabalho, leia este arquivo, o plano e o documento citado na fase atual.
+
+**Todo o contexto do projeto vive no repositório.** Não use memória persistente do agente. Decisões, convenções e lições novas vão para este arquivo ou para `docs/`.
 
 ## Comandos
 
 ```bash
-npm install          # Node >= 20
+npm install          # Node >= 22
 npm run dev          # servidor de desenvolvimento (http://localhost:5173)
 npm run build        # build de produção em dist/
 npm run preview      # serve o build
 npm test             # Vitest (uma execução)
 npm run test:watch   # Vitest em modo watch
 npm run lint         # ESLint (react, react-hooks, jsx-a11y)
-npm run format       # Prettier
+npm run format       # Prettier (format:check só verifica)
+npm run shot -- <arquivo.png> [rota] [--width 360] [--theme dark] [--full] [--eval "js"]
 ```
 
-Antes de considerar uma tarefa concluída: `npm run lint && npm test && npm run build` sem erros.
+Antes de considerar uma tarefa concluída: `npm run lint && npm test && npm run build && npm run format:check` sem erros, mais a verificação visual abaixo.
+
+## Verificação visual
+
+Toda mudança de interface é conferida em imagem, não só nos testes. Com `npm run dev` rodando, `npm run shot` (`scripts/screenshot.mjs`) abre o Chrome/Edge em modo headless e salva a captura em `shots/`, pasta ignorada pelo git. Depois, leia a imagem para conferir.
+
+```bash
+npm run shot -- inicio.png                                   # 1440px, tema claro
+npm run shot -- celular.png vender --width 360 --height 800 --theme dark
+npm run shot -- inteira.png design-system --full             # página inteira
+npm run shot -- secao.png design-system --eval "document.querySelector('#valores').scrollIntoView({ behavior: 'instant' })"
+npm run shot -- overflow.png --width 360 --eval "document.documentElement.scrollWidth"   # deve imprimir 360
+npm run shot -- dialogo.png --eval "[...document.querySelectorAll('button')].find((b) => b.textContent.includes('Vender fiado')).click()"
+```
+
+- No Git Bash, escreva a rota **sem barra inicial** (`vender`, não `/vender`), porque o MSYS converte `/x` em um caminho do Windows.
+- Âncoras `#secao` não rolam sozinhas: use `--eval` com `scrollIntoView`.
+- Tema alto contraste e tamanho do texto: clique nos rótulos do seletor (ex.: `--eval "(async () => { [...document.querySelectorAll('label')].find((l) => l.textContent.trim() === 'Contraste').click(); })()"`).
+- Mínimo por tela: 360px e 1440px, claro e escuro, e sem rolagem horizontal. Para telas novas, inclua também alto contraste com texto "Enorme".
+- Se o Claude in Chrome estiver conectado, ele também serve para interação real, mas o `npm run shot` não depende dele.
 
 ## Stack
 
@@ -56,7 +78,8 @@ src/
   hooks/         hooks reutilizáveis (useMediaQuery, useUndo, useSpeech...)
   lib/           format (Intl pt-BR), csv, whatsapp, share, id, viewTransition
   test/          setup do Vitest
-docs/            regras-de-negocio.md, design-system.md
+docs/            plano-de-implementacao.md, regras-de-negocio.md, design-system.md
+scripts/         screenshot.mjs (verificação visual: npm run shot)
 ```
 
 O import com alias `@/` aponta para `src/` (ex.: `import { APP_NAME } from '@/app/config.js'`).
@@ -100,8 +123,29 @@ O import com alias `@/` aponta para `src/` (ex.: `import { APP_NAME } from '@/ap
 
 Responsiva de 360px a desktop · tema claro, escuro e alto contraste · texto a 150% sem quebrar · operável só por teclado · estados vazio/carregando/erro · textos revisados em linguagem simples · `npm run lint && npm test && npm run build` passando.
 
+## Lições aprendidas (armadilhas já encontradas)
+
+- **Grid com conteúdo rolável:** use `grid-template-columns: minmax(0, 1fr)` (e `min-inline-size: 0` nos itens). Com `auto`/`1fr`, uma faixa com `overflow-x: auto` (chips, navegação) alarga a coluna e cria rolagem horizontal na página.
+- **`position: absolute` dentro de contêiner com rolagem:** o elemento precisa de um ancestral posicionado _dentro_ do contêiner. Exemplo: o rádio `.visually-hidden` do `SegmentedControl` vazava e alargava a página até a opção receber `position: relative`.
+- **`::backdrop` também existe em popovers.** Estilize só `dialog::backdrop`. Um `::backdrop` global escureceu a página inteira por causa do popover dos avisos.
+- **Avisos por cima de modais:** o `Toaster` é `popover="manual"` e é reaberto quando há um `dialog:modal` aberto, para voltar ao topo da camada superior.
+- **Escapes Unicode em código:** as ferramentas de edição podem converter ` ` em um espaço inseparável literal (o ESLint acusa `no-irregular-whitespace`). Prefira classes como `\s` ou confira os bytes (`od -c`).
+- **`!important` em camadas inverte a ordem:** declarações importantes de camadas _anteriores_ vencem as posteriores. O reset força durações mínimas com `prefers-reduced-motion`, então temporizadores não podem depender de `animationend` (o `Toaster` usa `setTimeout`).
+- **Ícones do lucide-react 1.x:** confira o nome em `node_modules/lucide-react/dist/lucide-react.d.ts` antes de importar (ex.: `CircleQuestionMark`, `Trash`).
+- **Fast Refresh:** um arquivo `.jsx` exporta apenas componentes. Contextos, constantes e hooks ficam em arquivos `.js` separados.
+- **Atkinson Hyperlegible tem o zero cortado** ("Ø"). É proposital, para distinguir 0 de O, e não é bug.
+- **Line endings:** `.gitattributes` força LF, porque o Git do Windows convertia para CRLF e quebrava o `prettier --check`.
+
+## Estado atual e próximos passos
+
+- **Concluído:** Fases 1 (fundação) e 2 (design system), com o catálogo vivo renderizado direto pelo `App.jsx` (ainda sem roteador).
+- **Próxima:** Fase 3, domínio e dados (constants, models, regras com testes, seed determinístico, db em memória, serviços e DataProvider). Depois, a Fase 4 (roteador, layout e login simulado), em que `/design-system` vira uma rota.
+- **Já pronto para reaproveitar:** `domain/rules/money.js`, `lib/date.js`, `lib/format.js`, `lib/cx.js`, os presets de status em `components/ui/StatusPill/statusPresets.js` (chaves devem bater com `domain/constants.js`), `useToast`, `usePreferences` e `useSpeech`.
+- Ao concluir cada fase: atualize esta seção, o status em `docs/plano-de-implementacao.md` e o Roadmap do `README.md`, e faça **um commit por fase**.
+
 ## Documentação relacionada
 
+- `docs/plano-de-implementacao.md`: plano mestre, status e detalhamento das fases.
 - `README.md`: visão geral, como rodar, roadmap e guia de integração com back-end.
 - `docs/regras-de-negocio.md`: regras detalhadas (vendas, pagamentos, fiado, estoque, caixa, relatórios).
 - `docs/design-system.md`: princípios visuais, tokens e componentes.

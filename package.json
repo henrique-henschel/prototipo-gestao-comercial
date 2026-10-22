@@ -5,7 +5,7 @@
   "description": "Protótipo front-end de alta fidelidade de um SaaS de gestão comercial para pequenos negócios e vendedores ambulantes.",
   "type": "module",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "scripts": {
     "dev": "vite",
@@ -15,7 +15,8 @@
     "test:watch": "vitest",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "shot": "node scripts/screenshot.mjs"
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible": "^5.3.0",
