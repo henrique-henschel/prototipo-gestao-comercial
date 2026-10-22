@@ -244,6 +244,7 @@ describe('autenticação, boas-vindas e modo demonstração', () => {
   it('cadastro leva às boas-vindas, que podem começar do zero', async () => {
     const session = await signup({ name: 'Joana', email: 'joana@exemplo.com', password: 'x' });
     expect(session.onboarded).toBe(false);
+    expect(await getBusiness()).toMatchObject({ name: '', sells: [] });
     await completeOnboarding({
       businessName: 'Doces da Joana',
       sells: ['doces'],

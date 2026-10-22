@@ -1,0 +1,48 @@
+@layer components {
+  .card {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .heading {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .title {
+    font-size: var(--text-2xl);
+  }
+
+  .description {
+    color: var(--text-2);
+  }
+
+  .footer {
+    margin-block-start: var(--space-5);
+    text-align: center;
+    color: var(--text-2);
+
+    & a {
+      display: inline-flex;
+      align-items: center;
+      min-block-size: var(--tap-min);
+      font-weight: var(--weight-bold);
+    }
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--text-3);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      border-block-start: var(--border-width) solid var(--border-1);
+    }
+  }
+}

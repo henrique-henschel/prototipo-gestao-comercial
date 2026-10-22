@@ -53,6 +53,11 @@
     min-inline-size: 0;
   }
 
+  /* O ícone mantém o tamanho quando o texto quebra em duas linhas. */
+  .button > svg {
+    flex-shrink: 0;
+  }
+
   /* ---------- Variantes ---------- */
   .primary {
     box-shadow: var(--shadow-1);

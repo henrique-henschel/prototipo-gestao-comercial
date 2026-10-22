@@ -1,0 +1,55 @@
+@layer components {
+  .header {
+    display: grid;
+    gap: var(--space-2);
+    margin-block-end: var(--space-6);
+    container-type: inline-size;
+  }
+
+  .back {
+    justify-self: start;
+    margin-inline-start: calc(var(--space-3) * -1);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .text {
+    display: grid;
+    gap: var(--space-1);
+    min-inline-size: min(100%, 16rem);
+    flex: 1;
+  }
+
+  .title {
+    font-size: var(--text-2xl);
+    overflow-wrap: break-word;
+  }
+
+  .description {
+    max-inline-size: 60ch;
+    color: var(--text-2);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  /* No celular as ações ocupam a largura toda, mais fáceis de tocar. */
+  @container (width < 30rem) {
+    .actions {
+      inline-size: 100%;
+
+      & > * {
+        flex: 1;
+      }
+    }
+  }
+}

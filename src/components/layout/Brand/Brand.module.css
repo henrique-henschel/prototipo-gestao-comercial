@@ -1,0 +1,81 @@
+@layer components {
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-inline-size: 0;
+  }
+
+  .logo {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    inline-size: 2.5rem;
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+  }
+
+  .text {
+    display: grid;
+    min-inline-size: 0;
+  }
+
+  .title {
+    font-weight: var(--weight-bold);
+    font-size: var(--text-lg);
+    line-height: var(--leading-tight);
+    color: var(--text-1);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .subtitle {
+    font-size: var(--text-sm);
+    line-height: var(--leading-snug);
+    color: var(--text-2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Modo estreito: a marca vira contêiner, e o logo sai quando falta espaço (texto grande). */
+  .wrap {
+    inline-size: 100%;
+    container-type: inline-size;
+  }
+
+  @container (width < 11rem) {
+    .wrap .logo {
+      display: none;
+    }
+  }
+
+  .wrap .title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    white-space: normal;
+    font-size: var(--text-md);
+    overflow-wrap: break-word;
+  }
+
+  .lg {
+    gap: var(--space-4);
+
+    .logo {
+      inline-size: 3.5rem;
+      border-radius: var(--radius-lg);
+    }
+
+    .title {
+      font-size: var(--text-2xl);
+    }
+
+    .subtitle {
+      font-size: var(--text-md);
+    }
+  }
+}

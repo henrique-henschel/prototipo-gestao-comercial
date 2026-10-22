@@ -1,5 +1,5 @@
 import { addDays, dateOf, diffInDays, eachDay, endOfMonth, startOfMonth, toISODate } from './date.js';
-import { formatDate, formatPercent, formatRelativeDay, plural } from './format.js';
+import { formatDate, formatDateMedium, formatPercent, formatRelativeDay, plural } from './format.js';
 
 describe('date', () => {
   it('soma dias respeitando a virada de mês e ano', () => {
@@ -27,6 +27,7 @@ describe('date', () => {
 describe('format', () => {
   it('formata datas e percentuais em pt-BR', () => {
     expect(formatDate('2026-10-05')).toBe('05/10/2026');
+    expect(formatDateMedium('2026-10-21')).toBe('qua., 21 de out.');
     expect(formatPercent(0.125)).toBe('12,5%');
   });
 

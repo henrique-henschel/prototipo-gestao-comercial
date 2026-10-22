@@ -1,0 +1,19 @@
+@layer components {
+  .skipLink {
+    position: fixed;
+    inset-inline-start: var(--space-4);
+    inset-block-start: var(--space-2);
+    z-index: var(--z-toast);
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-md);
+    background: var(--surface-inverse);
+    color: var(--text-inverse);
+    font-weight: var(--weight-bold);
+    text-decoration: none;
+    translate: 0 -200%;
+
+    &:focus-visible {
+      translate: 0 0;
+    }
+  }
+}

@@ -1,0 +1,31 @@
+@layer components {
+  .topbar {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: var(--z-sticky);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    min-block-size: var(--topbar-height);
+    padding: var(--space-2) var(--gutter);
+    padding-block-start: max(var(--space-2), env(safe-area-inset-top));
+    border-block-end: var(--border-width) solid var(--border-1);
+    background: color-mix(in oklch, var(--surface-1) 94%, transparent);
+    backdrop-filter: blur(12px);
+  }
+
+  @media (width >= 48rem) {
+    .topbar {
+      display: none;
+    }
+  }
+
+  .brandLink {
+    display: flex;
+    flex: 1;
+    min-inline-size: 0;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+  }
+}

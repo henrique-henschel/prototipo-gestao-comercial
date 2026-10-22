@@ -46,7 +46,15 @@ npm run shot -- dialogo.png --eval "[...document.querySelectorAll('button')].fin
 
 - No Git Bash, escreva a rota **sem barra inicial** (`vender`, não `/vender`), porque o MSYS converte `/x` em um caminho do Windows.
 - Âncoras `#secao` não rolam sozinhas: use `--eval` com `scrollIntoView`.
-- Tema alto contraste e tamanho do texto: clique nos rótulos do seletor (ex.: `--eval "(async () => { [...document.querySelectorAll('label')].find((l) => l.textContent.trim() === 'Contraste').click(); })()"`).
+- Tema alto contraste e tamanho do texto: abra `design-system`, clique nos rótulos do seletor (ex.: `--eval "(async () => { [...document.querySelectorAll('label')].find((l) => l.textContent.trim() === 'Contraste').click(); })()"`) e depois navegue dentro do app com `history.pushState(null, '', '/entrar?voltar=/fiado'); dispatchEvent(new PopStateEvent('popstate'))`. As preferências valem até recarregar a página.
+- **Telas logadas:** a sessão vive só em memória, então toda captura começa deslogada. Abra `entrar?voltar=/rota` e entre pela conta de demonstração no `--eval`; a guarda leva para a rota pedida:
+
+  ```bash
+  npm run shot -- fiado.png "entrar?voltar=/fiado" --width 360 --height 800 --eval "(async () => { [...document.querySelectorAll('button')].find((b) => b.textContent.includes('demonstração')).click(); await new Promise((r) => setTimeout(r, 2500)); return location.pathname + ' ' + document.documentElement.scrollWidth; })()"
+  ```
+
+- O `--eval` precisa ser **uma linha só** (quebras de linha dão `SyntaxError`). Para scripts longos, guarde num arquivo e passe `"$(tr '\n' ' ' < arquivo.js)"`.
+- Com `--full`, elementos fixos (como a `BottomNav`) aparecem no meio da imagem: é efeito da captura, não bug.
 - Mínimo por tela: 360px e 1440px, claro e escuro, e sem rolagem horizontal. Para telas novas, inclua também alto contraste com texto "Enorme".
 - Se o Claude in Chrome estiver conectado, ele também serve para interação real, mas o `npm run shot` não depende dele.
 
@@ -60,14 +68,17 @@ Vite 8 · React 19 · React Router 8 (`react-router`, modo biblioteca com `creat
 
 ```
 src/
-  app/           config.js (nome, locale), router, providers, constantes de rota
+  app/           config.js (nome, locale), routes.js (caminhos), router.js, providers.jsx,
+                 guards.jsx (RequireAuth, RequireOnboarded, PublicOnly), RootLayout.jsx
   styles/        index.css (ordem dos @layer), reset, tokens, base, utilities, animations, print
   components/
     ui/          primitivos do design system (Button, MoneyInput, NumericKeypad, Dialog, Toast...)
-    layout/      AppShell, Sidebar, BottomNav, TopBar, PageHeader
+    layout/      AppShell, Sidebar, BottomNav, TopBar, PageHeader, CenteredLayout, Brand...
+                 (índice em layout/index.js; itens de menu em layout/navigation.js)
     charts/      wrappers do Recharts estilizados pelos tokens
   features/      uma pasta por área: auth, dashboard, sales, fiado, customers, inventory,
-                 cash, reports, settings, help, design-system (pages/, components/, *.module.css)
+                 cash, reports, settings, help, more, errors, design-system
+                 (pages/, components/, *.module.css)
   domain/
     models.js    @typedef JSDoc de todas as entidades (contrato com o back-end futuro)
     constants.js formas de pagamento, status, unidades, categorias
@@ -76,8 +87,8 @@ src/
   services/      *.service.js — funções async sobre o db com latência simulada
   store/         Context + useReducer (DataProvider, Session, Preferences, Toast)
   hooks/         hooks reutilizáveis (useMediaQuery, useUndo, useSpeech...)
-  lib/           format (Intl pt-BR), csv, whatsapp, share, id, viewTransition
-  test/          setup do Vitest
+  lib/           format (Intl pt-BR), date, id, cx; csv, whatsapp, share (fases seguintes)
+  test/          setup do Vitest e renderApp.js (app inteiro num roteador em memória)
 docs/            plano-de-implementacao.md, regras-de-negocio.md, design-system.md
 scripts/         screenshot.mjs (verificação visual: npm run shot)
 ```
@@ -137,13 +148,18 @@ Responsiva de 360px a desktop · tema claro, escuro e alto contraste · texto a 
 - **Line endings:** `.gitattributes` força LF, porque o Git do Windows convertia para CRLF e quebrava o `prettier --check`.
 - **Refs nas ações do store:** o lint do React Compiler (`react-hooks/refs`) recusa passar uma ref a uma função durante a renderização, mesmo que ela só seja lida depois. Por isso as ações de dados dependem só de `dispatch`, e o rollback das atualizações otimistas fica no próprio reducer (`pending`).
 - **Dia civil × UTC:** registros guardam o instante em ISO (UTC), mas "dia" é sempre o dia civil local. Use `dateOf(iso)` (`lib/date.js`) para saber o dia de um instante; `iso.slice(0, 10)` devolve o dia em UTC e erra à noite no Brasil.
+- **`overflow-wrap: anywhere` corta palavras:** ele também muda o tamanho mínimo do texto, então, com letra grande, "Vendas" virou "Venda / s". Use `overflow-wrap: break-word`.
+- **`rem` em container query × media query:** em `@container`, `rem` segue o tamanho da raiz (cresce com `--font-scale`); em `@media`, `rem` é sempre 16px. Por isso o esqueleto troca de layout em 768px fixos, enquanto os componentes reagem ao texto grande.
+- **Foco ao trocar de tela:** o `<main>` (`tabIndex={-1}`) recebe o foco, sem contorno. Nas boas-vindas, quem recebe o foco é a pergunta de cada passo.
+- **Refs em objeto:** o lint do React Compiler acusa `ref={refs.email}` vindo de um objeto criado na renderização. Use uma `useRef` por campo.
+- **`window.scrollTo` no jsdom:** não existe; o `ScrollRestoration` o chama a cada tela, e `src/test/setup.js` o substitui por uma função vazia.
 - **Roteiro de fiado do seed:** pagamentos roteirizados abatem em FIFO tudo o que estiver aberto naquele dia, então um pagamento "tudo" depois de uma compra nova quita as duas. Ao mexer no `FIADO_SCRIPT`, confira o status final de cada cliente (o teste do seed exige todos os status).
 
 ## Estado atual e próximos passos
 
-- **Concluído:** Fases 1 (fundação), 2 (design system) e 3 (domínio e dados). O catálogo vivo ainda é renderizado direto pelo `App.jsx`, sem roteador.
-- **Próxima:** Fase 4 (roteador, layout, sessão e login simulado), em que `/design-system` vira uma rota e o `DataProvider` passa a envolver a área logada.
-- **Já pronto para reaproveitar:** regras em `domain/rules/` (mapa em `docs/regras-de-negocio.md`), constantes em `domain/constants.js`, serviços em `services/` (com `ApiError` e `configureApi`), o `DataProvider` e os hooks `useSales`, `useProducts`, `useCustomers`, `useFiado`, `useCash`, `useSettings` e `useDataStatus`; `lib/date.js`, `lib/format.js`, `lib/id.js`, `lib/cx.js`, os presets de status em `components/ui/StatusPill/statusPresets.js`, `useToast`, `usePreferences` e `useSpeech`.
+- **Concluído:** Fases 1 (fundação), 2 (design system), 3 (domínio e dados) e 4 (shell e navegação). O app tem roteador, sessão simulada (entrar, demonstração, criar conta, sair), boas-vindas, layout do celular e do computador, "Mais", 404 e tela de erro. As áreas das fases seguintes já têm rota e arquivo em `features/<área>/pages/`, com o conteúdo provisório `ComingSoon`.
+- **Próxima:** Fase 5 (Vender): substituir `SellPage`, `SalesPage` e `SaleDetailPage` (em `features/sales/pages/`) pelas telas reais. Leia as "Notas da Fase 3 para esta fase" no plano.
+- **Já pronto para reaproveitar:** regras em `domain/rules/` (mapa em `docs/regras-de-negocio.md`), constantes em `domain/constants.js`, serviços em `services/` (com `ApiError` e `configureApi`), o `DataProvider` e os hooks `useSales`, `useProducts`, `useCustomers`, `useFiado`, `useCash`, `useSettings`, `useDataStatus`, `useSession` e `useLogout`; `ROUTES` (`app/routes.js`); o layout (`PageHeader`, `CenteredLayout`...); `lib/date.js`, `lib/format.js`, `lib/id.js`, `lib/cx.js`, os presets de status em `components/ui/StatusPill/statusPresets.js`, `useToast`, `usePreferences` e `useSpeech`.
 - Ao concluir cada fase: atualize esta seção, o status em `docs/plano-de-implementacao.md` e o Roadmap do `README.md`, e faça **um commit por fase**.
 
 ## Documentação relacionada

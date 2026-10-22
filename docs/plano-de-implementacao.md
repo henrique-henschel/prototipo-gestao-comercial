@@ -24,9 +24,9 @@ Decisões fechadas com o dono do produto:
 | ---- | ------------------------------------- | ------------ |
 | 1    | Fundação                              | ✅ `6a60070` |
 | 2    | Design system                         | ✅ `590c2e6` |
-| 3    | Domínio e dados                       | ✅           |
-| 4    | Shell e navegação                     | ⏳ próxima   |
-| 5    | Vender                                | ⏳           |
+| 3    | Domínio e dados                       | ✅ `7794f72` |
+| 4    | Shell e navegação                     | ✅           |
+| 5    | Vender                                | ⏳ próxima   |
 | 6    | Fiado e clientes                      | ⏳           |
 | 7    | Estoque                               | ⏳           |
 | 8    | Caixa e despesas                      | ⏳           |
@@ -60,15 +60,18 @@ Ao concluir uma fase: marque aqui e no Roadmap do `README.md`, atualize a seçã
 
 ```
 src/
-  app/            config.js ✅, router.jsx, providers.jsx, routes.js
+  app/            ✅ config.js, routes.js, router.js, providers.jsx, guards.jsx, RootLayout.jsx
   styles/         index.css ✅, reset ✅, tokens ✅, base ✅, utilities ✅, animations ✅, print.css (Fase 10)
   components/
     ui/           ✅ 25 primitivos + index.js (ver docs/design-system.md)
-    layout/       AppShell, Sidebar, BottomNav, TopBar, PageHeader, SkipLink (Fase 4)
+    layout/       ✅ AppShell, Sidebar, BottomNav, TopBar, PageHeader, CenteredLayout, Brand,
+                  SkipLink, NavigationProgress, ComingSoon + navigation.js
     charts/       ChartCard, RevenueBarChart, PaymentDonut, TopProductsChart, Sparkline (Fase 9)
   features/
     design-system/ ✅ catálogo vivo
-    auth/         Entrar, Cadastro, BoasVindas (Fase 4)
+    auth/         ✅ LoginPage, SignupPage, OnboardingPage
+    more/         ✅ MorePage ("Mais" do celular)
+    errors/       ✅ NotFoundPage, RouteErrorPage
     dashboard/    (Fase 9)
     sales/        Vender, Carrinho, Pagamento, VendaConcluida, HistoricoVendas, DetalheVenda (Fase 5)
     fiado/        QuemDeve, ContaCliente, ReceberPagamento (Fase 6)
@@ -84,10 +87,10 @@ src/
     rules/        ✅ money, sales, payments, fiado, customers, stock, cash, period, metrics, settings
   mocks/          ✅ random.js (mulberry32), seed.js, db.js
   services/       ✅ api.js + auth, products, sales, customers, fiado, cash, reports, settings
-  store/          ToastProvider ✅, PreferencesProvider ✅, DataProvider ✅; SessionProvider (Fase 4)
+  store/          ✅ ToastProvider, PreferencesProvider, DataProvider, SessionProvider
   hooks/          useToast ✅, usePreferences ✅, useSpeech ✅, useData/useSales/useProducts/useCustomers/
-                  useFiado/useCash/useSettings ✅; useMediaQuery, useUndo, useVibrate...
-  lib/            cx ✅, date ✅, format ✅, id ✅; csv, whatsapp, share, viewTransition
+                  useFiado/useCash/useSettings ✅, useSession/useLogout ✅; useMediaQuery, useUndo, useVibrate...
+  lib/            cx ✅, date ✅, format ✅, id ✅; csv, whatsapp, share
 scripts/          screenshot.mjs ✅ (verificação visual)
 ```
 
@@ -135,10 +138,11 @@ Os presets visuais desses status já existem em `src/components/ui/StatusPill/st
 | `/relatorios`                               | Relatórios                 | filtros, prévia e exportações                                                                                                             |
 | `/ajustes`                                  | Ajustes                    | negócio, Pix, formas e taxas, regras, acessibilidade, modo demonstração e restaurar dados                                                 |
 | `/ajuda`                                    | Ajuda                      | perguntas frequentes e refazer o tour                                                                                                     |
-| `/design-system`                            | Catálogo vivo              | ✅ já existe; hoje é renderizado direto pelo `App.jsx`                                                                                    |
+| `/mais`                                     | Mais (celular)             | ✅ as áreas que não cabem na barra de baixo, a conta e "Sair"                                                                             |
+| `/design-system`                            | Catálogo vivo              | ✅ rota pública                                                                                                                           |
 | `*`                                         | 404 amigável               |                                                                                                                                           |
 
-Navegação: no **celular**, BottomNav com Início, Fiado, **Vender** (central, em destaque), Estoque e Mais. No **desktop/tablet**, Sidebar com ícone e rótulo. As rotas são protegidas pelo `SessionProvider` simulado. Os avisos ficam acima da BottomNav via `--toast-offset`.
+Navegação: no **celular**, BottomNav com Início, Fiado, **Vender** (central, em destaque), Estoque e Mais. No **desktop/tablet** (a partir de 768px), Sidebar com ícone e rótulo. As rotas são protegidas pelo `SessionProvider` simulado: sem sessão, a pessoa vai para `/entrar?voltar=<tela pedida>` e volta para lá depois de entrar. Os avisos ficam acima da BottomNav via `--toast-offset`.
 
 ## 6. Princípios de UX
 
@@ -169,9 +173,18 @@ Entregue conforme abaixo e detalhado na seção 3. Decisões tomadas durante a f
 5. `services/`: auth, products, sales, customers, fiado, cash, reports e settings; `async`, com latência configurável e modos de erro e lentidão.
 6. `store/DataProvider` (padrão de três arquivos) e hooks de consumo (`useProducts`, `useSales`, `useCustomers`, `useFiado`, `useCash`...).
 
-### Fase 4: Shell e navegação
+### ✅ Fase 4: Shell e navegação
 
-`app/router.jsx` com rotas lazy, `providers.jsx`, `routes.js`; AppShell, Sidebar, BottomNav, TopBar, PageHeader e SkipLink; `SessionProvider` e login, cadastro e onboarding simulados; 404; View Transitions nas trocas de rota (`lib/viewTransition.js`); `/design-system` vira rota. Atualizar o `App.test.jsx`.
+`app/router.js` com rotas carregadas sob demanda (`lazy`), `providers.jsx`, `routes.js` (caminhos e `safeReturnPath`) e `guards.jsx` (`RequireAuth`, `RequireOnboarded`, `PublicOnly`); AppShell, Sidebar, BottomNav, TopBar, PageHeader, SkipLink, NavigationProgress e CenteredLayout; `SessionProvider` (padrão de três arquivos) com entrar, conta de demonstração, criar conta e sair; boas-vindas em 3 passos; "Mais"; 404 e tela de erro; `/design-system` como rota pública. O `App.test.jsx` cobre guardas, login, cadastro e boas-vindas, navegação, sair e 404.
+
+Decisões tomadas durante a fase:
+
+- **View Transitions com o `<ViewTransition>` do React** em volta do conteúdo do `AppShell`. A v8 do React Router marcou como obsoleta a opção `viewTransition` dos links e recomenda o componente do React (19.3+); por isso não existe `lib/viewTransition.js`. O movimento reduzido é tratado em `styles/animations.css`.
+- **`DataProvider` só na área logada** (dentro de `RequireAuth`): os dados carregam depois de entrar, e sair descarta tudo.
+- **Sessão só em memória**, como o resto: recarregar a página sai da conta. O `?voltar=` devolve a pessoa à tela que ela tinha aberto.
+- **Telas das próximas fases** já têm rota e arquivo em `features/<área>/pages/`, com o componente `ComingSoon` (cabeçalho real + aviso "Esta tela está sendo construída"). Cada fase substitui o conteúdo do arquivo.
+- **Boas-vindas**: o último passo pergunta se a pessoa quer começar com os dados de exemplo; desligado, o negócio começa vazio (`createEmptyData`). Uma conta nova começa sem nome de negócio e sem categorias.
+- **Foco na troca de tela**: o `<main>` recebe o foco (sem contorno), para o leitor de tela anunciar a tela nova; nas boas-vindas, o foco vai para a pergunta de cada passo.
 
 ### Fase 5: Vender (fluxo crítico)
 

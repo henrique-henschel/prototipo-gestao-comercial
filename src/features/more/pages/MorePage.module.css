@@ -1,0 +1,104 @@
+@layer components {
+  .list {
+    display: grid;
+    gap: var(--space-3);
+    container-type: inline-size;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    min-block-size: var(--tap-hero);
+  }
+
+  .icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    inline-size: 3rem;
+    aspect-ratio: 1;
+    border-radius: var(--radius-md);
+    background: var(--color-primary-soft);
+    color: var(--color-primary-text);
+  }
+
+  .text {
+    display: grid;
+    flex: 1;
+    min-inline-size: 0;
+  }
+
+  .label {
+    font-weight: var(--weight-bold);
+    font-size: var(--text-lg);
+    line-height: var(--leading-snug);
+    overflow-wrap: break-word;
+  }
+
+  .description {
+    color: var(--text-2);
+    font-size: var(--text-sm);
+    overflow-wrap: break-word;
+  }
+
+  .chevron {
+    flex-shrink: 0;
+    color: var(--text-3);
+  }
+
+  /* Texto grande em tela estreita: ícone menor e sem a seta, para sobrar espaço para as palavras. */
+  @container (width < 16rem) {
+    .row {
+      gap: var(--space-3);
+    }
+
+    .icon {
+      inline-size: 2.25rem;
+    }
+
+    .chevron {
+      display: none;
+    }
+  }
+
+  .account {
+    display: grid;
+    gap: var(--space-3);
+    margin-block-start: var(--space-8);
+  }
+
+  .sectionTitle {
+    font-size: var(--text-lg);
+  }
+
+  .accountCard {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-inline-size: 0;
+  }
+
+  .userText {
+    min-inline-size: 0;
+  }
+
+  .footer {
+    margin-block-start: var(--space-8);
+    text-align: center;
+  }
+
+  .footerLink {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-block-size: var(--tap-min);
+    font-size: var(--text-sm);
+    color: var(--text-2);
+  }
+}

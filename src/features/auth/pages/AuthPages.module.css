@@ -1,0 +1,17 @@
+@layer components {
+  .form {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .demo {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .hint {
+    color: var(--text-2);
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+}

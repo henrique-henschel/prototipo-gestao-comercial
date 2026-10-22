@@ -68,3 +68,21 @@
   inherits: true;
   initial-value: 0%;
 }
+
+/*
+ * Troca de tela: o <ViewTransition> do React (no AppShell) faz um cross-fade curto.
+ * O reset não alcança os pseudo-elementos da transição, então o movimento reduzido
+ * é tratado aqui.
+ */
+::view-transition-group(*) {
+  animation-duration: var(--dur-slow);
+  animation-timing-function: var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

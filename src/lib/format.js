@@ -4,6 +4,7 @@ import { diffInDays, parseISODate, today } from './date.js';
 const dateShort = new Intl.DateTimeFormat(LOCALE, { day: '2-digit', month: '2-digit', year: 'numeric' });
 const dateLong = new Intl.DateTimeFormat(LOCALE, { weekday: 'long', day: 'numeric', month: 'long' });
 const dateDayMonth = new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 'short' });
+const dateMedium = new Intl.DateTimeFormat(LOCALE, { weekday: 'short', day: 'numeric', month: 'short' });
 const time = new Intl.DateTimeFormat(LOCALE, { hour: '2-digit', minute: '2-digit' });
 const number = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 3 });
 const percent = new Intl.NumberFormat(LOCALE, { style: 'percent', maximumFractionDigits: 1 });
@@ -16,6 +17,11 @@ export function formatDate(iso) {
 /** "quarta-feira, 21 de outubro" */
 export function formatDateLong(iso) {
   return dateLong.format(parseISODate(iso));
+}
+
+/** "qua., 21 de out." */
+export function formatDateMedium(iso) {
+  return dateMedium.format(parseISODate(iso));
 }
 
 /** "21 de out." */

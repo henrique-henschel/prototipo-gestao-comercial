@@ -1,0 +1,117 @@
+@layer components {
+  .sidebar {
+    display: none;
+  }
+
+  @media (width >= 48rem) {
+    .sidebar {
+      position: sticky;
+      inset-block-start: 0;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+      block-size: 100dvh;
+      padding: var(--space-5) var(--space-4);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      border-inline-end: var(--border-width) solid var(--border-1);
+      background: var(--surface-1);
+    }
+  }
+
+  .brandLink {
+    display: flex;
+    min-inline-size: 0;
+    padding: var(--space-1);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+  }
+
+  .sell[aria-current='page'] {
+    outline: 3px solid color-mix(in oklch, var(--color-primary) 40%, transparent);
+    outline-offset: 2px;
+  }
+
+  .nav {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-5);
+  }
+
+  .list {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-block-size: var(--tap-min);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    color: var(--text-2);
+    font-weight: var(--weight-bold);
+    text-decoration: none;
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+
+    & svg {
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      background: var(--surface-2);
+      color: var(--text-1);
+    }
+
+    &[aria-current='page'] {
+      background: var(--color-primary-soft);
+      color: var(--color-primary-text);
+      box-shadow: inset 4px 0 0 var(--color-primary);
+    }
+  }
+
+  .account {
+    display: grid;
+    gap: var(--space-2);
+    padding-block-start: var(--space-4);
+    border-block-start: var(--border-width) solid var(--border-1);
+  }
+
+  .user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-inline-size: 0;
+  }
+
+  .userText {
+    min-inline-size: 0;
+  }
+
+  .userName,
+  .userEmail {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .userName {
+    font-weight: var(--weight-bold);
+  }
+
+  .userEmail {
+    font-size: var(--text-sm);
+    color: var(--text-2);
+  }
+
+  @media (forced-colors: active) {
+    .link[aria-current='page'] {
+      outline: 2px solid Highlight;
+    }
+  }
+}

@@ -1,0 +1,53 @@
+@layer components {
+  /*
+   * Celular: uma coluna (TopBar, conteúdo) e a BottomNav fixa embaixo.
+   * minmax(0, 1fr): conteúdo rolável (chips, tabelas) nunca alarga a página.
+   */
+  .shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    min-block-size: 100dvh;
+  }
+
+  /* Os avisos ficam acima da barra de baixo enquanto ela existir. */
+  :root:has(.shell) {
+    --toast-offset: var(--bottomnav-height);
+  }
+
+  .main {
+    min-inline-size: 0;
+    padding-block-end: calc(var(--bottomnav-height) + env(safe-area-inset-bottom) + var(--space-6));
+
+    /* O foco programático (troca de tela) não precisa de contorno no conteúdo inteiro. */
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .page {
+    inline-size: 100%;
+    max-inline-size: var(--content-max);
+    margin-inline: auto;
+    padding: var(--space-6) var(--gutter);
+  }
+
+  @media (width >= 48rem) {
+    .shell {
+      grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+      grid-template-rows: minmax(0, 1fr);
+    }
+
+    :root:has(.shell) {
+      --toast-offset: 0px;
+    }
+
+    .main {
+      padding-block-end: var(--space-12);
+    }
+
+    .page {
+      padding-block-start: var(--space-8);
+    }
+  }
+}

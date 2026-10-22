@@ -1,0 +1,53 @@
+@layer components {
+  .page {
+    display: grid;
+    align-content: start;
+    justify-items: center;
+    gap: var(--space-6);
+    min-block-size: 100dvh;
+    padding: var(--space-8) var(--gutter) var(--space-12);
+    background:
+      radial-gradient(
+        ellipse 80% 45% at 50% 0%,
+        color-mix(in oklch, var(--color-primary-soft) 80%, transparent),
+        transparent
+      ),
+      var(--surface-page);
+  }
+
+  @media (height >= 44rem) and (width >= 48rem) {
+    .page {
+      padding-block-start: var(--space-16);
+    }
+  }
+
+  .header {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-2);
+    text-align: center;
+  }
+
+  .tagline {
+    max-inline-size: 26ch;
+    color: var(--text-2);
+    font-size: var(--text-lg);
+  }
+
+  .main {
+    inline-size: 100%;
+    min-inline-size: 0;
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .sm {
+    max-inline-size: 30rem;
+  }
+
+  .md {
+    max-inline-size: 40rem;
+  }
+}

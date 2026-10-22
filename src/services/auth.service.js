@@ -56,7 +56,8 @@ export function signup({ name, email, password }) {
     if (!cleanEmail || !password) throw new ApiError('login_incompleto');
     if (!name?.trim()) throw new ApiError('nome_obrigatorio');
     db.user = { id: createId('user'), name: name.trim(), email: cleanEmail };
-    db.business = { ...db.business, ownerName: db.user.name, onboarded: false };
+    // Conta nova: o negócio é descrito nas boas-vindas, então começa sem nome nem categorias.
+    db.business = { ...db.business, name: '', sells: [], ownerName: db.user.name, onboarded: false };
     return { user: db.user, token: `demo-${db.user.id}`, onboarded: false };
   });
 }

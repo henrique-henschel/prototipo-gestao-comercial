@@ -1,0 +1,102 @@
+@layer components {
+  .bottomNav {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: var(--z-nav);
+    padding-block-end: env(safe-area-inset-bottom);
+    border-block-start: var(--border-width) solid var(--border-1);
+    background: color-mix(in oklch, var(--surface-1) 94%, transparent);
+    backdrop-filter: blur(12px);
+  }
+
+  @media (width >= 48rem) {
+    .bottomNav {
+      display: none;
+    }
+  }
+
+  .list {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    block-size: var(--bottomnav-height);
+  }
+
+  .item {
+    display: flex;
+    min-inline-size: 0;
+    container-type: inline-size;
+  }
+
+  .link {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    min-inline-size: 0;
+    color: var(--text-2);
+    text-decoration: none;
+
+    &:active .icon {
+      scale: 0.92;
+    }
+  }
+
+  .icon {
+    display: grid;
+    place-items: center;
+    inline-size: min(3.25rem, 100cqi);
+    block-size: 2rem;
+    border-radius: var(--radius-pill);
+    transition:
+      background-color var(--dur-fast) var(--ease-out),
+      scale var(--dur-fast) var(--ease-out);
+  }
+
+  .label {
+    max-inline-size: 100%;
+    /* Cresce com o tamanho do texto, mas para antes de não caber na largura do item. */
+    font-size: min(var(--text-xs), 21cqi);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .active {
+    color: var(--color-primary-text);
+
+    .icon {
+      background: var(--color-primary-soft);
+    }
+  }
+
+  /* Vender: botão redondo saltado, a ação mais importante do app. */
+  .sell {
+    color: var(--text-1);
+
+    .icon {
+      inline-size: min(3.5rem, 92cqi);
+      block-size: min(3.5rem, 92cqi);
+      margin-block-start: calc(var(--space-6) * -1);
+      border: 4px solid var(--surface-1);
+      background: var(--color-primary);
+      color: var(--color-on-primary);
+      box-shadow: var(--shadow-2);
+    }
+
+    &.active .icon {
+      background: var(--color-primary);
+      outline: 3px solid color-mix(in oklch, var(--color-primary) 35%, transparent);
+    }
+  }
+
+  @media (forced-colors: active) {
+    .active .icon,
+    .sell .icon {
+      outline: 2px solid Highlight;
+    }
+  }
+}

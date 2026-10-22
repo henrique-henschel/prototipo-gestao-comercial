@@ -29,7 +29,7 @@ Para quem vende na rua, na feira, na barraca, no carrinho ou numa lojinha, e pre
 | **Relatórios**         | Por período e por tipo; exportação em Excel (CSV), PDF (impressão) e compartilhamento                                                                          |
 | **Ajustes**            | Dados do negócio, chave Pix, taxas da maquininha, regras de estoque, acessibilidade, modo demonstração                                                         |
 
-> As funcionalidades são entregues em fases (veja o [Roadmap](#roadmap)). As Fases 1 (fundação), 2 (design system) e 3 (domínio e dados: regras testadas, dados de exemplo, serviços e estado global) estão concluídas: rode `npm run dev` para ver o catálogo vivo de componentes.
+> As funcionalidades são entregues em fases (veja o [Roadmap](#roadmap)). As Fases 1 a 4 estão concluídas: fundação, design system, domínio e dados (regras testadas, dados de exemplo, serviços e estado global) e a navegação (entrar, criar conta, boas-vindas, menus do celular e do computador). As telas de cada área chegam a partir da Fase 5; o catálogo vivo de componentes fica em `/design-system`.
 
 ## Como rodar
 
@@ -40,7 +40,7 @@ npm install
 npm run dev
 ```
 
-Acesse `http://localhost:5173`. Quando a autenticação simulada existir (Fase 4), haverá o botão **"Entrar com conta de demonstração"**, e qualquer e-mail e senha também serão aceitos.
+Acesse `http://localhost:5173` e toque em **"Entrar com conta de demonstração"** para ver o app com os dados de exemplo da "Barraca da Rosa". Qualquer e-mail e senha também entram, e **"Criar conta"** mostra as boas-vindas, com a opção de começar do zero. Como nada é salvo, recarregar a página sai da conta e volta aos dados de exemplo.
 
 ### Scripts
 
@@ -110,7 +110,7 @@ O detalhamento de cada fase está em [`docs/plano-de-implementacao.md`](./docs/p
 | 1    | Fundação: Vite, React, ESLint, Prettier, Vitest, fonte, documentação | ✅ Concluída |
 | 2    | Design system: tokens, componentes `ui/`, página `/design-system`    | ✅ Concluída |
 | 3    | Domínio e dados: modelos, regras + testes, seed, serviços, store     | ✅ Concluída |
-| 4    | Shell e navegação: layout, rotas, login simulado, boas-vindas        | ⏳           |
+| 4    | Shell e navegação: layout, rotas, login simulado, boas-vindas        | ✅ Concluída |
 | 5    | Vender: PDV, carrinho, pagamentos, venda concluída, histórico        | ⏳           |
 | 6    | Fiado e clientes                                                     | ⏳           |
 | 7    | Estoque                                                              | ⏳           |

@@ -1,6 +1,6 @@
 # Design system
 
-Referência visual e de interação da Caderneta. A versão viva, com todos os componentes renderizados e interativos, fica na rota `/design-system`. Até a Fase 4, ela é a página inicial do app.
+Referência visual e de interação da Caderneta. A versão viva, com todos os componentes renderizados e interativos, fica na rota pública `/design-system` (também há um link no fim da tela "Mais").
 
 > Mantenha este documento sincronizado com `src/styles/tokens.css` e `src/components/ui/`.
 
@@ -122,11 +122,27 @@ Importe sempre pelo índice: `import { Button, MoneyInput } from '@/components/u
 
 Hooks e estado relacionados: `useToast`, `usePreferences`, `useSpeech` (`src/hooks/`); `ToastProvider` e `PreferencesProvider` (`src/store/`).
 
-## Layout (Fase 4)
+## Layout (`src/components/layout/`)
 
-- **Celular** (a partir de 360px): `TopBar` + conteúdo + `BottomNav` com 5 itens (Início, Fiado, **Vender** em destaque no centro, Estoque, Mais). Os avisos usam `--toast-offset` para ficar acima da navegação.
-- **Tablet e desktop**: `Sidebar` com ícone + rótulo; o PDV fica em duas colunas (produtos | carrinho).
+Importe pelo índice: `import { PageHeader } from '@/components/layout';`
+
+- **Celular** (a partir de 360px): `TopBar` + conteúdo + `BottomNav` com 5 itens (Início, Fiado, **Vender** em destaque no centro, Estoque, Mais). Os avisos usam `--toast-offset` para ficar acima da navegação (definido pelo `AppShell` com `:root:has(...)`).
+- **Tablet e computador** (a partir de 48rem = 768px): `Sidebar` com marca, "Vender" em destaque, as áreas com ícone + rótulo e a conta. O PDV ficará em duas colunas (produtos | carrinho).
 - Container queries nos componentes; media queries só para o esqueleto da página. Colunas de grid com `minmax(0, 1fr)`, para que conteúdo rolável não alargue a página.
+- **Texto grande em tela estreita** ("Enorme" a 360px equivale a uns 240px): os rótulos da `BottomNav` crescem até caber na largura do item (`min(var(--text-xs), 21cqi)`), o logo da `TopBar` sai quando falta espaço (container query no `Brand` com `wrap`) e a lista de "Mais" esconde a seta. Palavras nunca são cortadas no meio: use `overflow-wrap: break-word`, não `anywhere`.
+
+| Componente           | Uso e decisões                                                                                                                                       |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `AppShell`           | Esqueleto da área logada. Envolve o conteúdo no `<ViewTransition>` do React (cross-fade na troca de tela) e põe o foco no `<main>` a cada tela nova. |
+| `Sidebar`            | Barra lateral do computador. Itens em `navigation.js`; tela atual marcada por `aria-current="page"` (fundo suave + filete à esquerda).               |
+| `BottomNav`          | Barra de baixo do celular. "Mais" fica marcado também nas telas que moram dentro dele (Vendas, Clientes...).                                         |
+| `TopBar`             | Barra de cima do celular: nome do negócio, data curta ("qui., 22 de out.") e "Ajuda".                                                                |
+| `PageHeader`         | `h1`, frase de apoio, ações (largura toda no celular) e "Voltar" opcional. Também define o título da aba (`<title>` do React 19).                    |
+| `CenteredLayout`     | Telas fora da área logada (entrar, cadastro, boas-vindas, 404, erro): marca no topo e conteúdo centralizado (`sm` ou `md`).                          |
+| `Brand`              | Logo + nome. `subtitle` para uma segunda linha; `wrap` deixa o título em até duas linhas e esconde o logo quando falta espaço.                       |
+| `SkipLink`           | "Pular para o conteúdo", visível só com foco do teclado.                                                                                             |
+| `NavigationProgress` | Faixa no topo enquanto a próxima tela (carregada sob demanda) chega, com "Carregando…" para leitores de tela.                                        |
+| `ComingSoon`         | Conteúdo provisório das telas das próximas fases.                                                                                                    |
 
 ## Gráficos (Fase 9)
 

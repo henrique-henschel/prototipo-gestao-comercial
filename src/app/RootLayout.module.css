@@ -1,0 +1,16 @@
+@layer components {
+  .loading {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: var(--space-3);
+    min-block-size: 100dvh;
+    color: var(--text-2);
+    font-weight: var(--weight-bold);
+  }
+
+  .spinner {
+    color: var(--color-primary);
+    animation: spin 0.9s linear infinite;
+  }
+}

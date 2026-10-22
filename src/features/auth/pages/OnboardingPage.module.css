@@ -1,0 +1,74 @@
+@layer components {
+  .form {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .progress {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .stepCount {
+    color: var(--text-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+  }
+
+  .step {
+    display: grid;
+    gap: var(--space-4);
+    min-inline-size: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .title {
+    font-size: var(--text-2xl);
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  .description {
+    margin-block-start: calc(var(--space-2) * -1);
+    color: var(--text-2);
+  }
+
+  .switches {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .sample {
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--color-info-soft);
+  }
+
+  .error {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--color-danger-text);
+    font-weight: var(--weight-bold);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+
+  .next {
+    flex: 1;
+    margin-inline-start: auto;
+  }
+
+  .skeletonGap {
+    margin-block: var(--space-4);
+  }
+}
