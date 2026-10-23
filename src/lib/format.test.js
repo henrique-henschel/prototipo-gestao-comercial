@@ -2,10 +2,12 @@ import { addDays, dateOf, diffInDays, eachDay, endOfMonth, startOfMonth, toISODa
 import {
   formatDate,
   formatDateMedium,
+  formatDayOfMonth,
   formatPercent,
   formatPhone,
   formatQuantity,
   formatRelativeDay,
+  formatWeekdayShort,
   plural,
 } from './format.js';
 
@@ -37,6 +39,8 @@ describe('format', () => {
     expect(formatDate('2026-10-05')).toBe('05/10/2026');
     expect(formatDateMedium('2026-10-21')).toBe('qua., 21 de out.');
     expect(formatPercent(0.125)).toBe('12,5%');
+    expect(formatWeekdayShort('2026-10-21')).toBe('qua');
+    expect(formatDayOfMonth('2026-10-01')).toBe('1');
   });
 
   it('descreve o dia relativo em linguagem simples', () => {

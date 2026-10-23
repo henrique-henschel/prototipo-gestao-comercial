@@ -107,8 +107,33 @@ describe('métricas', () => {
       difference: 1200,
       percent: 1200 / 1800,
     });
+    expect(comparison.received).toMatchObject({
+      current: comparison.current.receivedCents,
+      previous: comparison.previous.receivedCents,
+    });
     expect(compareValues(10, 0).percent).toBeNull();
     expect(compareValues(-50, -100).percent).toBe(0.5);
+  });
+
+  it('7 compara hoje com ontem até a mesma hora', () => {
+    const cash = (day, hour, total) => ({
+      ...sale(day, { total, items: [], payments: [{ method: 'dinheiro', amountCents: total }] }),
+      createdAt: at(day, hour),
+    });
+    const list = [cash(20, 9, 1000), cash(20, 15, 5000), cash(21, 9, 1500)];
+    const input = {
+      sales: list,
+      fiadoPayments: [],
+      expenses: [],
+      period: { start: '2026-10-21', end: '2026-10-21' },
+    };
+    expect(compareWithPrevious(input).sold.previous).toBe(6000);
+    expect(compareWithPrevious(input, { now: at(21, 12) }).sold).toMatchObject({
+      previous: 1000,
+      difference: 500,
+    });
+    // Período que não termina hoje: compara os dias inteiros.
+    expect(compareWithPrevious(input, { now: at(22, 12) }).sold.previous).toBe(6000);
   });
 
   it('monta a série diária com zeros nos dias sem venda', () => {

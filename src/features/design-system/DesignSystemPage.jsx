@@ -18,6 +18,7 @@ const NAV = [
   { id: 'selecao', label: 'Seleção' },
   { id: 'status', label: 'Status' },
   { id: 'cards', label: 'Cards' },
+  { id: 'graficos', label: 'Gráficos' },
   { id: 'feedback', label: 'Feedback' },
   { id: 'sobreposicoes', label: 'Janelas e ajuda' },
   { id: 'diversos', label: 'Pessoas e busca' },

@@ -50,6 +50,7 @@ import {
 import { useToast } from '@/hooks/useToast.js';
 import { formatBRL } from '@/domain/rules/money.js';
 import { addDays, today } from '@/lib/date.js';
+import { ChartsSection } from './ChartDemos.jsx';
 import { Example, Section } from './Showcase.jsx';
 import styles from './DesignSystemPage.module.css';
 
@@ -83,6 +84,7 @@ export function ComponentDemos() {
       <SelectionSection />
       <StatusSection />
       <CardsSection />
+      <ChartsSection />
       <FeedbackSection />
       <OverlaysSection />
       <MiscSection />

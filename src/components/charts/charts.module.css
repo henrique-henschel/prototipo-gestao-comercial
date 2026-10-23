@@ -1,0 +1,297 @@
+@layer components {
+  /* ---------- ChartCard ---------- */
+  .card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+    container-type: inline-size;
+  }
+
+  .header {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+  }
+
+  .summary {
+    color: var(--text-2);
+
+    & strong {
+      color: var(--text-1);
+      font-size: var(--text-lg);
+    }
+  }
+
+  .plot {
+    min-inline-size: 0;
+  }
+
+  .details {
+    border-block-start: var(--border-width) solid var(--border-1);
+    padding-block-start: var(--space-3);
+
+    & > summary {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      min-block-size: var(--tap-min);
+      color: var(--color-primary-text);
+      font-weight: var(--weight-bold);
+      cursor: pointer;
+    }
+  }
+
+  .tableWrap {
+    overflow-x: auto;
+    margin-block-start: var(--space-2);
+  }
+
+  .table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+
+    & th,
+    & td {
+      padding: var(--space-2) var(--space-3);
+      border-block-end: var(--border-width) solid var(--border-1);
+      text-align: start;
+    }
+
+    & thead th {
+      color: var(--text-2);
+    }
+
+    & tbody th {
+      font-weight: var(--weight-regular);
+    }
+
+    & .numeric {
+      text-align: end;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+  }
+
+  /* ---------- Plotagem (Recharts) ---------- */
+  .frame {
+    inline-size: 100%;
+    min-inline-size: 0;
+
+    /* Texto dos eixos nos tokens de texto (nunca a cor da série). */
+    & :global(.recharts-cartesian-axis-tick-value) {
+      fill: var(--text-2);
+      font-size: var(--text-xs);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  .tooltip {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-width) solid var(--border-2);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    box-shadow: var(--shadow-2);
+    color: var(--text-1);
+    font-size: var(--text-sm);
+  }
+
+  .tooltipTitle {
+    color: var(--text-2);
+  }
+
+  .tooltipRows {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .tooltipRow {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Traço da cor da série: identifica sem pintar o texto. */
+  .key {
+    flex-shrink: 0;
+    inline-size: 0.875rem;
+    block-size: 0.1875rem;
+    border-radius: var(--radius-pill);
+  }
+
+  .tooltipName {
+    color: var(--text-2);
+  }
+
+  /* ---------- DonutChart ---------- */
+  .donut {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: var(--space-4);
+  }
+
+  @container (width >= 30rem) {
+    .donut {
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+    }
+  }
+
+  .donutPlot {
+    position: relative;
+    inline-size: min(12.5rem, 100%);
+    aspect-ratio: 1;
+  }
+
+  .donutCenter {
+    position: absolute;
+    inset: 22%;
+    display: grid;
+    place-content: center;
+    text-align: center;
+    pointer-events: none;
+
+    & span {
+      color: var(--text-2);
+      font-size: var(--text-sm);
+    }
+
+    & strong {
+      font-size: var(--text-md);
+      font-variant-numeric: tabular-nums;
+      overflow-wrap: break-word;
+    }
+  }
+
+  .legend {
+    display: grid;
+    justify-self: stretch;
+    gap: var(--space-2);
+  }
+
+  .legendRow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1) var(--space-2);
+    padding-block: var(--space-1);
+  }
+
+  .swatch {
+    flex-shrink: 0;
+    inline-size: 0.875rem;
+    aspect-ratio: 1;
+    border-radius: var(--radius-xs);
+  }
+
+  .legendIcon {
+    flex-shrink: 0;
+    color: var(--text-2);
+  }
+
+  .legendLabel {
+    flex: 1 1 6rem;
+    min-inline-size: 0;
+    overflow-wrap: break-word;
+  }
+
+  .legendValue {
+    display: inline-flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    margin-inline-start: auto;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .legendShare {
+    min-inline-size: 3.5em;
+    color: var(--text-2);
+    font-size: var(--text-sm);
+    text-align: end;
+  }
+
+  /* ---------- RankedBars ---------- */
+  .ranked {
+    display: grid;
+    gap: var(--space-3);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .rankedRow {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-1) var(--space-3);
+  }
+
+  .rankedPosition {
+    display: grid;
+    place-items: center;
+    inline-size: 1.75em;
+    aspect-ratio: 1;
+    border-radius: var(--radius-pill);
+    background: var(--surface-2);
+    color: var(--text-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+  }
+
+  .rankedText {
+    display: grid;
+    gap: var(--space-1);
+    min-inline-size: 0;
+  }
+
+  .rankedHead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 var(--space-3);
+  }
+
+  .rankedName {
+    flex: 1 1 8rem;
+    min-inline-size: 0;
+    font-weight: var(--weight-bold);
+    overflow-wrap: break-word;
+  }
+
+  .rankedDetail {
+    color: var(--text-2);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .rankedValue {
+    margin-inline-start: auto;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .rankedTrack {
+    grid-column: 2;
+    block-size: 0.5rem;
+    border-radius: var(--radius-pill);
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+
+  .rankedBar {
+    display: block;
+    block-size: 100%;
+    border-radius: var(--radius-pill);
+    background: var(--chart-1);
+  }
+}

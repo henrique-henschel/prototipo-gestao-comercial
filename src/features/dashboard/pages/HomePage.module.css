@@ -1,0 +1,162 @@
+@layer components {
+  .loading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: var(--space-4);
+  }
+
+  .cardTitle {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+  }
+
+  .muted {
+    color: var(--text-2);
+  }
+
+  /* ---------- Topo: hoje + avisos ---------- */
+  .top {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
+    gap: var(--space-4);
+    margin-block-end: var(--space-6);
+  }
+
+  @media (width >= 64rem) {
+    .top {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    }
+  }
+
+  .today {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    gap: var(--space-2);
+
+    & > a {
+      margin-block-start: var(--space-3);
+    }
+  }
+
+  .todayLabel {
+    color: var(--text-2);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+  }
+
+  .todayValue {
+    font-size: var(--text-money);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: break-word;
+  }
+
+  .allGood {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    color: var(--color-success-text);
+    font-weight: var(--weight-bold);
+
+    & svg {
+      flex-shrink: 0;
+      margin-block-start: 0.1em;
+    }
+  }
+
+  .alerts {
+    display: grid;
+  }
+
+  /* Selo e texto à esquerda, seta à direita: a seta nunca cai sozinha numa linha. */
+  .alert {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    justify-items: start;
+    gap: var(--space-2) var(--space-3);
+    min-block-size: var(--tap-min);
+    padding-block: var(--space-3);
+    border-block-end: var(--border-width) solid var(--border-1);
+    color: inherit;
+    text-decoration: none;
+
+    &:hover .alertText {
+      text-decoration: underline;
+    }
+  }
+
+  li:first-child > .alert {
+    padding-block-start: 0;
+  }
+
+  li:last-child > .alert {
+    padding-block-end: 0;
+    border-block-end: 0;
+  }
+
+  .alertText {
+    grid-column: 1;
+    min-inline-size: 0;
+    font-weight: var(--weight-bold);
+    overflow-wrap: break-word;
+  }
+
+  .nowrap {
+    white-space: nowrap;
+  }
+
+  .chevron {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    color: var(--text-2);
+  }
+
+  /* ---------- Período: indicadores e gráficos ---------- */
+  .period {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+    margin-block-end: var(--space-6);
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(8.5rem, 100%), 1fr));
+    gap: var(--space-3);
+  }
+
+  .charts {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-4);
+  }
+
+  @media (width >= 64rem) {
+    .charts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .wide {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* ---------- Atalhos ---------- */
+  .shortcuts {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(13rem, 100%), 1fr));
+    gap: var(--space-3);
+  }
+}

@@ -149,6 +149,19 @@ Importe pelo índice: `import { PageHeader } from '@/components/layout';`
 | `NavigationProgress` | Faixa no topo enquanto a próxima tela (carregada sob demanda) chega, com "Carregando…" para leitores de tela.                                        |
 | `ComingSoon`         | Conteúdo provisório das telas das próximas fases.                                                                                                    |
 
-## Gráficos (Fase 9)
+## Gráficos
 
-Recharts com cores de `--chart-*` e textos nos tokens de tipografia. Sempre com título em linguagem simples ("Quanto você vendeu nos últimos 7 dias"), valor principal escrito, tooltip ao passar o dedo ou o mouse e tabela alternativa. Nunca usar dois eixos Y.
+Recharts com cores de `--chart-*` e textos nos tokens de texto (nunca a cor da série). Sempre com título em linguagem simples ("Quanto você vendeu nos últimos 7 dias"), valor principal escrito, tooltip ao passar o dedo ou o mouse e tabela alternativa. Nunca usar dois eixos Y. Componentes em `src/components/charts/` (índice em `index.js`, exemplos em `/design-system#graficos`):
+
+| Componente     | Uso                                                                                                                                                                                                      |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ChartCard`    | Moldura de todo gráfico: `title`, `summary` (o valor principal escrito) e `table` (os mesmos números em "Ver os números", com `<details>`). O gráfico fica `aria-hidden`: a tabela é a versão acessível. |
+| `ColumnChart`  | Colunas de uma série (`--chart-1`), no máximo 24px de largura, ponta arredondada de 4px, grade horizontal discreta e eixo Y compacto (`formatBRL(v, { compact: true })`). Sem legenda.                   |
+| `DonutChart`   | Partes de um todo (até 6), total no meio e legenda escrita (cor, ícone, nome, valor e %). Vão de 2px da cor da superfície entre as fatias. Fatias zeradas somem.                                         |
+| `RankedBars`   | Ranking em HTML (mais vendidos): posição, nome, valor e barra proporcional ao maior. Sem espaço, o valor desce para baixo do nome. A lista já é acessível.                                               |
+| `ChartTooltip` | Conteúdo do tooltip: valor em destaque, nome em segundo plano e um traço da cor da série.                                                                                                                |
+
+- **Cor fixa por entidade:** cada forma de pagamento usa `--chart-${PAYMENT_METHODS[x].chartSlot}` em qualquer gráfico, e a cor nunca muda com o tamanho ou com um filtro.
+- **Ordem da rosca validada:** com 5 formas, nenhuma escolha de cores passa no validador da skill `dataviz` em todos os pares (Pix e débito, crédito e fiado são parecidos para daltônicos). A rosca usa a ordem fixa `PAYMENT_RING_ORDER` (Pix, crédito, débito, fiado, dinheiro), em que toda fatia vizinha passa, e a legenda escreve nome e valor de cada uma.
+- **Comparações em reais** nos indicadores ("R$ 12,00 a mais"), com a base escrita uma vez acima ("Comparando com ontem até esta hora"). Porcentagem confunde e perde o sentido quando o valor anterior é zero ou negativo.
+- **Recharts e reduzir movimento:** a animação do Recharts é feita em JavaScript, então os gráficos desligam `isAnimationActive` com `prefers-reduced-motion`. A camada de teclado do Recharts fica desligada (`accessibilityLayer={false}`), porque o gráfico está escondido do leitor de tela.

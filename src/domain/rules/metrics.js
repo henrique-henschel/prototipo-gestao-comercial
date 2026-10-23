@@ -81,17 +81,43 @@ export function compareValues(current, previous) {
   };
 }
 
+/** Milissegundos desde a meia-noite local de um instante. */
+function timeOfDay(iso) {
+  const date = new Date(iso);
+  return (
+    ((date.getHours() * 60 + date.getMinutes()) * 60 + date.getSeconds()) * 1000 + date.getMilliseconds()
+  );
+}
+
 /**
  * Indicadores do período e do período anterior de mesma duração, com as variações. Regra 7.
+ * Com `now`, quando o período termina hoje, o último dia do período anterior é cortado na
+ * mesma hora: às 10h, "hoje" é comparado com "ontem até as 10h", e não com o dia inteiro.
  * @param {{ sales: Sale[], fiadoPayments: FiadoPayment[], expenses: Expense[], period: Period }} input
+ * @param {{ now?: string }} [options] instante atual (ISO)
  */
-export function compareWithPrevious(input) {
+export function compareWithPrevious(input, { now } = {}) {
   const current = periodMetrics(input);
-  const previous = periodMetrics({ ...input, period: previousPeriod(input.period) });
+  const period = previousPeriod(input.period);
+  const sameTime = Boolean(now) && input.period.end === dateOf(now);
+  const cut = (records) =>
+    sameTime
+      ? records.filter(
+          (record) =>
+            dateOf(record.createdAt) !== period.end || timeOfDay(record.createdAt) <= timeOfDay(now),
+        )
+      : records;
+  const previous = periodMetrics({
+    sales: cut(input.sales),
+    fiadoPayments: cut(input.fiadoPayments),
+    expenses: cut(input.expenses),
+    period,
+  });
   return {
     current,
     previous,
     sold: compareValues(current.soldCents, previous.soldCents),
+    received: compareValues(current.receivedCents, previous.receivedCents),
     profit: compareValues(current.profitCents, previous.profitCents),
     salesCount: compareValues(current.salesCount, previous.salesCount),
     averageTicket: compareValues(current.averageTicketCents, previous.averageTicketCents),

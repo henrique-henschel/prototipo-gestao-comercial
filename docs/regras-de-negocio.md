@@ -124,7 +124,7 @@ Formas: `dinheiro`, `pix`, `debito`, `credito`, `fiado`. Cada forma pode ser des
 - **Taxas** = soma das taxas da maquininha das parcelas em cartão.
 - **Lucro estimado** = faturamento − custo das mercadorias − taxas − despesas.
 - **Ticket médio** = faturamento ÷ número de vendas.
-- **Comparativos**: sempre contra o período anterior de mesma duração ("hoje × ontem", "esta semana × semana passada").
+- **Comparativos**: sempre contra o período anterior de mesma duração ("hoje × ontem", "esta semana × semana passada"). Quando o período termina hoje, o último dia do período anterior é cortado na hora de agora (às 10h, hoje até as 10h × ontem até as 10h), para não comparar um dia pela metade com um dia inteiro. Vendido, recebido, lucro e ticket médio são comparados.
 
 ## 8. Relatórios e exportação
 
@@ -160,7 +160,7 @@ Funções puras em `src/domain/rules/`, cada uma com testes ao lado (`*.test.js`
 | 4. Clientes   | `customers.js` | `validateCustomer`, `normalizePhone`, `validateCustomerDeletion`, `canDeleteCustomer`                                                                                                                                                               |
 | 5. Estoque    | `stock.js`     | `stockStatus`, `calcMargin`, `unitProfit`, `isSellingAtLoss`, `validateProduct`, `parseQuantityFromDigits`, `previewMovement`, `applyMovement`, `validateUndoMovement`, `revertMovement`, `compareStockUrgency`, `findStockShortages`, `stockValue` |
 | 6. Caixa      | `cash.js`      | `summarizeCashDay`, `expectedCash`, `closingDifference`, `cashDayClosing`, `validateExpense`, `validateCashDayChange`                                                                                                                               |
-| 7. Métricas   | `metrics.js`   | `periodMetrics`, `compareWithPrevious`, `dailySeries`, `paymentMix`, `topProducts`                                                                                                                                                                  |
+| 7. Métricas   | `metrics.js`   | `periodMetrics`, `compareWithPrevious` (com `now`), `dailySeries`, `paymentMix`, `topProducts`                                                                                                                                                      |
 | 8. Períodos   | `period.js`    | `periodFromPreset`, `previousPeriod`, `filterByPeriod`                                                                                                                                                                                              |
 | 9. Ajustes    | `settings.js`  | `mergeSettings`, `validateSettings`                                                                                                                                                                                                                 |
 

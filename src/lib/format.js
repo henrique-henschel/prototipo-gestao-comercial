@@ -5,6 +5,8 @@ const dateShort = new Intl.DateTimeFormat(LOCALE, { day: '2-digit', month: '2-di
 const dateLong = new Intl.DateTimeFormat(LOCALE, { weekday: 'long', day: 'numeric', month: 'long' });
 const dateDayMonth = new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 'short' });
 const dateMedium = new Intl.DateTimeFormat(LOCALE, { weekday: 'short', day: 'numeric', month: 'short' });
+const weekdayShort = new Intl.DateTimeFormat(LOCALE, { weekday: 'short' });
+const dayOfMonth = new Intl.DateTimeFormat(LOCALE, { day: 'numeric' });
 const time = new Intl.DateTimeFormat(LOCALE, { hour: '2-digit', minute: '2-digit' });
 const number = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 3 });
 const fixed3 = new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 3, maximumFractionDigits: 3 });
@@ -23,6 +25,16 @@ export function formatDateLong(iso) {
 /** "qua., 21 de out." */
 export function formatDateMedium(iso) {
   return dateMedium.format(parseISODate(iso));
+}
+
+/** "qua", sem o ponto da abreviação (eixos dos gráficos) */
+export function formatWeekdayShort(iso) {
+  return weekdayShort.format(parseISODate(iso)).replace('.', '');
+}
+
+/** "21" (eixos dos gráficos de um mês) */
+export function formatDayOfMonth(iso) {
+  return dayOfMonth.format(parseISODate(iso));
 }
 
 /** "21 de out." */

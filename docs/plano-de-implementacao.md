@@ -29,9 +29,9 @@ Decisões fechadas com o dono do produto:
 | 5    | Vender                                | ✅ `101823a` |
 | 6    | Fiado e clientes                      | ✅ `4aad853` |
 | 7    | Estoque                               | ✅ `f78f19d` |
-| 8    | Caixa e despesas                      | ✅           |
-| 9    | Dashboard                             | ⏳ próxima   |
-| 10   | Relatórios                            | ⏳           |
+| 8    | Caixa e despesas                      | ✅ `2710865` |
+| 9    | Dashboard                             | ✅           |
+| 10   | Relatórios                            | ⏳ próxima   |
 | 11   | Ajustes, acessibilidade, ajuda e tour | ⏳           |
 | 12   | Polimento                             | ⏳           |
 
@@ -264,7 +264,31 @@ Plano original da fase:
 
 Caixa do dia (troco inicial, entradas por forma de pagamento, recebimentos de fiado), despesas, fechar o dia com conferência e reabertura.
 
-### Fase 9: Dashboard
+### ✅ Fase 9: Dashboard
+
+Entregue:
+
+- **`/inicio`:**
+  - "Hoje você vendeu R$ X" em destaque, com "Vender" como a ação principal.
+  - "Precisa de atenção": fiado atrasado e vencendo logo, produtos que acabaram e que estão acabando, cada um com link para a lista já filtrada.
+  - Período na URL (`?periodo=hoje|7dias|este_mes`), que vale para tudo abaixo dele.
+  - Indicadores (vendido, recebido, lucro estimado e média por venda) com a diferença em reais para o período anterior.
+  - "Quanto você vendeu nos últimos 7 dias" (ou em cada dia do mês), "Como os clientes pagaram" (rosca) e "Mais vendidos".
+  - Atalhos, e o estado vazio que ensina a fazer a primeira venda.
+- **Componentes:** wrappers em `src/components/charts/` (`ChartCard`, `ColumnChart`, `DonutChart`, `RankedBars`, `ChartTooltip`), com exemplos em `/design-system#graficos`.
+- **Testes:** regra nova, textos da comparação, formatadores e integração (destaque, avisos com links, troca de período, tabela dos gráficos e estado vazio).
+
+Decisões tomadas durante a fase:
+
+- **Hoje × ontem até esta hora** (`compareWithPrevious(input, { now })`): às 8h, comparar com o dia inteiro de ontem deixava tudo vermelho. Quando o período termina hoje, o último dia do período anterior é cortado na mesma hora.
+- **Diferença em reais, não em %** ("R$ 12,00 a mais"), com a base escrita uma vez acima dos cartões ("Comparando com ontem até esta hora"). O lucro passando de positivo para negativo dava "1.935,9% a menos".
+- **"Recebido" comparado também** (`received` em `compareWithPrevious`), para a tela não refazer a conta.
+- **Ordem fixa da rosca** (`PAYMENT_RING_ORDER`): com 5 formas, nenhuma paleta passa no validador da skill `dataviz` em todos os pares. Pix ↔ débito e crédito ↔ fiado são os pares parecidos, e eles nunca ficam vizinhos. A legenda escreve nome, valor e % de cada fatia.
+- **Mais vendidos em HTML** (`RankedBars`), e não em barras deitadas do Recharts: nomes longos com texto Enorme espremiam o gráfico.
+- **Gráfico escondido do leitor de tela, tabela em "Ver os números"**. A camada de teclado do Recharts fica desligada, para não haver foco dentro de algo escondido.
+- **Um período para tudo**: as fichas de período ficam acima dos indicadores e dos gráficos (regra da skill `dataviz`). Em "Hoje", o gráfico de colunas mostra os 7 dias, com "hoje" no eixo.
+
+Plano original da fase:
 
 Cards (StatCard), gráficos Recharts (vendas dos 7 dias, rosca por forma de pagamento, mais vendidos), avisos (fiados vencendo ou atrasados, estoque acabando) e atalhos. **Carregar a skill `dataviz` antes de escrever os gráficos.** Usar a paleta `--chart-*` já validada, com uma cor fixa por entidade, tabela alternativa e nenhum eixo duplo.
 
