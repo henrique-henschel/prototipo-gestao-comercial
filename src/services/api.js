@@ -55,10 +55,12 @@ export const ERROR_MESSAGES = {
   cliente_arquivado: 'Esse cliente está arquivado.',
   fiado_nao_permitido: 'Fiado não pode ser pago com fiado. Escolha outra forma.',
   desfazer_recebimento: 'Só dá para desfazer o último recebimento desse cliente.',
+  prazo_desfazer_recebimento: 'Só dá para desfazer um recebimento no mesmo dia em que ele foi feito.',
   nome_obrigatorio: 'Digite o nome.',
   whatsapp_invalido: 'Confira o WhatsApp: DDD e número, como (11) 98765-4321.',
   limite_invalido: 'Confira o limite do fiado.',
   cliente_devendo: 'Esse cliente ainda deve. Você pode arquivar, mas não apagar.',
+  cliente_com_credito: 'Esse cliente tem crédito com você. Você pode arquivar, mas não apagar.',
   // Estoque
   preco_invalido: 'Confira o preço de venda.',
   custo_invalido: 'Confira o custo.',

@@ -63,3 +63,14 @@ export function formatRelativeDay(iso, reference = today()) {
 export function plural(count, singular, pluralForm = `${singular}s`) {
   return `${formatNumber(count)} ${count === 1 ? singular : pluralForm}`;
 }
+
+/**
+ * WhatsApp guardado só com dígitos, para exibir: "11987654321" → "(11) 98765-4321".
+ * Números fora do padrão (DDD + 8 ou 9 dígitos) voltam como estão.
+ * @param {string|null|undefined} phone
+ */
+export function formatPhone(phone) {
+  const digits = String(phone ?? '').replace(/\D/g, '');
+  const match = digits.match(/^(\d{2})(\d{4,5})(\d{4})$/);
+  return match ? `(${match[1]}) ${match[2]}-${match[3]}` : (phone ?? '');
+}

@@ -1,4 +1,10 @@
-import { canDeleteCustomer, isValidPhone, normalizePhone, validateCustomer } from './customers.js';
+import {
+  canDeleteCustomer,
+  isValidPhone,
+  normalizePhone,
+  validateCustomer,
+  validateCustomerDeletion,
+} from './customers.js';
 
 describe('clientes', () => {
   it('normaliza o WhatsApp para DDD + número', () => {
@@ -17,8 +23,10 @@ describe('clientes', () => {
     expect(validateCustomer({ name: 'Maria', creditLimitCents: -1 })).toEqual(['limite_invalido']);
   });
 
-  it('4 só exclui cliente sem saldo em aberto', () => {
-    expect(canDeleteCustomer({ openCents: 0 })).toBe(true);
-    expect(canDeleteCustomer({ openCents: 500 })).toBe(false);
+  it('4 só exclui cliente sem saldo em aberto e sem crédito', () => {
+    expect(canDeleteCustomer({ openCents: 0, balanceCents: 0 })).toBe(true);
+    expect(canDeleteCustomer({ openCents: 500, balanceCents: 500 })).toBe(false);
+    expect(validateCustomerDeletion({ openCents: 500, balanceCents: 200 })).toEqual(['cliente_devendo']);
+    expect(validateCustomerDeletion({ openCents: 0, balanceCents: -300 })).toEqual(['cliente_com_credito']);
   });
 });

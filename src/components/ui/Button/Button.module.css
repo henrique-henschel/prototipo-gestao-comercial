@@ -111,7 +111,9 @@
 
   .hero {
     --btn-height: var(--tap-hero);
-    --btn-pad: var(--space-8);
+    /* Recuo pela largura da tela: com texto Enorme a 360px, um recuo fixo em rem
+       deixava o botão mais largo que a tela. No computador continua em --space-8. */
+    --btn-pad: clamp(var(--space-3), 4vw, var(--space-8));
 
     font-size: var(--text-xl);
     border-radius: var(--radius-lg);

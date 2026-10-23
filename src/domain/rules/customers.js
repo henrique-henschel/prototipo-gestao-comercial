@@ -38,9 +38,21 @@ export function validateCustomer({ name, phone, creditLimitCents }) {
 }
 
 /**
- * Cliente com saldo em aberto não pode ser excluído, só arquivado. Regra 4.
- * @param {{ openCents: number }} fiadoSummary resultado de `customerFiadoSummary`
+ * Por que um cliente não pode ser excluído. Regra 4: quem deve só pode ser arquivado,
+ * e quem tem crédito também, para o dinheiro dele não sumir junto com o cadastro.
+ * @param {{ openCents: number, balanceCents: number }} fiadoSummary resultado de `customerFiadoSummary`
+ * @returns {('cliente_devendo'|'cliente_com_credito')[]}
+ */
+export function validateCustomerDeletion({ openCents, balanceCents }) {
+  if (openCents > 0) return ['cliente_devendo'];
+  if (balanceCents < 0) return ['cliente_com_credito'];
+  return [];
+}
+
+/**
+ * Cliente sem saldo em aberto e sem crédito pode ser excluído. Regra 4.
+ * @param {{ openCents: number, balanceCents: number }} fiadoSummary resultado de `customerFiadoSummary`
  */
 export function canDeleteCustomer(fiadoSummary) {
-  return fiadoSummary.openCents === 0;
+  return validateCustomerDeletion(fiadoSummary).length === 0;
 }

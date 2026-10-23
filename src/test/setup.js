@@ -1,6 +1,10 @@
 import '@testing-library/jest-dom/vitest';
-import { cleanup } from '@testing-library/react';
+import { cleanup, configure } from '@testing-library/react';
 import { afterEach } from 'vitest';
+
+// `findBy*` e `waitFor` esperam até 5 s (o padrão é 1 s): as telas são carregadas sob
+// demanda, e a primeira importação pode demorar com a suíte inteira rodando.
+configure({ asyncUtilTimeout: 5000 });
 
 // O jsdom não implementa rolagem; o ScrollRestoration do roteador chama scrollTo a cada tela.
 window.scrollTo = () => {};

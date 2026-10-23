@@ -1,0 +1,244 @@
+@layer components {
+  .loading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .archived {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-block-end: var(--space-4);
+
+    & p {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-weight: var(--weight-bold);
+    }
+
+    & svg {
+      flex-shrink: 0;
+    }
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-4);
+  }
+
+  @media (width >= 64rem) {
+    .layout {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    }
+  }
+
+  .main,
+  .side {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .card {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  /* ---------- Resumo: o número que importa ---------- */
+  .summary {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .summaryLabel {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-2);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+  }
+
+  .balance {
+    font-size: var(--text-money);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: break-word;
+  }
+
+  .credit {
+    color: var(--color-success-text);
+  }
+
+  .paid {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--color-success-text);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+
+    & svg {
+      flex-shrink: 0;
+    }
+  }
+
+  .status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+  }
+
+  .due {
+    color: var(--text-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+  }
+
+  .limit {
+    display: grid;
+    gap: var(--space-2);
+    padding-block-start: var(--space-3);
+    border-block-start: var(--border-width) solid var(--border-1);
+  }
+
+  .actions {
+    display: grid;
+    gap: var(--space-3);
+    margin-block-start: var(--space-2);
+  }
+
+  .muted {
+    color: var(--text-2);
+    font-size: var(--text-sm);
+  }
+
+  /* ---------- Listas: compras em aberto e histórico ---------- */
+  .rows {
+    display: grid;
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: var(--space-1) var(--space-3);
+    padding-block: var(--space-3);
+    border-block-end: var(--border-width) solid var(--border-1);
+
+    &:first-child {
+      padding-block-start: 0;
+    }
+
+    &:last-child {
+      padding-block-end: 0;
+      border-block-end: 0;
+    }
+  }
+
+  .entryIcon {
+    flex-shrink: 0;
+    margin-block-start: 0.1em;
+    color: var(--color-accent-text);
+  }
+
+  .received {
+    color: var(--color-success-text);
+  }
+
+  .rowText {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-1);
+    flex: 1 1 11rem;
+    min-inline-size: 0;
+  }
+
+  .rowTitle {
+    font-weight: var(--weight-bold);
+    overflow-wrap: break-word;
+  }
+
+  .rowMeta {
+    color: var(--text-2);
+    font-size: var(--text-sm);
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: break-word;
+  }
+
+  .rowStatus {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .rowValue {
+    display: grid;
+    justify-items: end;
+    gap: var(--space-1);
+    margin-inline-start: auto;
+    text-align: end;
+  }
+
+  .value {
+    margin-inline-start: auto;
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .receivedValue {
+    color: var(--color-success-text);
+  }
+
+  .struck {
+    color: var(--text-3);
+    text-decoration: line-through;
+  }
+
+  .undo {
+    margin-inline-start: calc(var(--space-3) * -1);
+  }
+
+  /* ---------- Dados do cliente ---------- */
+  .facts {
+    display: grid;
+    gap: var(--space-3);
+
+    & > div {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--space-1) var(--space-3);
+    }
+
+    & dt {
+      color: var(--text-2);
+    }
+
+    & dd {
+      font-weight: var(--weight-bold);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  .buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .danger {
+    color: var(--color-danger-text);
+  }
+}

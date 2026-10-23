@@ -1,4 +1,4 @@
-import { addDays, diffInDays, today as todayISO } from '@/lib/date.js';
+import { addDays, dateOf, diffInDays, today as todayISO } from '@/lib/date.js';
 import { FIADO_SOON_DAYS, FIADO_STATUS, FIADO_STATUS_SEVERITY } from '../constants.js';
 import { sumCents } from './money.js';
 
@@ -8,6 +8,7 @@ import { sumCents } from './money.js';
  * @typedef {import('../models.js').Cents} Cents
  * @typedef {import('../models.js').Customer} Customer
  * @typedef {import('../models.js').FiadoAccount} FiadoAccount
+ * @typedef {import('../models.js').FiadoPayment} FiadoPayment
  * @typedef {import('../models.js').FiadoStatus} FiadoStatus
  */
 
@@ -188,6 +189,42 @@ export function applyAllocations(accounts, allocations, direction = 1) {
       ? { ...account, paidCents: account.paidCents + direction * byId.get(account.id) }
       : account,
   );
+}
+
+/**
+ * Pode desfazer este recebimento? Só o último do cliente, para o FIFO e o crédito voltarem
+ * exatamente ao que eram, e só no mesmo dia, para não mudar o caixa de dias anteriores. Regra 3.8.
+ * @param {FiadoPayment} payment
+ * @param {FiadoPayment[]} payments recebimentos (o filtro por cliente é feito aqui)
+ * @param {string} [today]
+ * @returns {('desfazer_recebimento'|'prazo_desfazer_recebimento')[]}
+ */
+export function validateUndoFiadoPayment(payment, payments, today = todayISO()) {
+  const last = payments
+    .filter((p) => p.customerId === payment.customerId)
+    .reduce((latest, p) => (!latest || p.createdAt >= latest.createdAt ? p : latest), null);
+  if (last?.id !== payment.id) return ['desfazer_recebimento'];
+  if (dateOf(payment.createdAt) !== today) return ['prazo_desfazer_recebimento'];
+  return [];
+}
+
+/**
+ * Histórico do cliente no fiado, do mais novo para o mais antigo: cada compra fiado
+ * (inclusive as de vendas canceladas) e cada recebimento.
+ * @param {string} customerId
+ * @param {FiadoAccount[]} accounts
+ * @param {FiadoPayment[]} payments
+ * @returns {({ type: 'compra', id: string, createdAt: string, account: FiadoAccount }
+ *   | { type: 'recebimento', id: string, createdAt: string, payment: FiadoPayment })[]}
+ */
+export function customerTimeline(customerId, accounts, payments) {
+  const purchases = accounts
+    .filter((account) => account.customerId === customerId)
+    .map((account) => ({ type: 'compra', id: account.id, createdAt: account.createdAt, account }));
+  const received = payments
+    .filter((payment) => payment.customerId === customerId)
+    .map((payment) => ({ type: 'recebimento', id: payment.id, createdAt: payment.createdAt, payment }));
+  return [...purchases, ...received].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 /**

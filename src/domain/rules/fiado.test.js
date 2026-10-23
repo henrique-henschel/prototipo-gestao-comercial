@@ -6,11 +6,13 @@ import {
   cancelSaleAccounts,
   compareUrgency,
   customerFiadoSummary,
+  customerTimeline,
   daysOverdue,
   dueDateIn,
   fiadoAlerts,
   fiadoIndicators,
   receiveFiado,
+  validateUndoFiadoPayment,
   worstStatus,
 } from './fiado.js';
 
@@ -171,5 +173,30 @@ describe('fiado', () => {
       overdueCount: 1,
     });
     expect(indicators.topDebtors.map((row) => row.customer.id)).toEqual(['c2', 'c1']);
+  });
+
+  it('3.8 só desfaz o último recebimento do cliente, e no mesmo dia', () => {
+    const payment = (id, createdAt, customerId = 'c1') => ({ id, customerId, createdAt });
+    const old = payment('p1', '2026-10-20T15:00:00');
+    const last = payment('p2', '2026-10-21T09:00:00');
+    const otherCustomer = payment('p3', '2026-10-21T10:00:00', 'c2');
+    const payments = [old, last, otherCustomer];
+    expect(validateUndoFiadoPayment(last, payments, TODAY)).toEqual([]);
+    expect(validateUndoFiadoPayment(old, payments, TODAY)).toEqual(['desfazer_recebimento']);
+    expect(validateUndoFiadoPayment(last, payments, '2026-10-22')).toEqual(['prazo_desfazer_recebimento']);
+  });
+
+  it('monta o histórico do cliente com compras e recebimentos, do mais novo ao mais antigo', () => {
+    const accounts = [
+      account('a', { createdAt: '2026-10-01T10:00:00Z' }),
+      account('b', { createdAt: '2026-10-15T10:00:00Z' }),
+      account('outro', { customerId: 'c2', createdAt: '2026-10-16T10:00:00Z' }),
+    ];
+    const payments = [{ id: 'p1', customerId: 'c1', createdAt: '2026-10-10T10:00:00Z' }];
+    expect(customerTimeline('c1', accounts, payments).map((entry) => `${entry.type}:${entry.id}`)).toEqual([
+      'compra:b',
+      'recebimento:p1',
+      'compra:a',
+    ]);
   });
 });

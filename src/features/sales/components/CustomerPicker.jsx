@@ -7,53 +7,58 @@ import { useCustomers } from '@/hooks/useCustomers.js';
 import { useFiado } from '@/hooks/useFiado.js';
 import { today } from '@/lib/date.js';
 import { cx } from '@/lib/cx.js';
+import { normalizeSearch } from '@/lib/text.js';
 import styles from './CustomerPicker.module.css';
-
-function normalize(text) {
-  return text
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .toLowerCase();
-}
 
 /**
  * Escolha de quem está comprando (obrigatório no fiado, regra 1.5), com a situação
  * do fiado de cada cliente e o cadastro rápido (só nome e WhatsApp, seção 4).
- * Remonte com `key` ao abrir, para limpar a busca.
+ * Remonte com `key` ao abrir, para limpar a busca. Também serve para "Quem está pagando?"
+ * no fiado (`onlyDebtors`, sem cadastro rápido).
  *
  * @param {object} props
  * @param {boolean} props.open
  * @param {() => void} props.onClose
  * @param {string|null} props.selectedId
  * @param {(customerId: string|null) => void} props.onSelect
+ * @param {string} [props.title='Quem está comprando?']
+ * @param {boolean} [props.onlyDebtors=false] lista só quem deve, inclusive arquivados
  */
-export function CustomerPicker({ open, onClose, selectedId, onSelect }) {
+export function CustomerPicker({
+  open,
+  onClose,
+  selectedId,
+  onSelect,
+  title = 'Quem está comprando?',
+  onlyDebtors = false,
+}) {
   const { customers, createCustomer } = useCustomers();
   const { accounts } = useFiado();
   const [query, setQuery] = useState('');
   const [creating, setCreating] = useState(false);
 
   const rows = useMemo(() => {
-    const term = normalize(query.trim());
+    const term = normalizeSearch(query.trim());
     const day = today();
     return customers
-      .filter((customer) => !customer.archived)
+      .filter((customer) => onlyDebtors || !customer.archived)
       .filter(
         (customer) =>
           !term ||
-          normalize(customer.name).includes(term) ||
-          normalize(customer.note).includes(term) ||
+          normalizeSearch(customer.name).includes(term) ||
+          normalizeSearch(customer.note).includes(term) ||
           customer.phone?.includes(term),
       )
       .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'))
-      .map((customer) => ({ customer, summary: customerFiadoSummary(customer, accounts, day) }));
-  }, [customers, accounts, query]);
+      .map((customer) => ({ customer, summary: customerFiadoSummary(customer, accounts, day) }))
+      .filter(({ summary }) => !onlyDebtors || summary.openCents > 0);
+  }, [customers, accounts, query, onlyDebtors]);
 
   return (
     <BottomSheet
       open={open}
       onClose={onClose}
-      title={creating ? 'Cliente novo' : 'Quem está comprando?'}
+      title={creating ? 'Cliente novo' : title}
       description={creating ? 'Só o nome já basta. O WhatsApp serve para mandar recibo e cobrar.' : undefined}
     >
       {creating ? (
@@ -73,24 +78,34 @@ export function CustomerPicker({ open, onClose, selectedId, onSelect }) {
             label="Procurar cliente"
             placeholder="Nome ou apelido…"
           />
-          <div className={styles.actions}>
-            <Button variant="secondary" icon={UserPlus} onClick={() => setCreating(true)}>
-              Cadastrar cliente novo
-            </Button>
-            {selectedId && (
-              <Button variant="ghost" icon={UserRoundX} onClick={() => onSelect(null)}>
-                Vender sem cliente
+          {!onlyDebtors && (
+            <div className={styles.actions}>
+              <Button variant="secondary" icon={UserPlus} onClick={() => setCreating(true)}>
+                Cadastrar cliente novo
               </Button>
-            )}
-          </div>
+              {selectedId && (
+                <Button variant="ghost" icon={UserRoundX} onClick={() => onSelect(null)}>
+                  Vender sem cliente
+                </Button>
+              )}
+            </div>
+          )}
 
           {rows.length === 0 ? (
-            <EmptyState
-              compact
-              emoji="🙋"
-              title={query ? 'Ninguém com esse nome' : 'Você ainda não tem clientes'}
-              description="Cadastre agora: leva só alguns segundos."
-            />
+            onlyDebtors ? (
+              <EmptyState
+                compact
+                emoji="🎉"
+                title={query ? 'Ninguém com esse nome deve' : 'Ninguém está devendo'}
+              />
+            ) : (
+              <EmptyState
+                compact
+                emoji="🙋"
+                title={query ? 'Ninguém com esse nome' : 'Você ainda não tem clientes'}
+                description="Cadastre agora: leva só alguns segundos."
+              />
+            )
           ) : (
             <ul role="list" className={styles.list} aria-label="Clientes">
               {rows.map(({ customer, summary }) => {

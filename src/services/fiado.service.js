@@ -1,6 +1,7 @@
-import { applyAllocations, receiveFiado } from '@/domain/rules/fiado.js';
+import { applyAllocations, receiveFiado, validateUndoFiadoPayment } from '@/domain/rules/fiado.js';
+import { today } from '@/lib/date.js';
 import { createId } from '@/lib/id.js';
-import { ApiError, findOrFail, nowISO, request } from './api.js';
+import { ApiError, assertValid, findOrFail, nowISO, request } from './api.js';
 
 /**
  * Contas de fiado e recebimentos (seção 3 de docs/regras-de-negocio.md).
@@ -73,16 +74,15 @@ export function receiveFiadoPayment(customerId, { amountCents, method }) {
 }
 
 /**
- * DELETE /fiado/payments/:id — "Desfazer" de um recebimento. Só o último do cliente,
- * para que o FIFO e o crédito voltem exatamente ao que eram.
+ * DELETE /fiado/payments/:id — "Desfazer" de um recebimento: só o último do cliente
+ * e só no mesmo dia (`validateUndoFiadoPayment`).
  * @param {string} paymentId
  * @returns {Promise<{ paymentId: string, fiadoAccounts: FiadoAccount[], customer: Customer }>}
  */
 export function undoFiadoPayment(paymentId) {
   return request((db) => {
     const payment = findOrFail(db.fiadoPayments, paymentId);
-    const last = db.fiadoPayments.filter((p) => p.customerId === payment.customerId).at(-1);
-    if (last.id !== paymentId) throw new ApiError('desfazer_recebimento');
+    assertValid(validateUndoFiadoPayment(payment, db.fiadoPayments, today()));
 
     const customer = findOrFail(db.customers, payment.customerId);
     const restoredCustomer = {

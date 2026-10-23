@@ -1,0 +1,28 @@
+@layer components {
+  .form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+
+  .fieldset {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+    min-inline-size: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+  }
+
+  .legend {
+    margin-block-end: var(--space-3);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+  }
+
+  .formError {
+    color: var(--color-danger-text);
+    font-weight: var(--weight-bold);
+  }
+}

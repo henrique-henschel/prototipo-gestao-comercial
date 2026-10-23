@@ -112,7 +112,7 @@ O detalhamento de cada fase está em [`docs/plano-de-implementacao.md`](./docs/p
 | 3    | Domínio e dados: modelos, regras + testes, seed, serviços, store     | ✅ Concluída |
 | 4    | Shell e navegação: layout, rotas, login simulado, boas-vindas        | ✅ Concluída |
 | 5    | Vender: PDV, carrinho, pagamentos, venda concluída, histórico        | ✅ Concluída |
-| 6    | Fiado e clientes                                                     | ⏳           |
+| 6    | Fiado e clientes: quem me deve, receber, cobrar no WhatsApp, CRUD    | ✅ Concluída |
 | 7    | Estoque                                                              | ⏳           |
 | 8    | Caixa e despesas                                                     | ⏳           |
 | 9    | Dashboard                                                            | ⏳           |

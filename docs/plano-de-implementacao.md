@@ -26,9 +26,9 @@ Decisões fechadas com o dono do produto:
 | 2    | Design system                         | ✅ `590c2e6` |
 | 3    | Domínio e dados                       | ✅ `7794f72` |
 | 4    | Shell e navegação                     | ✅ `4a01170` |
-| 5    | Vender                                | ✅           |
-| 6    | Fiado e clientes                      | ⏳ próxima   |
-| 7    | Estoque                               | ⏳           |
+| 5    | Vender                                | ✅ `101823a` |
+| 6    | Fiado e clientes                      | ✅           |
+| 7    | Estoque                               | ⏳ próxima   |
 | 8    | Caixa e despesas                      | ⏳           |
 | 9    | Dashboard                             | ⏳           |
 | 10   | Relatórios                            | ⏳           |
@@ -206,7 +206,24 @@ PDV (grade, busca, categorias e valor avulso), carrinho (quantidade, desconto e 
 
 Notas da Fase 3 para esta fase: use `useSales().createSale` e trate `ApiError` (`error.message` já é o texto da tela, e `error.codes` traz todos os problemas). Antes de cobrar, mostre o aviso de estoque com `findStockShortages` e o de fiado com `fiadoAlerts`; o serviço só recusa a falta de estoque quando o bloqueio está ligado. O aviso de "Desfazer" deve usar `duration: UNDO_WINDOW_MS`, porque o `ToastProvider` usa 8 s por padrão em avisos com ação.
 
-### Fase 6: Fiado e clientes
+### ✅ Fase 6: Fiado e clientes
+
+Entregue: `/fiado` ("Quem me deve") com indicadores (para receber, atrasado, clientes atrasados e % de inadimplência), filtros de situação na URL (atrasados, vencem logo, em dia), ordem "quem está mais atrasado" ou "quem deve mais", busca e "Cobrar no WhatsApp" em cada linha; "Receber pagamento" pergunta quem está pagando (`CustomerPicker` com `onlyDebtors`) e abre a conta com `?receber=1`. `/fiado/:customerId` com o saldo em destaque, uso do limite, compras em aberto na ordem do FIFO, histórico de compras e recebimentos, receber pagamento (prévia do que cada valor quita, crédito usado e excedente que só vira crédito com o botão "Receber e guardar crédito" ou é corrigido por "Receber só o que deve"), "Desfazer" no aviso e no histórico, "Não vender fiado" com "Desfazer", editar, "Nova venda para…", arquivar com "Desfazer" e apagar com confirmação. `/clientes` com filtros (devendo, sem fiado, arquivados), busca por nome, apelido ou WhatsApp e cadastro/edição (`CustomerFormSheet`). Testes: regras novas, mensagem de cobrança, `formatPhone`, serviços e integração (ordem e filtros, link do WhatsApp, recebimento FIFO com desfazer, excedente como crédito, desfazer pelo histórico, bloqueio valendo na venda, cadastro com validação, edição, arquivar e apagar).
+
+Decisões tomadas durante a fase:
+
+- **Desfazer recebimento só no mesmo dia** (`validateUndoFiadoPayment`, código `prazo_desfazer_recebimento`), além de ser só o último do cliente: o recebimento já entrou no caixa, e o caixa de dias anteriores não deve mudar (Fase 8).
+- **Cliente com crédito também não pode ser apagado** (`validateCustomerDeletion`, código `cliente_com_credito`): o crédito é dinheiro do cliente.
+- **O excedente nunca vira crédito por engano**: o botão muda para "Receber e guardar crédito" e o aviso oferece "Receber só o que deve" (para quem vai dar troco). É a confirmação pedida pela regra 3.8, sem janela de "Tem certeza?".
+- **Mensagem de cobrança em `features/fiado/charge.js`** (mesmo padrão do `receipt.js`), com o nome do negócio em negrito no topo (sem "Aqui é da...", que supõe gênero) e a chave Pix quando houver. Sem WhatsApp cadastrado, o botão de cobrar não aparece e a conta oferece "Cadastrar WhatsApp para cobrar".
+- **A conta do cliente é também o detalhe do cliente**: `/clientes` leva para `/fiado/:id` com `state.from`, e o "Voltar" volta para a lista de origem.
+- **Indicadores somam o que está em aberto** (`fiadoIndicators`); a linha de cada cliente mostra o saldo já descontado o crédito. Para não parecer conta errada, a lista não mostra um total próprio.
+- **Ordem da lista num `Select`**: o `SegmentedControl` não quebra linha e passava da tela com texto Enorme.
+- **`normalizeSearch`** (`lib/text.js`) substituiu as cópias de `normalize` nas buscas.
+- **Prazos maiores nos testes** (`testTimeout` de 20 s e `asyncUtilTimeout` de 5 s): com a máquina lenta, a suíte de integração estourava o tempo sem nenhum erro de código.
+- **Correção no design system**: o recuo lateral do `Button` `hero` virou `clamp(var(--space-3), 4vw, var(--space-8))`; com texto Enorme a 360px, o recuo fixo deixava o botão mais largo que a tela.
+
+Plano original da fase:
 
 "Quem me deve" (ordenado por urgência, totais e filtros), conta do cliente, receber pagamento (FIFO), limite e bloqueio com alerta na venda, cobrança por WhatsApp (`lib/whatsapp.js`) e CRUD simulado de clientes.
 

@@ -1,7 +1,7 @@
-import { canDeleteCustomer, normalizePhone, validateCustomer } from '@/domain/rules/customers.js';
+import { normalizePhone, validateCustomer, validateCustomerDeletion } from '@/domain/rules/customers.js';
 import { customerFiadoSummary } from '@/domain/rules/fiado.js';
 import { createId } from '@/lib/id.js';
-import { ApiError, assertValid, findOrFail, nowISO, request } from './api.js';
+import { assertValid, findOrFail, nowISO, request } from './api.js';
 
 /**
  * Clientes (seção 4 de docs/regras-de-negocio.md).
@@ -71,16 +71,15 @@ export function updateCustomer(id, changes) {
 }
 
 /**
- * DELETE /customers/:id — só sem saldo em aberto; com saldo, use o arquivamento (regra 4).
+ * DELETE /customers/:id — só sem saldo em aberto e sem crédito; nos outros casos,
+ * use o arquivamento (regra 4).
  * @param {string} id
  * @returns {Promise<{ customerId: string }>}
  */
 export function deleteCustomer(id) {
   return request((db) => {
     const customer = findOrFail(db.customers, id);
-    if (!canDeleteCustomer(customerFiadoSummary(customer, db.fiadoAccounts))) {
-      throw new ApiError('cliente_devendo');
-    }
+    assertValid(validateCustomerDeletion(customerFiadoSummary(customer, db.fiadoAccounts)));
     db.customers = db.customers.filter((c) => c.id !== id);
     return { customerId: id };
   });

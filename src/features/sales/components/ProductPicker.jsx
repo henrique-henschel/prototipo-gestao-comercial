@@ -4,19 +4,13 @@ import { Plus, SearchX } from 'lucide-react';
 import { ROUTES } from '@/app/routes.js';
 import { Button, Chip, ChipGroup, EmptyState, SearchBar } from '@/components/ui';
 import { PRODUCT_CATEGORIES } from '@/domain/constants.js';
+import { normalizeSearch } from '@/lib/text.js';
 import { CustomAmountTile, ProductTile } from './ProductTile.jsx';
 import styles from './ProductPicker.module.css';
 
 const ALL = 'todos';
 
 /** Busca sem acento e sem diferença de maiúsculas: "agua" acha "Água". */
-function normalize(text) {
-  return text
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .toLowerCase();
-}
-
 /**
  * Escolha de produtos: busca, categorias e a grade de cards grandes.
  *
@@ -36,11 +30,11 @@ export function ProductPicker({ products, quantities, onAdd, onCustomAmount }) {
   }, [products]);
 
   const visible = useMemo(() => {
-    const term = normalize(query.trim());
+    const term = normalizeSearch(query.trim());
     return products.filter(
       (product) =>
         (category === ALL || product.category === category) &&
-        (!term || normalize(product.name).includes(term) || product.code?.includes(term)),
+        (!term || normalizeSearch(product.name).includes(term) || product.code?.includes(term)),
     );
   }, [products, query, category]);
 

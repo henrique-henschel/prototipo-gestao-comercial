@@ -4,12 +4,17 @@ import { ApiError, configureApi } from './api.js';
 import { login, signup } from './auth.service.js';
 import { closeCashDay, createExpense, listCashDays, reopenCashDay } from './cash.service.js';
 import { createCustomer, deleteCustomer, listCustomers } from './customers.service.js';
-import { listFiadoAccounts, receiveFiadoPayment, undoFiadoPayment } from './fiado.service.js';
+import {
+  listFiadoAccounts,
+  listFiadoPayments,
+  receiveFiadoPayment,
+  undoFiadoPayment,
+} from './fiado.service.js';
 import { addStockMovement, createProduct, listProducts } from './products.service.js';
 import { getReport } from './reports.service.js';
 import { cancelSale, createSale, listSales, undoSale } from './sales.service.js';
 import { completeOnboarding, getBusiness, updateSettings } from './settings.service.js';
-import { today } from '@/lib/date.js';
+import { dateOf, today } from '@/lib/date.js';
 
 async function stockedProduct(minQuantity = 5) {
   const products = await listProducts();
@@ -172,6 +177,30 @@ describe('serviço de fiado', () => {
       receiveFiadoPayment(customer.id, { amountCents: 100, method: 'fiado' }),
       'fiado_nao_permitido',
     );
+  });
+
+  it('crédito do cliente impede apagar, e recebimento de outro dia não pode ser desfeito', async () => {
+    const product = await stockedProduct();
+    const customer = await newCustomer();
+    await createSale({
+      items: [{ productId: product.id, quantity: 1 }],
+      payments: [{ method: 'fiado', amountCents: product.priceCents, dueDate: '2099-01-01' }],
+      customerId: customer.id,
+    });
+    const { payment } = await receiveFiadoPayment(customer.id, {
+      amountCents: product.priceCents + 300,
+      method: 'dinheiro',
+    });
+    expect(payment.creditAddedCents).toBe(300);
+    await expectApiError(deleteCustomer(customer.id), 'cliente_com_credito');
+
+    // Nos dados de exemplo, os recebimentos são de dias anteriores.
+    const seedPayments = (await listFiadoPayments()).filter((p) => p.customerId !== customer.id);
+    const lastOf = (customerId) => seedPayments.filter((p) => p.customerId === customerId).at(-1);
+    const oldLast = seedPayments.find((p) => lastOf(p.customerId) === p && dateOf(p.createdAt) < today());
+    const notLast = seedPayments.find((p) => lastOf(p.customerId) !== p);
+    await expectApiError(undoFiadoPayment(oldLast.id), 'prazo_desfazer_recebimento');
+    await expectApiError(undoFiadoPayment(notLast.id), 'desfazer_recebimento');
   });
 });
 

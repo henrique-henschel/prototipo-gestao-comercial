@@ -24,6 +24,9 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./src/test/setup.js'],
+    // Os testes de integração montam o app inteiro e carregam telas sob demanda:
+    // numa máquina lenta (ou com a suíte inteira em paralelo), 5 s não bastam.
+    testTimeout: 20_000,
     css: { modules: { classNameStrategy: 'non-scoped' } },
   },
 });

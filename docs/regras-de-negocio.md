@@ -67,14 +67,16 @@ Formas: `dinheiro`, `pix`, `debito`, `credito`, `fiado`. Cada forma pode ser des
    - Quita as contas **mais antigas primeiro** (FIFO por vencimento e, no empate, pela data da compra).
    - Um valor acima do saldo total vira crédito do cliente, após confirmação.
    - Todo abatimento gera um registro no histórico do cliente e entra no caixa do dia como "recebimento de fiado", e não como venda.
-9. **Cobrança pelo WhatsApp**: link `https://wa.me/55<DDD><número>?text=...` com uma mensagem educada pronta, contendo o nome do negócio, o valor em aberto e o vencimento. Disponível na lista "Quem me deve" e na conta do cliente.
+   - **Desfazer um recebimento**: só o **último** do cliente (para o FIFO e o crédito voltarem exatamente ao que eram) e só **no mesmo dia** (para não mudar o caixa de dias anteriores). A interface oferece "Desfazer" no aviso e no histórico do cliente.
+9. **Cobrança pelo WhatsApp**: link `https://wa.me/55<DDD><número>?text=...` com uma mensagem educada pronta, contendo o nome do negócio, o valor em aberto (já descontado o crédito) e o vencimento mais antigo, mais a chave Pix quando houver. Disponível na lista "Quem me deve" e na conta do cliente, só para clientes com WhatsApp cadastrado.
 10. **Indicadores**: total a receber, total atrasado, % de inadimplência (atrasado ÷ a receber), quantidade de clientes devendo e maiores devedores.
 
 ## 4. Clientes
 
 - Campos: nome (obrigatório), WhatsApp (opcional, mas exigido para a cobrança; DDD + 8 ou 9 dígitos, guardado só com os dígitos), apelido/observação, limite de crédito, bloqueio para fiado.
 - O **cadastro rápido** dentro da venda pede só nome e WhatsApp.
-- Um cliente com saldo em aberto não pode ser excluído, apenas arquivado.
+- Um cliente com saldo em aberto **ou com crédito** não pode ser excluído, apenas arquivado (o crédito é dinheiro do cliente e não pode sumir com o cadastro).
+- **Arquivar** tira o cliente da escolha na venda e da lista de clientes, mas guarda a conta e o histórico; quem deve continua em "Quem me deve". Arquivar e bloquear têm "Desfazer"; apagar pede confirmação, porque não pode ser desfeito.
 
 ## 5. Estoque
 
@@ -143,17 +145,17 @@ Pelo menos uma forma de pagamento precisa ficar ativa.
 
 Funções puras em `src/domain/rules/`, cada uma com testes ao lado (`*.test.js`) que citam o número da regra.
 
-| Seção         | Arquivo        | Principais funções                                                                                                                                   |
-| ------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Dinheiro      | `money.js`     | `toCents`, `formatBRL`, `parseCentsFromDigits`, `sumCents`, `percentOf`                                                                              |
-| 1. Vendas     | `sales.js`     | `calcSaleTotals`, `calcDiscount`, `validateSale`, `canUndoSale`, `validateCancellation`, `activeSales`                                               |
-| 2. Pagamentos | `payments.js`  | `calcChange`, `suggestCashAmounts`, `paymentProgress`, `validatePayments`, `calcFee`, `finalizePayments`                                             |
-| 3. Fiado      | `fiado.js`     | `accountStatus`, `customerFiadoSummary`, `fiadoAlerts`, `allocatePayment`, `receiveFiado`, `cancelSaleAccounts`, `compareUrgency`, `fiadoIndicators` |
-| 4. Clientes   | `customers.js` | `validateCustomer`, `normalizePhone`, `canDeleteCustomer`                                                                                            |
-| 5. Estoque    | `stock.js`     | `stockStatus`, `calcMargin`, `isSellingAtLoss`, `validateProduct`, `applyMovement`, `findStockShortages`, `stockValue`                               |
-| 6. Caixa      | `cash.js`      | `summarizeCashDay`, `expectedCash`, `closingDifference`, `validateExpense`                                                                           |
-| 7. Métricas   | `metrics.js`   | `periodMetrics`, `compareWithPrevious`, `dailySeries`, `paymentMix`, `topProducts`                                                                   |
-| 8. Períodos   | `period.js`    | `periodFromPreset`, `previousPeriod`, `filterByPeriod`                                                                                               |
-| 9. Ajustes    | `settings.js`  | `mergeSettings`, `validateSettings`                                                                                                                  |
+| Seção         | Arquivo        | Principais funções                                                                                                                                                                                   |
+| ------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dinheiro      | `money.js`     | `toCents`, `formatBRL`, `parseCentsFromDigits`, `sumCents`, `percentOf`                                                                                                                              |
+| 1. Vendas     | `sales.js`     | `calcSaleTotals`, `calcDiscount`, `validateSale`, `canUndoSale`, `validateCancellation`, `activeSales`                                                                                               |
+| 2. Pagamentos | `payments.js`  | `calcChange`, `suggestCashAmounts`, `paymentProgress`, `validatePayments`, `calcFee`, `finalizePayments`                                                                                             |
+| 3. Fiado      | `fiado.js`     | `accountStatus`, `customerFiadoSummary`, `fiadoAlerts`, `allocatePayment`, `receiveFiado`, `validateUndoFiadoPayment`, `customerTimeline`, `cancelSaleAccounts`, `compareUrgency`, `fiadoIndicators` |
+| 4. Clientes   | `customers.js` | `validateCustomer`, `normalizePhone`, `validateCustomerDeletion`, `canDeleteCustomer`                                                                                                                |
+| 5. Estoque    | `stock.js`     | `stockStatus`, `calcMargin`, `isSellingAtLoss`, `validateProduct`, `applyMovement`, `findStockShortages`, `stockValue`                                                                               |
+| 6. Caixa      | `cash.js`      | `summarizeCashDay`, `expectedCash`, `closingDifference`, `validateExpense`                                                                                                                           |
+| 7. Métricas   | `metrics.js`   | `periodMetrics`, `compareWithPrevious`, `dailySeries`, `paymentMix`, `topProducts`                                                                                                                   |
+| 8. Períodos   | `period.js`    | `periodFromPreset`, `previousPeriod`, `filterByPeriod`                                                                                                                                               |
+| 9. Ajustes    | `settings.js`  | `mergeSettings`, `validateSettings`                                                                                                                                                                  |
 
 Os serviços (`src/services/`) aplicam essas regras antes de gravar e devolvem erros com códigos (`soma_diferente`, `cliente_obrigatorio`...) e mensagens em linguagem simples (`ERROR_MESSAGES` em `services/api.js`).

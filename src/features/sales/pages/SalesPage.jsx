@@ -13,6 +13,7 @@ import { useDataStatus } from '@/hooks/useData.js';
 import { useSales } from '@/hooks/useSales.js';
 import { dateOf } from '@/lib/date.js';
 import { formatDateLong, formatRelativeDay, plural } from '@/lib/format.js';
+import { normalizeSearch } from '@/lib/text.js';
 import { PAYMENT_ICONS } from '../paymentIcons.js';
 import { SaleRow } from '../components/SaleRow.jsx';
 import styles from './SalesPage.module.css';
@@ -21,13 +22,6 @@ const PERIODS = PERIOD_PRESETS.filter((preset) => preset.value !== 'personalizad
 const DEFAULT_PERIOD = 'hoje';
 const ALL_METHODS = 'todas';
 const PAGE_SIZE = 50;
-
-function normalize(text) {
-  return text
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .toLowerCase();
-}
 
 /** "Hoje, quinta-feira, 22 de outubro" / "Segunda-feira, 19 de outubro" */
 function dayTitle(day) {
@@ -58,15 +52,15 @@ export default function SalesPage() {
   const customerNames = useMemo(() => new Map(customers.map((c) => [c.id, c.name])), [customers]);
 
   const filtered = useMemo(() => {
-    const term = normalize(query.trim().replace(/^n[ºo°]?\s*/i, ''));
+    const term = normalizeSearch(query.trim().replace(/^n[ºo°]?\s*/i, ''));
     return filterByPeriod(sales, periodFromPreset(preset))
       .filter((sale) => method === ALL_METHODS || sale.payments.some((payment) => payment.method === method))
       .filter((sale) => {
         if (!term) return true;
         if (String(sale.number) === term) return true;
         const customer = customerNames.get(sale.customerId);
-        if (customer && normalize(customer).includes(term)) return true;
-        return sale.items.some((item) => normalize(item.name).includes(term));
+        if (customer && normalizeSearch(customer).includes(term)) return true;
+        return sale.items.some((item) => normalizeSearch(item.name).includes(term));
       })
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }, [sales, preset, method, query, customerNames]);

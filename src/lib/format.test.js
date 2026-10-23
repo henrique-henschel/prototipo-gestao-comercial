@@ -1,5 +1,12 @@
 import { addDays, dateOf, diffInDays, eachDay, endOfMonth, startOfMonth, toISODate } from './date.js';
-import { formatDate, formatDateMedium, formatPercent, formatRelativeDay, plural } from './format.js';
+import {
+  formatDate,
+  formatDateMedium,
+  formatPercent,
+  formatPhone,
+  formatRelativeDay,
+  plural,
+} from './format.js';
 
 describe('date', () => {
   it('soma dias respeitando a virada de mês e ano', () => {
@@ -44,5 +51,12 @@ describe('format', () => {
     expect(plural(1, 'item', 'itens')).toBe('1 item');
     expect(plural(3, 'item', 'itens')).toBe('3 itens');
     expect(plural(2, 'venda')).toBe('2 vendas');
+  });
+
+  it('formata o WhatsApp com DDD', () => {
+    expect(formatPhone('11987654321')).toBe('(11) 98765-4321');
+    expect(formatPhone('1133334444')).toBe('(11) 3333-4444');
+    expect(formatPhone('123')).toBe('123');
+    expect(formatPhone(null)).toBe('');
   });
 });
