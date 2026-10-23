@@ -32,7 +32,8 @@
     justify-content: center;
     gap: var(--space-2);
     min-block-size: calc(var(--tap-min) - var(--space-2));
-    padding-inline: var(--space-4);
+    /* Recuo pela largura da tela: com texto Enorme a 360px, o recuo em rem alargava a página. */
+    padding-inline: clamp(var(--space-2), 3vw, var(--space-4));
     border-radius: calc(var(--radius-md) - var(--space-1));
     color: var(--text-2);
     font-weight: var(--weight-bold);

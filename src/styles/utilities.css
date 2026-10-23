@@ -28,6 +28,22 @@
   gap: var(--cluster-gap, var(--space-3));
 }
 
+/*
+ * Item que acaba de entrar numa lista (linha do carrinho, despesa, recebimento do fiado,
+ * parte do pagamento dividido): aparece deslizando de leve. Só CSS (@starting-style), sem
+ * depender de animationend; com prefers-reduced-motion, o reset zera a duração.
+ */
+.enter {
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    translate var(--dur-base) var(--ease-out);
+
+  @starting-style {
+    opacity: 0;
+    translate: 0 0.5rem;
+  }
+}
+
 /* Largura máxima de conteúdo com respiro lateral. */
 .container {
   inline-size: 100%;

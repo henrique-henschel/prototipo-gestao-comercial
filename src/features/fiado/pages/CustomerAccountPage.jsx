@@ -7,7 +7,6 @@ import {
   MessageCircle,
   Pencil,
   PiggyBank,
-  RotateCcw,
   ShoppingBag,
   ShoppingCart,
   Trash,
@@ -23,8 +22,10 @@ import {
   CardHeader,
   Dialog,
   EmptyState,
+  LoadError,
   ProgressBar,
   Skeleton,
+  SkeletonGroup,
   StatusPill,
   Switch,
 } from '@/components/ui';
@@ -105,10 +106,10 @@ export default function CustomerAccountPage() {
     return (
       <>
         <PageHeader title="Conta do cliente" backTo={backTo} backLabel={backLabel} />
-        <div className={styles.loading} aria-busy="true" aria-label="Carregando a conta do cliente">
+        <SkeletonGroup label="Carregando a conta do cliente" className={styles.loading}>
           <Skeleton shape="rect" height="12rem" />
           <Skeleton shape="rect" height="16rem" />
-        </div>
+        </SkeletonGroup>
       </>
     );
   }
@@ -117,19 +118,7 @@ export default function CustomerAccountPage() {
     return (
       <>
         <PageHeader title="Conta do cliente" backTo={backTo} backLabel={backLabel} />
-        <Card>
-          <EmptyState
-            tone="danger"
-            emoji="📡"
-            title="Não deu para carregar a conta"
-            description="Confira a internet e tente de novo."
-            action={
-              <Button icon={RotateCcw} onClick={reload}>
-                Tentar de novo
-              </Button>
-            }
-          />
-        </Card>
+        <LoadError title="Não deu para carregar a conta" onRetry={reload} />
       </>
     );
   }
@@ -567,7 +556,7 @@ export default function CustomerAccountPage() {
 function PurchaseEntry({ account, saleNumber }) {
   const cancelled = Boolean(account.cancelledAt);
   return (
-    <li className={styles.row}>
+    <li className={cx(styles.row, 'enter')}>
       <ShoppingBag className={styles.entryIcon} size={22} aria-hidden="true" />
       <span className={styles.rowText}>
         <span className={styles.rowTitle}>Comprou fiado</span>
@@ -596,7 +585,7 @@ function PaymentEntry({ payment, canUndo, onUndo }) {
   const Icon = PAYMENT_ICONS[payment.method];
   const method = PAYMENT_METHODS[payment.method];
   return (
-    <li className={styles.row}>
+    <li className={cx(styles.row, 'enter')}>
       <Icon className={cx(styles.entryIcon, styles.received)} size={22} aria-hidden="true" />
       <span className={styles.rowText}>
         <span className={styles.rowTitle}>Pagou em {method.shortLabel ?? method.label}</span>

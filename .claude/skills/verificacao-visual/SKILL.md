@@ -31,4 +31,8 @@ npm run shot -- dialogo.png --eval "[...document.querySelectorAll('button')].fin
 - **Impressão e PDF:** `--media print` emula a impressão (`print.css`) na captura; com o nome terminando em `.pdf`, a saída é o PDF A4 que o navegador imprimiria. O `beforeprint` não dispara sozinho na captura: chame `dispatchEvent(new Event('beforeprint'))` no `--eval` para abrir os "Ver os números".
 - **`voltar` com mais de um parâmetro:** o `&` da rota pedida vira parâmetro do `/entrar`. Use `encodeURIComponent` (ex.: `entrar?voltar=%2Frelatorios%3Ftipo%3Dcaixa%26periodo%3D7dias`).
 - **Porta ocupada:** se o `npm run dev` subir em outra porta (5174), passe `--base http://localhost:5174`.
+- **Acessibilidade de todas as telas:** `npm run a11y` (`scripts/a11y.mjs`) entra pela demonstração, percorre as 24 telas e estados e roda o axe, medindo também a rolagem horizontal (`--width 360`, `--theme dark|contrast`, `--text 1.5`, `--only caixa`). Sai com código 1 se algo falhar.
+- **Estados carregando e erro:** em Ajustes > Modo demonstração, ligue "Simular internet lenta" ou "Simular falha de internet" e toque em "Carregar tudo de novo"; depois navegue com `history.pushState`.
+- **Botões de janelas fechadas:** os `<dialog>` fechados continuam no DOM. Num `--eval`, procure botões dentro de `dialog[open]` (ou da tela), senão um "assim mesmo" escondido pode ser clicado.
+- **Imagens leves:** com o nome terminando em `.webp`, a captura sai comprimida (as do README ficam em `docs/capturas/`).
 - Se o Claude in Chrome estiver conectado, ele também serve para interação real, mas o `npm run shot` não depende dele.

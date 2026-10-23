@@ -3,10 +3,14 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   Button,
+  EmptyState,
+  LoadError,
   MoneyInput,
   PercentInput,
   QuantityInput,
   QuantityStepper,
+  Skeleton,
+  SkeletonGroup,
   StatusPill,
   Tabs,
 } from '@/components/ui';
@@ -161,5 +165,32 @@ describe('StatusPill', () => {
   it('mostra texto além da cor', () => {
     render(<StatusPill status="atrasado" />);
     expect(screen.getByText('Atrasado')).toBeInTheDocument();
+  });
+});
+
+describe('estados de carregando, vazio e erro', () => {
+  it('SkeletonGroup marca a região como ocupada e diz o que está carregando', () => {
+    render(
+      <SkeletonGroup label="Carregando as vendas">
+        <Skeleton />
+      </SkeletonGroup>,
+    );
+    const region = screen.getByText('Carregando as vendas').parentElement;
+    expect(region).toHaveAttribute('aria-busy', 'true');
+    expect(region).not.toHaveAttribute('aria-label');
+  });
+
+  it('LoadError é anunciado e tem "Tentar de novo"', async () => {
+    const user = userEvent.setup();
+    const retry = vi.fn();
+    render(<LoadError title="Não deu para carregar as vendas" onRetry={retry} />);
+    expect(screen.getByRole('alert')).toHaveTextContent('Confira a internet e tente de novo.');
+    await user.click(screen.getByRole('button', { name: 'Tentar de novo' }));
+    expect(retry).toHaveBeenCalledTimes(1);
+  });
+
+  it('EmptyState pode ser o título da página (404)', () => {
+    render(<EmptyState titleAs="h1" title="Não achamos essa página" />);
+    expect(screen.getByRole('heading', { level: 1, name: 'Não achamos essa página' })).toBeInTheDocument();
   });
 });

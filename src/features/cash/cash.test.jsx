@@ -20,6 +20,22 @@ async function openCash(path = '/caixa') {
   return { user, ...view };
 }
 
+/**
+ * Os dados de exemplo sorteiam as despesas de cada dia (lição "Dados de exemplo dependem do
+ * dia"): se hoje ainda não tem nenhuma, o teste lança uma antes de abrir a tela.
+ */
+function ensureExpenseToday() {
+  if (db.expenses.some((item) => dateOf(item.createdAt) === today())) return;
+  db.expenses.push({
+    id: 'desp_teste',
+    description: 'Saco de gelo',
+    category: 'mercadoria',
+    amountCents: 800,
+    method: 'dinheiro',
+    createdAt: new Date().toISOString(),
+  });
+}
+
 async function typeMoney(user, input, digits) {
   await user.clear(input);
   await user.type(input, digits);
@@ -90,10 +106,12 @@ describe('caixa do dia', () => {
 
     await user.click(screen.getByRole('button', { name: 'Desfazer', hidden: true }));
     await waitFor(() => expect(db.expenses).toHaveLength(before.count));
-    await waitFor(() => expect(list).not.toHaveTextContent('Gelo'));
+    // Se o Gelo era a única despesa do dia, a lista dá lugar ao "nenhuma despesa".
+    await waitFor(() => expect(screen.queryByText('Gelo')).not.toBeInTheDocument());
   });
 
   it('apaga uma despesa e o "Desfazer" devolve a mesma despesa', async () => {
+    ensureExpenseToday();
     const { user } = await openCash();
     const list = await screen.findByRole('list', { name: 'Despesas do dia' });
     const expense = db.expenses.find((item) => dateOf(item.createdAt) === today());
@@ -106,7 +124,9 @@ describe('caixa do dia', () => {
 
     await user.click(screen.getByRole('button', { name: 'Desfazer', hidden: true }));
     await waitFor(() => expect(db.expenses.find((item) => item.id === expense.id)).toEqual(expense));
-    await waitFor(() => expect(list).toHaveTextContent(expense.description));
+    await waitFor(() =>
+      expect(screen.getByRole('list', { name: 'Despesas do dia' })).toHaveTextContent(expense.description),
+    );
   });
 
   it('fecha o dia mostrando o que sobrou, e reabre', async () => {

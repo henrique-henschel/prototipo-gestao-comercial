@@ -27,13 +27,15 @@ npm run test:watch   # Vitest em modo watch
 npm run lint         # ESLint (react, react-hooks, jsx-a11y)
 npm run format       # Prettier (format:check só verifica)
 npm run shot -- <arquivo.png> [rota] [--width 360] [--theme dark] [--full] [--eval "js"]
+npm run a11y -- [--width 360] [--theme dark|contrast] [--text 1.5] [--only vender]   # axe em todas as telas
+npm run icons        # ícones do PWA (public/) a partir do favicon.svg
 ```
 
-Antes de considerar uma tarefa concluída: `npm run lint && npm test && npm run build && npm run format:check` sem erros, mais a verificação visual (skill `verificacao-visual`).
+Antes de considerar uma tarefa concluída: `npm run lint && npm test && npm run build && npm run format:check` sem erros, mais a verificação visual (skill `verificacao-visual`) e, se mexeu em interface, `npm run a11y` (com o `npm run dev` rodando) sem violações.
 
 ## Verificação visual
 
-Toda mudança de interface é conferida em imagem, não só nos testes: use a skill `verificacao-visual` (`.claude/skills/verificacao-visual/SKILL.md`), que explica o `npm run shot`, as telas logadas, o alto contraste e o texto Enorme. Mínimo por tela: 360px e 1440px, claro e escuro, e sem rolagem horizontal.
+Toda mudança de interface é conferida em imagem, não só nos testes: use a skill `verificacao-visual` (`.claude/skills/verificacao-visual/SKILL.md`), que explica o `npm run shot`, as telas logadas, o alto contraste e o texto Enorme. Mínimo por tela: 360px e 1440px, claro e escuro, e sem rolagem horizontal. O `npm run a11y` confere o axe e a rolagem horizontal de todas as telas de uma vez.
 
 ## Stack
 
@@ -74,7 +76,7 @@ Vite 8 · React 19 · React Router 8 (`react-router`, modo biblioteca com `creat
 - [ ] Valores digitados no teclado numérico próprio (`NumericKeypad`/`MoneyInput`), nunca campo livre com vírgula.
 - [ ] **Desfazer** em vez de "Tem certeza?"; confirmação só para ações destrutivas e irreversíveis.
 - [ ] Significado nunca só pela cor: verde = ok/entrou dinheiro, âmbar = atenção/fiado, vermelho = atrasado/acabou, azul = informação, sempre com ícone + texto.
-- [ ] Estados de **vazio** (que ensinam o próximo passo), **carregando** (skeleton) e **erro** (com "Tentar de novo") em toda tela com dados.
+- [ ] Estados de **vazio** (que ensinam o próximo passo), **carregando** (skeleton) e **erro** (com "Tentar de novo") em toda tela com dados (`SkeletonGroup` e `LoadError`, de `components/ui`; para vê-los, Ajustes > Modo demonstração > "Carregar tudo de novo").
 - [ ] `aria-live` para mudanças importantes (total do carrinho, troco, toasts).
 - [ ] Contraste WCAG 2.2 AA, foco visível, navegação completa por teclado, landmarks e skip link, `<dialog>` nativo com foco gerenciado.
 
@@ -123,12 +125,24 @@ Responsiva de 360px a desktop · tema claro, escuro e alto contraste · texto a 
 - **Recharts na impressão:** o gráfico fica dentro de um `<div>` de largura 0 (`overflow: visible`), então `max-inline-size: 100%` no `.recharts-wrapper` o zerava. O `print.css` dá 100% a esse `<div>` e encolhe o SVG pelo `viewBox`. Uma coluna `auto` com `min(…, 100%)` dentro também some no papel: a rosca tem tamanho fixo na impressão.
 - **Container query × impressão:** a troca "tabela vira lista" fica dentro de `@media screen`; no papel (texto a 10pt), a mesma largura em `rem` disparava a lista.
 - **Redirecionamento descarta o `state`:** ao concluir as boas-vindas, o `<Navigate>` da própria tela leva ao Início e trocaria qualquer `navigate(..., { state })` feito antes. Para abrir o tour, a tela guarda que acabou de concluir e passa o `state` no próprio `<Navigate>`.
+- **`aria-label` num `<div>` sem papel:** o axe recusa (`aria-prohibited-attr`). Para regiões "carregando", use o `SkeletonGroup`, que põe o texto num `visually-hidden`.
+- **Rosca do Recharts no Tab:** o `<Pie>` tem `tabIndex=0` próprio (`rootTabIndex`), mesmo com `accessibilityLayer={false}`. Dentro de um `aria-hidden`, isso é violação: use `rootTabIndex={-1}`.
+- **Campo de texto alarga a tela com texto Enorme:** um `<input>` dentro de flex tem a largura mínima de ~20 letras. O `Input` tem `min-inline-size: 0`; faça o mesmo em campos próprios.
+- **Título espremido letra por letra:** num cabeçalho flex com título `min-inline-size: 0` e uma ação que não encolhe (selo, botão), o título vira "O / qu / e". Deixe a linha quebrar (`flex-wrap` + `flex-basis` no título), como no `CardHeader`.
+- **Janelas fechadas continuam no DOM:** num `--eval` (ou num teste com `{ hidden: true }`), procurar um botão pelo texto pode achar o de um `<dialog>` fechado. Na captura do troco, isso disparou "Vender fiado assim mesmo" escondido. Procure dentro de `dialog[open]`.
+- **Lighthouse só nas telas públicas:** ele abre cada endereço do zero, e a sessão vive em memória. As telas logadas são auditadas pelo `npm run a11y`, que usa o mesmo axe e navega dentro do app.
+- **Testes do caixa dependem das despesas sorteadas:** num dia sem despesa até a hora do teste, a lista "Despesas do dia" não existe. O teste lança uma (`ensureExpenseToday`) e, depois do "Desfazer", procura o texto em vez de reaproveitar a lista antiga.
 
 ## Estado atual e próximos passos
 
-- **Concluído:** Fases 1 a 11: fundação, design system, domínio e dados, shell e navegação, vender, fiado e clientes, estoque, caixa e despesas, dashboard, relatórios e ajustes/ajuda/tour. Todas as telas do plano existem: vender (`/vender`, `/vendas`, `/vendas/:id`), fiado (`/fiado`, `/fiado/:customerId`), clientes, estoque (`/estoque`, `/estoque/novo`, `/estoque/:productId`), caixa (`/caixa?dia=`), Início (`/inicio?periodo=`), relatórios (`/relatorios?tipo=&periodo=&de=&ate=`), ajustes (`/ajustes`) e ajuda (`/ajuda`), com o tour de primeiro uso no Início (`state.tour`).
-- **Próxima:** Fase 12 (Polimento): animações, revisão dos estados vazio/carregando/erro em todas as telas, auditoria de acessibilidade (axe/Lighthouse ≥ 95), revisão dos textos, PWA básico (manifest), testes dos fluxos principais e capturas de tela no README. O componente `ComingSoon` já não é usado por nenhuma tela e pode sair.
-- Ao concluir cada fase: atualize esta seção, o status em `docs/plano-de-implementacao.md` e o Roadmap do `README.md`, e faça **um commit por fase**.
+- **O protótipo está completo: Fases 1 a 12 concluídas.** Todas as telas do plano existem: vender (`/vender`, `/vendas`, `/vendas/:id`), fiado (`/fiado`, `/fiado/:customerId`), clientes, estoque (`/estoque`, `/estoque/novo`, `/estoque/:productId`), caixa (`/caixa?dia=`), Início (`/inicio?periodo=`), relatórios (`/relatorios?tipo=&periodo=&de=&ate=`), ajustes (`/ajustes`) e ajuda (`/ajuda`), com o tour de primeiro uso no Início (`state.tour`). A Fase 12 padronizou carregando/erro (`SkeletonGroup`, `LoadError`), deixou o axe sem violações em todas as telas (`npm run a11y`), acrescentou o manifest para "instalar na tela inicial" e o teste do fluxo principal (`src/mainFlow.test.jsx`).
+- **O que a empresa deve fazer a seguir** (detalhes em "Integração futura com o back-end" no `README.md`):
+  1. **Trocar `src/services/` pela API real**, mantendo as assinaturas (JSDoc) e os códigos de `ERROR_MESSAGES`. O `request` de `services/api.js` vira o `fetch` com o token; comece por `auth.service.js` e siga por vendas, fiado, estoque e caixa. `mocks/` passa a servir só aos testes (ou ao MSW).
+  2. **Revalidar no servidor** as regras de `docs/regras-de-negocio.md`; `domain/rules` continua no front para a resposta imediata (troco, totais, status).
+  3. **Carregar por tela:** o `DataProvider` busca tudo de uma vez (`fetchAllData`), o que só serve com os dados de exemplo; com volume real, cada área carrega e pagina o que mostra.
+  4. **Persistência e sessão:** com a API, a regra "estado só em memória" deixa de valer para os dados de negócio; guarde a sessão de forma segura e decida o funcionamento sem internet (fila de vendas + service worker) antes de prometer "offline".
+  5. **CI:** `npm run lint`, `npm test` (com o fluxo principal), `npm run build`, `npm run format:check` e `npm run a11y` (com o build servido) a cada mudança.
+- Ao mudar o produto: atualize esta seção, o plano (`docs/plano-de-implementacao.md`), as regras e o design system, e faça commits pequenos com a mesma linguagem simples na interface.
 
 ## Documentação relacionada
 

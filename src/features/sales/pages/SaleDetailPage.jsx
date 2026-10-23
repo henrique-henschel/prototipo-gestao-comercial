@@ -1,9 +1,19 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import { Ban, NotebookText, RotateCcw, Send, ShoppingBag } from 'lucide-react';
+import { Ban, NotebookText, Send, ShoppingBag } from 'lucide-react';
 import { ROUTES } from '@/app/routes.js';
 import { PageHeader } from '@/components/layout';
-import { Avatar, Button, Card, CardHeader, EmptyState, Skeleton, StatusPill } from '@/components/ui';
+import {
+  Avatar,
+  Button,
+  Card,
+  CardHeader,
+  EmptyState,
+  LoadError,
+  Skeleton,
+  SkeletonGroup,
+  StatusPill,
+} from '@/components/ui';
 import { CANCEL_REASONS, PAYMENT_METHODS, UNITS } from '@/domain/constants.js';
 import { cancelSaleAccounts } from '@/domain/rules/fiado.js';
 import { formatBRL } from '@/domain/rules/money.js';
@@ -53,9 +63,9 @@ export default function SaleDetailPage() {
     return (
       <>
         <PageHeader title="Venda" backTo={ROUTES.sales} />
-        <Card aria-busy="true" aria-label="Carregando a venda">
+        <SkeletonGroup label="Carregando a venda" as={Card}>
           <Skeleton lines={6} />
-        </Card>
+        </SkeletonGroup>
       </>
     );
   }
@@ -64,19 +74,7 @@ export default function SaleDetailPage() {
     return (
       <>
         <PageHeader title="Venda" backTo={ROUTES.sales} />
-        <Card>
-          <EmptyState
-            tone="danger"
-            emoji="📡"
-            title="Não deu para carregar a venda"
-            description="Confira a internet e tente de novo."
-            action={
-              <Button icon={RotateCcw} onClick={reload}>
-                Tentar de novo
-              </Button>
-            }
-          />
-        </Card>
+        <LoadError title="Não deu para carregar a venda" onRetry={reload} />
       </>
     );
   }

@@ -33,8 +33,15 @@ export function Toaster({ toasts, onDismiss }) {
   }, [toasts]);
 
   return (
-    <div ref={ref} popover="manual" className={cx(styles.toaster, 'no-print')}>
-      <ol className={styles.list} role="status" aria-live="polite" aria-label="Avisos">
+    <div
+      ref={ref}
+      popover="manual"
+      className={cx(styles.toaster, 'no-print')}
+      role="status"
+      aria-live="polite"
+      aria-label="Avisos"
+    >
+      <ol className={styles.list}>
         {toasts.map((toast) => (
           <ToastItem key={toast.id} toast={toast} onDismiss={onDismiss} />
         ))}

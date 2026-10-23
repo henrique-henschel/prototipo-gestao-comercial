@@ -35,7 +35,8 @@
   }
 
   .pad-lg {
-    padding: var(--space-6);
+    /* Encolhe em telas estreitas: com texto Enorme, sobra mais espaço para o conteúdo. */
+    padding: clamp(var(--space-4), 6vw, var(--space-6));
   }
 
   .interactive {
@@ -60,6 +61,7 @@
 
   .header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--space-3);
     margin-block-end: var(--space-4);
@@ -76,8 +78,10 @@
     color: var(--color-primary-text);
   }
 
+  /* Com texto Enorme, a ação (um selo, um botão) desce para a linha de baixo em vez de
+     espremer o título letra por letra. */
   .headerText {
-    flex: 1;
+    flex: 1 1 8rem;
     min-inline-size: 0;
   }
 

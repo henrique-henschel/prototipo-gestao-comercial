@@ -1,9 +1,19 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
-import { RotateCcw, SearchX, ShoppingCart } from 'lucide-react';
+import { SearchX, ShoppingCart } from 'lucide-react';
 import { ROUTES } from '@/app/routes.js';
 import { PageHeader } from '@/components/layout';
-import { Button, Card, Chip, ChipGroup, EmptyState, SearchBar, Skeleton } from '@/components/ui';
+import {
+  Button,
+  Card,
+  Chip,
+  ChipGroup,
+  EmptyState,
+  LoadError,
+  SearchBar,
+  Skeleton,
+  SkeletonGroup,
+} from '@/components/ui';
 import { PAYMENT_METHOD_KEYS, PAYMENT_METHODS, PERIOD_PRESETS } from '@/domain/constants.js';
 import { formatBRL, sumCents } from '@/domain/rules/money.js';
 import { filterByPeriod, periodFromPreset } from '@/domain/rules/period.js';
@@ -102,11 +112,11 @@ export default function SalesPage() {
     return (
       <>
         {header}
-        <div className={styles.list} aria-busy="true" aria-label="Carregando as vendas">
+        <SkeletonGroup label="Carregando as vendas" className={styles.list}>
           {Array.from({ length: 6 }, (_, index) => (
             <Skeleton key={index} shape="rect" height="5rem" />
           ))}
-        </div>
+        </SkeletonGroup>
       </>
     );
   }
@@ -115,19 +125,7 @@ export default function SalesPage() {
     return (
       <>
         {header}
-        <Card>
-          <EmptyState
-            tone="danger"
-            emoji="📡"
-            title="Não deu para carregar as vendas"
-            description="Confira a internet e tente de novo."
-            action={
-              <Button icon={RotateCcw} onClick={reload}>
-                Tentar de novo
-              </Button>
-            }
-          />
-        </Card>
+        <LoadError title="Não deu para carregar as vendas" onRetry={reload} />
       </>
     );
   }

@@ -40,6 +40,8 @@ export function DonutChart({ data, formatValue, totalLabel, legendLabel, animate
               endAngle={-270}
               stroke="var(--surface-1)"
               strokeWidth={2}
+              // O gráfico é só visual (a legenda tem os valores): fora da ordem do Tab.
+              rootTabIndex={-1}
               isAnimationActive={animate && !reducedMotion}
             >
               {slices.map((item) => (

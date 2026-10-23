@@ -1,9 +1,18 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
-import { Package, RotateCcw } from 'lucide-react';
+import { Package } from 'lucide-react';
 import { ROUTES } from '@/app/routes.js';
 import { PageHeader } from '@/components/layout';
-import { Button, Card, CardHeader, EmptyState, Skeleton, StatusPill } from '@/components/ui';
+import {
+  Button,
+  Card,
+  CardHeader,
+  EmptyState,
+  LoadError,
+  Skeleton,
+  SkeletonGroup,
+  StatusPill,
+} from '@/components/ui';
 import { UNITS } from '@/domain/constants.js';
 import { stockStatus } from '@/domain/rules/stock.js';
 import { useDataStatus } from '@/hooks/useData.js';
@@ -58,10 +67,10 @@ export default function ProductFormPage() {
     return (
       <>
         {header}
-        <div className={styles.loading} aria-busy="true" aria-label="Carregando o produto">
+        <SkeletonGroup label="Carregando o produto" className={styles.loading}>
           <Skeleton shape="rect" height="8rem" />
           <Skeleton shape="rect" height="20rem" />
-        </div>
+        </SkeletonGroup>
       </>
     );
   }
@@ -70,19 +79,7 @@ export default function ProductFormPage() {
     return (
       <>
         {header}
-        <Card>
-          <EmptyState
-            tone="danger"
-            emoji="📡"
-            title="Não deu para carregar o produto"
-            description="Confira a internet e tente de novo."
-            action={
-              <Button icon={RotateCcw} onClick={reload}>
-                Tentar de novo
-              </Button>
-            }
-          />
-        </Card>
+        <LoadError title="Não deu para carregar o produto" onRetry={reload} />
       </>
     );
   }

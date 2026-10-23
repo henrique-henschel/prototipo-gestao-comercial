@@ -79,7 +79,7 @@ export function SplitPayment({ totalCents, parts, methods, onAdd, onRemove }) {
                 ? calcChange(part.receivedCents, part.amountCents).changeCents
                 : 0;
             return (
-              <li key={part.key} className={styles.part}>
+              <li key={part.key} className={cx(styles.part, 'enter')}>
                 <Icon className={styles.partIcon} size={24} aria-hidden="true" />
                 <span className={styles.partText}>
                   <span className={styles.partLabel}>

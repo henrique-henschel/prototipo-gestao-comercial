@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import { IconButton } from '../IconButton/IconButton.jsx';
 import { cx } from '@/lib/cx.js';
@@ -32,6 +32,8 @@ export function Dialog({
   children,
 }) {
   const ref = useRef(null);
+  const bodyRef = useRef(null);
+  const [scrollable, setScrollable] = useState(false);
   const titleId = useId();
   const descriptionId = useId();
 
@@ -41,6 +43,17 @@ export function Dialog({
     if (open && !dialog.open) dialog.showModal?.();
     if (!open && dialog.open) dialog.close?.();
   }, [open]);
+
+  // Corpo que rola (texto Enorme, tela baixa) precisa ser alcançável pelo teclado para
+  // rolar com as setas, mesmo sem nenhum botão dentro (o tour, por exemplo).
+  useEffect(() => {
+    const body = bodyRef.current;
+    if (!open || !body || typeof ResizeObserver === 'undefined') return;
+    const observer = new ResizeObserver(() => setScrollable(body.scrollHeight > body.clientHeight));
+    observer.observe(body);
+    for (const child of body.children) observer.observe(child);
+    return () => observer.disconnect();
+  }, [open, children]);
 
   const handleCancel = (event) => {
     // Esc: quem decide fechar é o estado do React.
@@ -78,7 +91,13 @@ export function Dialog({
           </div>
           <IconButton label="Fechar" icon={X} variant="soft" onClick={onClose} className={styles.close} />
         </header>
-        <div className={styles.body}>{children}</div>
+        <div
+          ref={bodyRef}
+          className={styles.body}
+          {...(scrollable && { tabIndex: 0, role: 'region', 'aria-labelledby': titleId })}
+        >
+          {children}
+        </div>
         {footer && <footer className={styles.footer}>{footer}</footer>}
       </div>
     </dialog>

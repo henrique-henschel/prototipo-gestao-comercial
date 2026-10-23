@@ -3,7 +3,7 @@ import styles from './Skeleton.module.css';
 
 /**
  * Bloco de carregamento no formato do conteúdo real (evita "pulos" na tela).
- * Puramente visual: quem envolve deve marcar a região com `aria-busy="true"`.
+ * Puramente visual: agrupe os blocos de uma região num `SkeletonGroup`.
  *
  * @param {object} props
  * @param {'text'|'rect'|'circle'} [props.shape='text']
@@ -32,5 +32,27 @@ export function Skeleton({ shape = 'text', width, height, lines = 1, className }
       style={{ inlineSize: width, blockSize: height }}
       aria-hidden="true"
     />
+  );
+}
+
+/**
+ * Região "carregando": marca `aria-busy` e diz ao leitor de tela o que está chegando
+ * (um texto escondido, porque `aria-label` não vale num `<div>` sem papel).
+ *
+ * @example
+ * <SkeletonGroup label="Carregando as vendas" className={styles.list}>
+ *   <Skeleton shape="rect" height="5rem" />
+ * </SkeletonGroup>
+ *
+ * @param {object} props
+ * @param {string} props.label ex.: "Carregando as vendas"
+ * @param {import('react').ElementType} [props.as='div'] ex.: `Card` (as outras props vão para ele)
+ */
+export function SkeletonGroup({ label, as: Component = 'div', children, ...rest }) {
+  return (
+    <Component {...rest} aria-busy="true">
+      <span className="visually-hidden">{label}</span>
+      {children}
+    </Component>
   );
 }

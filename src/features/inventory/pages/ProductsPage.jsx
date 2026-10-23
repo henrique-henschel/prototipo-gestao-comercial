@@ -1,9 +1,20 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
-import { PackageX, Plus, RotateCcw, SearchX, Wallet } from 'lucide-react';
+import { PackageX, Plus, SearchX, Wallet } from 'lucide-react';
 import { ROUTES } from '@/app/routes.js';
 import { PageHeader } from '@/components/layout';
-import { Button, Card, Chip, ChipGroup, EmptyState, SearchBar, Skeleton, StatCard } from '@/components/ui';
+import {
+  Button,
+  Card,
+  Chip,
+  ChipGroup,
+  EmptyState,
+  LoadError,
+  SearchBar,
+  Skeleton,
+  SkeletonGroup,
+  StatCard,
+} from '@/components/ui';
 import { PRODUCT_CATEGORIES, STOCK_STATUS } from '@/domain/constants.js';
 import { formatBRL } from '@/domain/rules/money.js';
 import { compareStockUrgency, stockStatus, stockValue } from '@/domain/rules/stock.js';
@@ -94,7 +105,7 @@ export default function ProductsPage() {
     return (
       <>
         {header}
-        <div className={styles.loading} aria-busy="true" aria-label="Carregando o estoque">
+        <SkeletonGroup label="Carregando o estoque" className={styles.loading}>
           <div className={styles.stats}>
             <Skeleton shape="rect" height="6rem" />
             <Skeleton shape="rect" height="6rem" />
@@ -102,7 +113,7 @@ export default function ProductsPage() {
           {Array.from({ length: 5 }, (_, index) => (
             <Skeleton key={index} shape="rect" height="4.5rem" />
           ))}
-        </div>
+        </SkeletonGroup>
       </>
     );
   }
@@ -111,19 +122,7 @@ export default function ProductsPage() {
     return (
       <>
         {header}
-        <Card>
-          <EmptyState
-            tone="danger"
-            emoji="📡"
-            title="Não deu para carregar o estoque"
-            description="Confira a internet e tente de novo."
-            action={
-              <Button icon={RotateCcw} onClick={reload}>
-                Tentar de novo
-              </Button>
-            }
-          />
-        </Card>
+        <LoadError title="Não deu para carregar o estoque" onRetry={reload} />
       </>
     );
   }

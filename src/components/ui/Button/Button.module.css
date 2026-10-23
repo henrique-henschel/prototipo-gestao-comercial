@@ -104,7 +104,8 @@
 
   .lg {
     --btn-height: var(--tap-primary);
-    --btn-pad: var(--space-6);
+    /* Como no hero: o recuo encolhe em telas estreitas para caber o texto Enorme. */
+    --btn-pad: clamp(var(--space-3), 4vw, var(--space-6));
 
     font-size: var(--text-lg);
   }
@@ -120,8 +121,17 @@
   }
 
   .fullWidth {
+    container-type: inline-size;
     display: flex;
     inline-size: 100%;
+  }
+
+  /* Botão de largura toda muito estreito (texto Enorme no celular): o ícone sai para a
+     palavra mais longa ("demonstração") caber sem alargar a tela. */
+  @container (inline-size < 12rem) {
+    .fullWidth > svg:not(.spinner) {
+      display: none;
+    }
   }
 
   .spinner {

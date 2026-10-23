@@ -1,17 +1,19 @@
 import { useEffect, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router';
-import {
-  FileSpreadsheet,
-  MessageCircle,
-  PackagePlus,
-  Printer,
-  RotateCcw,
-  Share2,
-  ShoppingCart,
-} from 'lucide-react';
+import { FileSpreadsheet, MessageCircle, PackagePlus, Printer, Share2, ShoppingCart } from 'lucide-react';
 import { ROUTES } from '@/app/routes.js';
 import { PageHeader } from '@/components/layout';
-import { Button, Card, Chip, ChipGroup, EmptyState, Input, Skeleton } from '@/components/ui';
+import {
+  Button,
+  Card,
+  Chip,
+  ChipGroup,
+  EmptyState,
+  Input,
+  LoadError,
+  Skeleton,
+  SkeletonGroup,
+} from '@/components/ui';
 import { PERIOD_PRESETS, REPORT_TYPES } from '@/domain/constants.js';
 import { useSettings } from '@/hooks/useSettings.js';
 import { useToast } from '@/hooks/useToast.js';
@@ -276,33 +278,19 @@ function PreviewBody({ status, report, empty, onRetry, hasPeriod }) {
   if (!hasPeriod) return null;
 
   if (status === 'error') {
-    return (
-      <Card>
-        <EmptyState
-          tone="danger"
-          emoji="📡"
-          title="Não deu para montar o relatório"
-          description="Confira a internet e tente de novo."
-          action={
-            <Button icon={RotateCcw} onClick={onRetry}>
-              Tentar de novo
-            </Button>
-          }
-        />
-      </Card>
-    );
+    return <LoadError title="Não deu para montar o relatório" onRetry={onRetry} />;
   }
 
   if (!report) {
     return (
-      <div className={styles.loading} aria-label="Carregando o relatório">
+      <SkeletonGroup label="Carregando o relatório" className={styles.loading}>
         <div className={styles.loadingStats}>
           {Array.from({ length: 4 }, (_, index) => (
             <Skeleton key={index} shape="rect" height="6rem" />
           ))}
         </div>
         <Skeleton shape="rect" height="16rem" />
-      </div>
+      </SkeletonGroup>
     );
   }
 

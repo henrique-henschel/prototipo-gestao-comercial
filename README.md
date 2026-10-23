@@ -29,7 +29,7 @@ Para quem vende na rua, na feira, na barraca, no carrinho ou numa lojinha, e pre
 | **Relatórios**         | Por período e por tipo; exportação em Excel (CSV), PDF (impressão) e compartilhamento                                                                          |
 | **Ajustes**            | Dados do negócio, chave Pix, taxas da maquininha, regras de estoque, acessibilidade, modo demonstração                                                         |
 
-> As funcionalidades são entregues em fases (veja o [Roadmap](#roadmap)). As Fases 1 a 11 estão concluídas: fundação, design system, domínio e dados (regras testadas, dados de exemplo, serviços e estado global), a navegação (entrar, criar conta, boas-vindas, menus do celular e do computador), o fluxo de vender (PDV, carrinho, todas as formas de pagamento, venda concluída com "Desfazer", histórico e cancelamento), o fiado e os clientes, o estoque, o caixa do dia com despesas, o Início com gráficos, os relatórios (Excel, PDF e WhatsApp), os ajustes (negócio, Pix, formas e taxas, regras, acessibilidade e modo demonstração), a ajuda e o tour de primeiro uso. A Fase 12 faz o polimento final; o catálogo vivo de componentes fica em `/design-system`.
+> O protótipo está completo: as 12 fases do [Roadmap](#roadmap) foram concluídas, da fundação ao polimento final (estados de carregando, vazio e erro em todas as telas, animações, auditoria de acessibilidade com o axe, "instalar na tela inicial" e o teste do fluxo principal de ponta a ponta). O catálogo vivo de componentes fica em `/design-system`.
 
 ## Como rodar
 
@@ -44,15 +44,17 @@ Acesse `http://localhost:5173` e toque em **"Entrar com conta de demonstração"
 
 ### Scripts
 
-| Comando                                   | Descrição                                                                        |
-| ----------------------------------------- | -------------------------------------------------------------------------------- |
-| `npm run dev`                             | Servidor de desenvolvimento                                                      |
-| `npm run build`                           | Build de produção (`dist/`)                                                      |
-| `npm run preview`                         | Serve o build localmente                                                         |
-| `npm test` / `npm run test:watch`         | Testes com Vitest + Testing Library                                              |
-| `npm run lint`                            | ESLint (React, Hooks, acessibilidade JSX)                                        |
-| `npm run format` / `npm run format:check` | Prettier                                                                         |
-| `npm run shot -- <arquivo.png> [rota]`    | Captura de tela headless para verificação visual (veja `scripts/screenshot.mjs`) |
+| Comando                                   | Descrição                                                                         |
+| ----------------------------------------- | --------------------------------------------------------------------------------- |
+| `npm run dev`                             | Servidor de desenvolvimento                                                       |
+| `npm run build`                           | Build de produção (`dist/`)                                                       |
+| `npm run preview`                         | Serve o build localmente                                                          |
+| `npm test` / `npm run test:watch`         | Testes com Vitest + Testing Library                                               |
+| `npm run lint`                            | ESLint (React, Hooks, acessibilidade JSX)                                         |
+| `npm run format` / `npm run format:check` | Prettier                                                                          |
+| `npm run shot -- <arquivo.png> [rota]`    | Captura de tela headless para verificação visual (veja `scripts/screenshot.mjs`)  |
+| `npm run a11y`                            | Auditoria de acessibilidade com o axe em todas as telas (veja `scripts/a11y.mjs`) |
+| `npm run icons`                           | Gera os ícones do app (PWA) a partir do `public/favicon.svg`                      |
 
 ## Tecnologias
 
@@ -79,7 +81,8 @@ src/
 ├─ hooks/        hooks reutilizáveis
 └─ lib/          formatação, CSV, WhatsApp, compartilhamento
 docs/            plano de implementação, regras de negócio e design system
-scripts/         screenshot.mjs (capturas de tela para verificação visual)
+scripts/         capturas de tela (shot), auditoria de acessibilidade (a11y) e ícones do app
+public/          favicon, ícones e manifest ("instalar na tela inicial")
 ```
 
 Os detalhes e as convenções estão no [`CLAUDE.md`](./CLAUDE.md).
@@ -100,10 +103,13 @@ O protótipo foi organizado para que a troca por uma API real seja localizada:
 2. **Serviços**: cada função de `src/services/*.service.js` já é `async` e tem assinatura equivalente a um endpoint REST. Basta trocar a implementação em memória por chamadas HTTP, mantendo a mesma assinatura.
 3. **Mocks**: `src/mocks/` pode ser removido ou reaproveitado em testes e em MSW.
 4. **Regras puras**: `src/domain/rules` pode continuar no front para feedback imediato (troco, totais, status) e ser espelhado no servidor.
+5. **Rede**: `request` (`src/services/api.js`) é o único lugar que simula latência e falha; ele vira o `fetch` (com o token da sessão), e os `ApiError` com os códigos de `ERROR_MESSAGES` continuam chegando às telas, que já mostram carregando, erro e "Tentar de novo".
+
+Próximos passos sugeridos para o produto real, nesta ordem: trocar `services/` pela API (começando por `auth.service.js`, depois vendas, fiado, estoque e caixa); trocar o `fetchAllData` do `DataProvider` por cargas por tela e paginadas quando o volume crescer; guardar a sessão de forma segura; decidir o funcionamento sem internet (fila de vendas e service worker); e manter `npm test`, `npm run a11y` e o teste do fluxo principal (`src/mainFlow.test.jsx`) numa etapa de CI.
 
 ## Roadmap
 
-O detalhamento de cada fase está em [`docs/plano-de-implementacao.md`](./docs/plano-de-implementacao.md).
+**Fases 1 a 12 concluídas.** O detalhamento de cada fase está em [`docs/plano-de-implementacao.md`](./docs/plano-de-implementacao.md).
 
 | Fase | Entrega                                                              | Status       |
 | ---- | -------------------------------------------------------------------- | ------------ |
@@ -118,14 +124,29 @@ O detalhamento de cada fase está em [`docs/plano-de-implementacao.md`](./docs/p
 | 9    | Dashboard: hoje, avisos, indicadores, gráficos e atalhos             | ✅ Concluída |
 | 10   | Relatórios: filtros, prévia, Excel (CSV), PDF e compartilhar         | ✅ Concluída |
 | 11   | Ajustes, acessibilidade, ajuda e tour                                | ✅ Concluída |
-| 12   | Polimento, auditoria de acessibilidade, PWA básico                   | ⏳           |
+| 12   | Polimento, auditoria de acessibilidade, PWA básico                   | ✅ Concluída |
 
 ## Limitações do protótipo
 
 - Nenhum dado é salvo: recarregar a página volta aos dados de exemplo.
 - Login, Pix, maquininha e WhatsApp são simulados: o Pix mostra um QR da chave configurada e o WhatsApp abre um link `wa.me` com a mensagem pronta.
 - Não há multiusuário, sincronização ou emissão fiscal.
+- Dá para "instalar na tela inicial" (manifest e ícones), mas o app não funciona sem internet: não há service worker, de propósito, porque nada é guardado.
 
 ## Capturas de tela
 
-_Serão adicionadas conforme as telas forem concluídas._
+No celular: o Início, a venda montada (tema escuro) e o troco em destaque.
+
+<p>
+  <img src="docs/capturas/celular-inicio-claro.webp" alt="Início no celular: quanto vendeu hoje, o botão Vender e os avisos do que precisa de atenção" width="260" />
+  <img src="docs/capturas/celular-vender-escuro.webp" alt="Tela Vender no tema escuro: grade de produtos e a barra do carrinho com 4 itens e o botão Cobrar" width="260" />
+  <img src="docs/capturas/celular-troco-claro.webp" alt="Pagamento em dinheiro: o cliente deu R$ 20,00 e o troco de R$ 8,00 aparece em destaque, com o botão Ouvir" width="260" />
+</p>
+
+No computador: o Início e o fiado (tema escuro).
+
+<img src="docs/capturas/computador-inicio-claro.webp" alt="Início no computador: menu lateral, quanto vendeu hoje, avisos e os indicadores do período" />
+
+<img src="docs/capturas/computador-fiado-escuro.webp" alt="Quem me deve no tema escuro: quanto há para receber, quanto está atrasado e a lista de clientes com Cobrar no WhatsApp" />
+
+As imagens ficam em `docs/capturas/` e são feitas com `npm run shot` (nome terminado em `.webp`).

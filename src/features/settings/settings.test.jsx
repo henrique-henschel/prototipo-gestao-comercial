@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { db, resetDemo } from '@/mocks/db.js';
 import { configureApi, getApiConfig } from '@/services/api.js';
@@ -132,6 +132,24 @@ describe('ajustes', () => {
     expect(getApiConfig().failing).toBe(true);
     await user.click(screen.getByRole('switch', { name: /^Simular falha de internet/ }));
     expect(getApiConfig().failing).toBe(false);
+  });
+
+  it('"Carregar tudo de novo" com falha mostra o erro nas telas, e "Tentar de novo" volta', async () => {
+    const { user, router } = await openSettings();
+    await user.click(screen.getByRole('switch', { name: /^Simular falha de internet/ }));
+    await user.click(screen.getByRole('button', { name: 'Carregar tudo de novo' }));
+    // Os Ajustes continuam abertos (os dados de antes ficam na memória) para desligar a falha.
+    await waitFor(() => expect(router.state.location.pathname).toBe('/ajustes'));
+    expect(screen.getByRole('region', { name: 'Formas de pagamento' })).toBeInTheDocument();
+
+    await act(() => router.navigate('/vendas'));
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('Não deu para carregar as vendas');
+
+    configureApi({ failing: false });
+    await user.click(within(alert).getByRole('button', { name: 'Tentar de novo' }));
+    await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
+    expect(await screen.findByRole('searchbox')).toBeInTheDocument();
   });
 
   it('restaurar os dados de exemplo pede confirmação, porque não tem volta', async () => {

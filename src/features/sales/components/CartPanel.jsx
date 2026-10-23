@@ -7,6 +7,7 @@ import { findStockShortages } from '@/domain/rules/stock.js';
 import { useCart } from '@/hooks/useCart.js';
 import { useToast } from '@/hooks/useToast.js';
 import { formatNumber, plural } from '@/lib/format.js';
+import { cx } from '@/lib/cx.js';
 import { DiscountSheet } from './DiscountSheet.jsx';
 import styles from './CartPanel.module.css';
 
@@ -78,7 +79,7 @@ export function CartPanel() {
           const unit = UNITS[line.unit] ?? UNITS.un;
           const shortage = line.productId && shortages.get(line.productId);
           return (
-            <li key={line.key} className={styles.line}>
+            <li key={line.key} className={cx(styles.line, 'enter')}>
               <span className={styles.emoji} aria-hidden="true">
                 {line.emoji ?? '🧮'}
               </span>

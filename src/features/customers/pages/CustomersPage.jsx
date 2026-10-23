@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
-import { ChevronRight, RotateCcw, SearchX, UserPlus } from 'lucide-react';
+import { ChevronRight, SearchX, UserPlus } from 'lucide-react';
 import { ROUTES } from '@/app/routes.js';
 import { PageHeader } from '@/components/layout';
 import {
@@ -11,8 +11,10 @@ import {
   Chip,
   ChipGroup,
   EmptyState,
+  LoadError,
   SearchBar,
   Skeleton,
+  SkeletonGroup,
   StatusPill,
 } from '@/components/ui';
 import { customerFiadoSummary } from '@/domain/rules/fiado.js';
@@ -125,11 +127,11 @@ export default function CustomersPage() {
     return (
       <>
         {header}
-        <div className={styles.list} aria-busy="true" aria-label="Carregando os clientes">
+        <SkeletonGroup label="Carregando os clientes" className={styles.list}>
           {Array.from({ length: 6 }, (_, index) => (
             <Skeleton key={index} shape="rect" height="4.5rem" />
           ))}
-        </div>
+        </SkeletonGroup>
       </>
     );
   }
@@ -138,19 +140,7 @@ export default function CustomersPage() {
     return (
       <>
         {header}
-        <Card>
-          <EmptyState
-            tone="danger"
-            emoji="📡"
-            title="Não deu para carregar os clientes"
-            description="Confira a internet e tente de novo."
-            action={
-              <Button icon={RotateCcw} onClick={reload}>
-                Tentar de novo
-              </Button>
-            }
-          />
-        </Card>
+        <LoadError title="Não deu para carregar os clientes" onRetry={reload} />
       </>
     );
   }

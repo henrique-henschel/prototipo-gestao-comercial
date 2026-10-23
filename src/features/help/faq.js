@@ -15,13 +15,13 @@ export const FAQ = [
       {
         question: 'Como faço uma venda?',
         answer:
-          'Toque em Vender, toque nos produtos que o cliente levou e depois em Cobrar. Escolha como ele pagou e confirme. Para algo que não está na lista, use "Valor avulso".',
+          'Toque em Vender, toque nos produtos que o cliente levou e depois em Cobrar. Escolha a forma de pagamento e conclua a venda. Para algo que não está na lista, use "Valor avulso".',
         link: { to: ROUTES.sell, label: 'Ir para Vender' },
       },
       {
         question: 'Como sei quanto dar de troco?',
         answer:
-          'No pagamento em dinheiro, digite quanto o cliente deu (ou toque na nota). O troco aparece bem grande, e o botão "Ouvir" fala o valor.',
+          'No pagamento em dinheiro, digite quanto o cliente deu (ou toque no valor da nota). O troco aparece bem grande, e o botão "Ouvir" fala o valor.',
       },
       {
         question: 'Errei a venda. E agora?',
@@ -44,13 +44,13 @@ export const FAQ = [
       {
         question: 'O cliente pagou uma parte. Como registro?',
         answer:
-          'Em Fiado, toque em "Receber pagamento", escolha o cliente e digite quanto ele deu. O pagamento abate primeiro a compra mais antiga.',
+          'Em Fiado, toque em "Receber pagamento", escolha quem está pagando e digite o valor. O pagamento abate primeiro a compra mais antiga.',
         link: { to: ROUTES.fiado, label: 'Ir para o Fiado' },
       },
       {
         question: 'Como cobro um cliente atrasado?',
         answer:
-          'Toque em "Cobrar no WhatsApp" na lista do Fiado. A mensagem já vai pronta e educada, com quanto ele deve e a sua chave Pix.',
+          'Toque em "Cobrar no WhatsApp" na lista do Fiado. A mensagem já vai pronta e educada, com o valor da dívida e a sua chave Pix.',
       },
     ],
   },
@@ -89,7 +89,7 @@ export const FAQ = [
           'Não. Registre como entrada no Estoque. Despesa é gasto que não vira mercadoria: gasolina, almoço, aluguel, gelo, sacolas.',
       },
       {
-        question: 'O que é o "lucro estimado"?',
+        question: 'O que é o "Lucro estimado"?',
         answer:
           'É o que você vendeu menos o custo dos produtos, as taxas da maquininha e as despesas. Se algum produto está sem custo, o lucro de verdade pode ser menor.',
       },

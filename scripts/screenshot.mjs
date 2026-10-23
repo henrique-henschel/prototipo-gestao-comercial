@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 /**
  * Captura de tela do app para verificação visual (sem dependências).
- * Abre o Chrome/Edge em modo headless e o controla pelo Chrome DevTools Protocol
- * com o WebSocket nativo do Node (>= 22).
+ * Abre o Chrome/Edge em modo headless pelo `browser.mjs` (Chrome DevTools Protocol).
  *
  * Pré-requisito: servidor rodando (`npm run dev`).
  *
@@ -32,25 +31,14 @@
  *   npm run shot -- overflow.png --width 360 --eval "document.documentElement.scrollWidth"
  *   npm run shot -- relatorio.pdf "entrar?voltar=/relatorios" --eval "..."   # PDF como na impressão (A4)
  *
- * Com o nome terminando em .pdf, a saída é o PDF que o navegador imprimiria (Page.printToPDF).
+ * Com o nome terminando em .pdf, a saída é o PDF que o navegador imprimiria (Page.printToPDF);
+ * terminando em .webp, a imagem sai comprimida (usada nas capturas do README, em docs/capturas/).
  * Arquivos sem pasta são salvos em `shots/` (ignorada pelo git).
  * Se o Chrome não for encontrado, defina CHROME_PATH.
  */
-import { spawn } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
-
-const BROWSER_CANDIDATES = [
-  process.env.CHROME_PATH,
-  'C:/Program Files/Google/Chrome/Application/chrome.exe',
-  'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
-  'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
-  '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-  '/usr/bin/google-chrome',
-  '/usr/bin/chromium',
-  '/usr/bin/chromium-browser',
-].filter(Boolean);
+import { assertServer, openPage, sleep } from './browser.mjs';
 
 function parseArgs(argv) {
   const options = {
@@ -93,103 +81,25 @@ function parseArgs(argv) {
   };
 }
 
-const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
-
 async function main() {
   const opts = parseArgs(process.argv.slice(2));
   const out = resolve(/[\\/]/.test(opts.file) ? opts.file : join('shots', opts.file));
   mkdirSync(dirname(out), { recursive: true });
 
   const url = new URL(opts.route, opts.base).toString();
+  await assertServer(opts.base);
+
+  const { send, evaluate, close } = await openPage(opts);
   try {
-    await fetch(opts.base);
-  } catch {
-    console.error(`Não consegui acessar ${opts.base}. Rode "npm run dev" antes.`);
-    process.exit(1);
-  }
-
-  const browser = BROWSER_CANDIDATES.find((path) => existsSync(path));
-  if (!browser) {
-    console.error('Chrome/Edge não encontrado. Defina a variável CHROME_PATH.');
-    process.exit(1);
-  }
-
-  const profile = mkdtempSync(join(tmpdir(), 'caderneta-shot-'));
-  const proc = spawn(
-    browser,
-    [
-      '--headless=new',
-      '--disable-gpu',
-      '--hide-scrollbars',
-      '--no-first-run',
-      '--remote-debugging-port=0',
-      `--user-data-dir=${profile}`,
-      'about:blank',
-    ],
-    { stdio: 'ignore' },
-  );
-
-  try {
-    // Com a porta 0 o navegador escolhe uma livre e a informa neste arquivo.
-    let port;
-    for (let i = 0; i < 100 && !port; i++) {
-      await sleep(100);
-      try {
-        port = readFileSync(join(profile, 'DevToolsActivePort'), 'utf8').split('\n')[0];
-      } catch {
-        /* ainda iniciando */
-      }
-    }
-    if (!port) throw new Error('O navegador não abriu a porta de depuração.');
-
-    const targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json();
-    const page = targets.find((target) => target.type === 'page');
-    const ws = new WebSocket(page.webSocketDebuggerUrl);
-    await new Promise((done, fail) => {
-      ws.addEventListener('open', done);
-      ws.addEventListener('error', fail);
-    });
-
-    let nextId = 0;
-    const pending = new Map();
-    ws.addEventListener('message', (event) => {
-      const message = JSON.parse(event.data);
-      if (message.id && pending.has(message.id)) {
-        pending.get(message.id)(message);
-        pending.delete(message.id);
-      }
-    });
-    const send = (method, params = {}) =>
-      new Promise((done) => {
-        nextId += 1;
-        pending.set(nextId, done);
-        ws.send(JSON.stringify({ id: nextId, method, params }));
-      });
-
-    await send('Emulation.setDeviceMetricsOverride', {
-      width: opts.width,
-      height: opts.height,
-      deviceScaleFactor: 1,
-      mobile: opts.width < 600,
-    });
-    await send('Emulation.setEmulatedMedia', {
-      media: opts.media ?? '',
-      features: [{ name: 'prefers-color-scheme', value: opts.theme }],
-    });
-    await send('Page.enable');
     await send('Page.navigate', { url });
     await sleep(opts.wait);
 
     if (opts.eval) {
-      const expression = `(async () => { return (${opts.eval}); })()`;
-      const result = await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true });
-      if (result.result?.exceptionDetails) {
-        console.error(
-          'Erro no --eval:',
-          result.result.exceptionDetails.exception?.description ?? result.result.exceptionDetails.text,
-        );
-      } else if (result.result?.result?.value !== undefined) {
-        console.log('eval:', JSON.stringify(result.result.result.value));
+      try {
+        const value = await evaluate(`(async () => { return (${opts.eval}); })()`);
+        if (value !== undefined) console.log('eval:', JSON.stringify(value));
+      } catch (error) {
+        console.error('Erro no --eval:', error.message);
       }
       await sleep(800); // deixa animações e transições terminarem
     }
@@ -198,11 +108,11 @@ async function main() {
       const pdf = await send('Page.printToPDF', { preferCSSPageSize: true, printBackground: true });
       writeFileSync(out, Buffer.from(pdf.result.data, 'base64'));
       console.log(`PDF salvo em ${out}`);
-      ws.close();
       return;
     }
 
-    const params = { format: 'png' };
+    // .webp sai comprimido (capturas do README); o resto, em PNG sem perdas.
+    const params = out.endsWith('.webp') ? { format: 'webp', quality: 80 } : { format: 'png' };
     if (opts.full) {
       const metrics = await send('Page.getLayoutMetrics');
       const { width, height } = metrics.result.cssContentSize;
@@ -212,16 +122,8 @@ async function main() {
     const shot = await send('Page.captureScreenshot', params);
     writeFileSync(out, Buffer.from(shot.result.data, 'base64'));
     console.log(`Captura salva em ${out}`);
-    ws.close();
   } finally {
-    const exited = new Promise((done) => proc.once('exit', done));
-    proc.kill();
-    await Promise.race([exited, sleep(3000)]);
-    try {
-      rmSync(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 });
-    } catch {
-      // Perfil temporário: se o Windows ainda segurar algum arquivo, o sistema limpa depois.
-    }
+    await close();
   }
 }
 

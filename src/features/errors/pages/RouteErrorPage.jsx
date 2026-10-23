@@ -24,6 +24,7 @@ export default function RouteErrorPage() {
       <title>{`Algo deu errado · ${APP_NAME}`}</title>
       <Card>
         <EmptyState
+          titleAs="h1"
           tone="danger"
           emoji="😕"
           title="Algo deu errado"

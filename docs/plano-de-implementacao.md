@@ -32,12 +32,14 @@ Decisões fechadas com o dono do produto:
 | 8    | Caixa e despesas                      | ✅ `2710865` |
 | 9    | Dashboard                             | ✅ `d0539ac` |
 | 10   | Relatórios                            | ✅ `202c1d5` |
-| 11   | Ajustes, acessibilidade, ajuda e tour | ✅           |
-| 12   | Polimento                             | ⏳ próxima   |
+| 11   | Ajustes, acessibilidade, ajuda e tour | ✅ `ae4571f` |
+| 12   | Polimento                             | ✅           |
 
 Agrupamento sugerido por sessão de trabalho: **3+4** → **5** → **6+7** → **8+9** → **10+11** → **12**.
 
-Ao concluir uma fase: marque aqui e no Roadmap do `README.md`, atualize a seção "Estado atual" do `CLAUDE.md` e faça o commit.
+Ao concluir uma fase: marque aqui e no Roadmap do `README.md`, atualize a seção "Estado atual" do `CLAUDE.md` e faça o commit. O hash de cada fase entra na tabela no commit seguinte; o da Fase 12 é o do commit "Fase 12: polimento".
+
+**O protótipo está completo.** Os próximos passos da empresa (API real, persistência e o que mais o produto pedir) estão no "Estado atual" do `CLAUDE.md` e em "Integração futura com o back-end" no `README.md`.
 
 ## 1. Stack
 
@@ -65,7 +67,7 @@ src/
   components/
     ui/           ✅ 27 primitivos + index.js (ver docs/design-system.md)
     layout/       ✅ AppShell, Sidebar, BottomNav, TopBar, PageHeader, CenteredLayout, Brand,
-                  SkipLink, NavigationProgress, ComingSoon + navigation.js
+                  SkipLink, NavigationProgress + navigation.js
     charts/       ChartCard, RevenueBarChart, PaymentDonut, TopProductsChart, Sparkline (Fase 9)
   features/
     design-system/ ✅ catálogo vivo
@@ -91,7 +93,8 @@ src/
   hooks/          useToast ✅, usePreferences ✅, useSpeech ✅, useData/useSales/useProducts/useCustomers/
                   useFiado/useCash/useSettings ✅, useSession/useLogout ✅, useCart/useMediaQuery/useVibrate ✅
   lib/            cx ✅, date ✅, format ✅, id ✅, whatsapp ✅, csv ✅, share ✅
-scripts/          screenshot.mjs ✅ (verificação visual)
+scripts/          screenshot.mjs ✅ (verificação visual), a11y.mjs ✅ (axe), icons.mjs ✅ (PWA),
+                  browser.mjs ✅ (Chrome headless em comum)
 ```
 
 ## 3. Arquitetura de dados (sem back-end)
@@ -182,7 +185,7 @@ Decisões tomadas durante a fase:
 - **View Transitions com o `<ViewTransition>` do React** em volta do conteúdo do `AppShell`. A v8 do React Router marcou como obsoleta a opção `viewTransition` dos links e recomenda o componente do React (19.3+); por isso não existe `lib/viewTransition.js`. O movimento reduzido é tratado em `styles/animations.css`.
 - **`DataProvider` só na área logada** (dentro de `RequireAuth`): os dados carregam depois de entrar, e sair descarta tudo.
 - **Sessão só em memória**, como o resto: recarregar a página sai da conta. O `?voltar=` devolve a pessoa à tela que ela tinha aberto.
-- **Telas das próximas fases** já têm rota e arquivo em `features/<área>/pages/`, com o componente `ComingSoon` (cabeçalho real + aviso "Esta tela está sendo construída"). Cada fase substitui o conteúdo do arquivo.
+- **Telas das próximas fases** já têm rota e arquivo em `features/<área>/pages/`, com o componente `ComingSoon` (cabeçalho real + aviso "Esta tela está sendo construída"). Cada fase substituiu o conteúdo do arquivo, e o componente saiu na Fase 12.
 - **Boas-vindas**: o último passo pergunta se a pessoa quer começar com os dados de exemplo; desligado, o negócio começa vazio (`createEmptyData`). Uma conta nova começa sem nome de negócio e sem categorias.
 - **Foco na troca de tela**: o `<main>` recebe o foco (sem contorno), para o leitor de tela anunciar a tela nova; nas boas-vindas, o foco vai para a pergunta de cada passo.
 
@@ -344,7 +347,52 @@ Plano original da fase:
 
 Dados do negócio, chave Pix, formas e taxas, regras de estoque e de fiado, acessibilidade (tema, tamanho do texto, vibração e "Ouvir"), modo demonstração (lentidão e erro) e restaurar dados; FAQ em linguagem simples; tour de primeiro uso.
 
-### Fase 12: Polimento
+### ✅ Fase 12: Polimento
+
+Entregue:
+
+- **Estados vazio, carregando e erro revisados em todas as telas com dados.** O erro virou um componente só (`LoadError`: "📡", "Não deu para carregar…", "Confira a internet e tente de novo." e "Tentar de novo", anunciado com `role="alert"`), usado no Início, Vender, Vendas, detalhe da venda, Fiado, conta do cliente, Clientes, Estoque, formulário do produto, Caixa, Relatórios, Ajustes e boas-vindas. O carregando ganhou o `SkeletonGroup` (`aria-busy` e um texto escondido no lugar do `aria-label` num `<div>`, que o axe recusa). Os vazios já ensinavam o próximo passo e foram conferidos numa conta "começando do zero".
+- **Modo demonstração completo:** "Carregar tudo de novo" nos Ajustes busca os dados outra vez, para ver qualquer tela carregando (com "internet lenta") ou com erro (com "falha de internet"). Os Ajustes continuam abertos, porque os dados de antes ficam na memória.
+- **Animações com intenção** (documentadas em `docs/design-system.md`): itens novos de lista entram com `@starting-style` (utilitário `.enter`: carrinho, despesas, histórico do fiado, pagamento dividido e movimentos do estoque) e a venda concluída ganhou o anel que se abre em volta do selo (`ring`). As View Transitions, as janelas e os avisos já animavam. Tudo respeita `prefers-reduced-motion` e nada depende de `animationend`.
+- **Auditoria de acessibilidade:** `npm run a11y` (`scripts/a11y.mjs`) roda o axe-core 4.14 (o motor do Lighthouse, regras WCAG 2.2 A/AA e boas práticas) em 24 telas e estados e mede a rolagem horizontal. Lighthouse (acessibilidade) nas telas públicas: Entrar 100, Cadastro 100 e Página não encontrada 100.
+- **Revisão dos textos:** a Ajuda e o tour citam só botões que existem com o mesmo nome; as respostas deixaram de supor o gênero do cliente ("como ele pagou" virou "a forma de pagamento"; "quanto ele deve", "o valor da dívida").
+- **PWA básico:** `public/manifest.webmanifest` (nome, `start_url` no Início, atalhos para Vender e Fiado, cores dos tokens `--color-primary` e `--surface-page`), ícones em `public/` gerados do `favicon.svg` por `npm run icons` (192, 512, maskable e `apple-touch-icon`) e as metas do iPhone. O Chrome não aponta nenhum erro de instalação.
+- **Teste do fluxo principal** (`src/mainFlow.test.jsx`, seção 9 deste plano): entrar pela demonstração → dinheiro com troco, Pix, fiado e dividida → desfazer → receber parte do fiado → entrada de estoque → fechar o dia → Início com o vendido de hoje → planilha e impressão do relatório. Mais testes para `LoadError`, `SkeletonGroup`, `titleAs` e o "Carregar tudo de novo".
+- **Capturas no README**, em `docs/capturas/` (WebP: o `npm run shot` grava WebP quando o nome termina em `.webp`).
+- **Limpeza:** o `ComingSoon` saiu; o `scripts/browser.mjs` reúne o que o `shot`, o `a11y` e o `icons` têm em comum (abrir o Chrome headless pelo DevTools Protocol).
+
+Resultado da auditoria: 0 violações do axe e nenhuma rolagem horizontal em cada tela, nas seis combinações (1440px e 360px; claro, escuro e alto contraste com texto Enorme).
+
+| Tela                          | axe  | Tela                 | axe  |
+| ----------------------------- | ---- | -------------------- | ---- |
+| Entrar                        | ✅ 0 | Conta do cliente     | ✅ 0 |
+| Cadastro                      | ✅ 0 | Clientes             | ✅ 0 |
+| Página não encontrada         | ✅ 0 | Estoque              | ✅ 0 |
+| Boas-vindas (3 passos)        | ✅ 0 | Novo produto         | ✅ 0 |
+| Início com o tour             | ✅ 0 | Editar produto       | ✅ 0 |
+| Início                        | ✅ 0 | Caixa do dia         | ✅ 0 |
+| Vender (produtos e pagamento) | ✅ 0 | Relatórios           | ✅ 0 |
+| Vendas                        | ✅ 0 | Ajustes              | ✅ 0 |
+| Detalhe da venda              | ✅ 0 | Ajuda                | ✅ 0 |
+| Fiado (Quem me deve)          | ✅ 0 | Mais e design system | ✅ 0 |
+
+O que a auditoria encontrou e foi corrigido:
+
+- **Contraste:** o contador da ficha escolhida (3,5:1) agora é claro com o número verde.
+- **Nomes e papéis:** a região dos avisos tinha `role="status"` numa `<ol>` (passou para o contêiner); os esqueletos tinham `aria-label` num `<div>` sem papel (`SkeletonGroup`); a 404 e a tela de erro não tinham `h1` (`EmptyState titleAs="h1"`).
+- **Teclado:** a rosca do Recharts entrava na ordem do Tab mesmo escondida (`rootTabIndex={-1}`); o corpo rolável das janelas sem botões (o tour com texto Enorme) não era alcançável pelo teclado.
+- **Texto Enorme a 360px:** Entrar (largura própria do campo e recuo do botão), detalhe da venda (grade sem `minmax(0, 1fr)` e o selo espremendo o título do cartão) e o catálogo (controle segmentado e `QuantityStepper` lado a lado) alargavam a página.
+
+Decisões tomadas durante a fase:
+
+- **axe-core por script, não por extensão:** `npm run a11y` entra pela demonstração, percorre as telas no mesmo app (o estado em memória continua) e sai com código 1 se algo falhar, então pode virar uma etapa de CI. O Lighthouse audita só as telas públicas, porque abre cada endereço do zero e a sessão vive só em memória; como ele usa o mesmo axe, as telas logadas ficam cobertas pelo script.
+- **Um `LoadError` para todas as telas** em vez de 13 cópias do mesmo bloco: o texto e o "Tentar de novo" ficam iguais no app inteiro, e o `role="alert"` anuncia o erro.
+- **"Carregar tudo de novo" em vez de recarregar sozinho ao ligar a falha:** quem liga a simulação escolhe quando ver o efeito, e os Ajustes nunca ficam presos no erro.
+- **PWA sem service worker:** "instalar na tela inicial" funciona (o Chrome não exige mais o worker), e não há cache que pareça guardar dados, coerente com o estado só em memória.
+- **O ícone do botão de largura toda sai quando falta espaço** (container query de 12rem): com texto Enorme, "demonstração" sozinha quase enche o cartão a 360px, e quebrar a palavra no meio é pior que perder o ícone.
+- **Testes que dependiam do dia:** os dois testes de despesa do Caixa falhavam nos dias em que o sorteio não cria despesa até a hora do teste; agora o teste lança uma despesa quando falta.
+
+Plano original da fase:
 
 Animações, estados vazio, carregando e erro em todas as telas, auditoria de acessibilidade (axe/Lighthouse ≥ 95), revisão dos textos, PWA básico (manifest para "instalar na tela inicial"), testes dos fluxos principais e capturas de tela no README.
 
@@ -352,5 +400,6 @@ Animações, estados vazio, carregando e erro em todas as telas, auditoria de ac
 
 1. `npm run lint && npm test && npm run build` sem erros, e `npm run format:check`.
 2. Verificação visual com `npm run dev` + `npm run shot` (skill `verificacao-visual`): 360px e 1440px, claro e escuro, alto contraste com texto a 150% e ausência de rolagem horizontal (`--eval "document.documentElement.scrollWidth"` deve ser igual à largura).
-3. Fluxo manual de ponta a ponta a partir da Fase 5: login demo → venda em dinheiro, Pix, fiado e dividida → desfazer → receber fiado parcial → entrada de estoque → fechar o dia → dashboard refletindo tudo → exportar CSV e imprimir PDF.
-4. Recarregar a página volta aos dados de exemplo (comportamento esperado).
+3. Fluxo de ponta a ponta a partir da Fase 5: login demo → venda em dinheiro, Pix, fiado e dividida → desfazer → receber fiado parcial → entrada de estoque → fechar o dia → dashboard refletindo tudo → exportar CSV e imprimir PDF. Desde a Fase 12, ele é um teste automático (`src/mainFlow.test.jsx`).
+4. Acessibilidade com `npm run a11y` (axe em todas as telas, nas combinações de largura e tema): nenhuma violação e nenhuma rolagem horizontal.
+5. Recarregar a página volta aos dados de exemplo (comportamento esperado).

@@ -29,6 +29,13 @@
   }
 }
 
+/* Anel que se abre em volta de um selo de sucesso (venda concluída): vai até o box-shadow do elemento. */
+@keyframes ring {
+  from {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
 @keyframes spin {
   to {
     rotate: 1turn;

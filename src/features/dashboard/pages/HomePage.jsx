@@ -6,7 +6,6 @@ import {
   HandCoins,
   PackagePlus,
   Receipt,
-  RotateCcw,
   ShoppingBag,
   ShoppingCart,
   TrendingUp,
@@ -23,7 +22,9 @@ import {
   Chip,
   ChipGroup,
   EmptyState,
+  LoadError,
   Skeleton,
+  SkeletonGroup,
   StatCard,
   StatusPill,
 } from '@/components/ui';
@@ -97,7 +98,7 @@ export default function HomePage() {
       <>
         {header}
         {tour}
-        <div className={styles.loading} aria-busy="true" aria-label="Carregando o início">
+        <SkeletonGroup label="Carregando o início" className={styles.loading}>
           <Skeleton shape="rect" height="12rem" />
           <div className={styles.stats}>
             {Array.from({ length: 4 }, (_, index) => (
@@ -105,7 +106,7 @@ export default function HomePage() {
             ))}
           </div>
           <Skeleton shape="rect" height="18rem" />
-        </div>
+        </SkeletonGroup>
       </>
     );
   }
@@ -115,19 +116,7 @@ export default function HomePage() {
       <>
         {header}
         {tour}
-        <Card>
-          <EmptyState
-            tone="danger"
-            emoji="📡"
-            title="Não deu para carregar o início"
-            description="Confira a internet e tente de novo."
-            action={
-              <Button icon={RotateCcw} onClick={reload}>
-                Tentar de novo
-              </Button>
-            }
-          />
-        </Card>
+        <LoadError title="Não deu para carregar o início" onRetry={reload} />
       </>
     );
   }

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, CircleAlert, PartyPopper, RotateCcw, Store } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CircleAlert, PartyPopper, Store } from 'lucide-react';
 import { Navigate } from 'react-router';
 import { APP_NAME } from '@/app/config.js';
 import { ROUTES } from '@/app/routes.js';
@@ -10,10 +10,11 @@ import {
   Card,
   Chip,
   ChipGroup,
-  EmptyState,
   Input,
+  LoadError,
   ProgressBar,
   Skeleton,
+  SkeletonGroup,
   Switch,
 } from '@/components/ui';
 import { PAYMENT_METHOD_KEYS, PAYMENT_METHODS, PRODUCT_CATEGORIES } from '@/domain/constants.js';
@@ -53,29 +54,14 @@ export default function OnboardingPage() {
 
   let content;
   if (status === 'error' && !business) {
-    content = (
-      <Card>
-        <EmptyState
-          tone="danger"
-          emoji="📶"
-          title="Não foi possível carregar"
-          description="Confira a internet e tente de novo."
-          action={
-            <Button icon={RotateCcw} onClick={reload}>
-              Tentar de novo
-            </Button>
-          }
-        />
-      </Card>
-    );
+    content = <LoadError title="Não deu para carregar" onRetry={reload} />;
   } else if (!business || !settings) {
     content = (
-      <Card padding="lg" aria-busy="true">
-        <span className="visually-hidden">Carregando…</span>
+      <SkeletonGroup as={Card} padding="lg" label="Carregando…">
         <Skeleton width="40%" />
         <Skeleton shape="rect" height="3rem" className={styles.skeletonGap} />
         <Skeleton lines={3} />
-      </Card>
+      </SkeletonGroup>
     );
   } else {
     content = (

@@ -12,6 +12,7 @@ export default function NotFoundPage() {
       <title>{`Página não encontrada · ${APP_NAME}`}</title>
       <Card>
         <EmptyState
+          titleAs="h1"
           emoji="🧭"
           title="Não achamos essa página"
           description="O endereço pode estar errado ou a página mudou de lugar."

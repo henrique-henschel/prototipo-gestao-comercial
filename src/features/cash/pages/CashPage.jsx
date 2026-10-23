@@ -9,7 +9,6 @@ import {
   Pencil,
   Plus,
   Receipt,
-  RotateCcw,
   ShoppingBag,
   Trash,
   Wallet,
@@ -21,8 +20,10 @@ import {
   Card,
   CardHeader,
   EmptyState,
+  LoadError,
   MoneyInput,
   Skeleton,
+  SkeletonGroup,
   StatCard,
   StatusPill,
 } from '@/components/ui';
@@ -40,6 +41,7 @@ import { useSettings } from '@/hooks/useSettings.js';
 import { today as todayISO } from '@/lib/date.js';
 import { formatDateLong, formatDateMedium, formatTime, plural } from '@/lib/format.js';
 import { PAYMENT_ICONS } from '@/features/sales/paymentIcons.js';
+import { cx } from '@/lib/cx.js';
 import { CloseDaySheet } from '../components/CloseDaySheet.jsx';
 import { ClosingResult } from '../components/ClosingResult.jsx';
 import { ExpenseSheet } from '../components/ExpenseSheet.jsx';
@@ -104,7 +106,7 @@ export default function CashPage() {
     return (
       <>
         {header}
-        <div className={styles.loading} aria-busy="true" aria-label="Carregando o caixa">
+        <SkeletonGroup label="Carregando o caixa" className={styles.loading}>
           <div className={styles.stats}>
             {Array.from({ length: 4 }, (_, index) => (
               <Skeleton key={index} shape="rect" height="6rem" />
@@ -112,7 +114,7 @@ export default function CashPage() {
           </div>
           <Skeleton shape="rect" height="16rem" />
           <Skeleton shape="rect" height="10rem" />
-        </div>
+        </SkeletonGroup>
       </>
     );
   }
@@ -121,19 +123,7 @@ export default function CashPage() {
     return (
       <>
         {header}
-        <Card>
-          <EmptyState
-            tone="danger"
-            emoji="📡"
-            title="Não deu para carregar o caixa"
-            description="Confira a internet e tente de novo."
-            action={
-              <Button icon={RotateCcw} onClick={reload}>
-                Tentar de novo
-              </Button>
-            }
-          />
-        </Card>
+        <LoadError title="Não deu para carregar o caixa" onRetry={reload} />
       </>
     );
   }
@@ -490,7 +480,7 @@ function ExpenseRow({ expense, canDelete, loading, onDelete }) {
   const category = EXPENSE_CATEGORIES.find((option) => option.value === expense.category);
   const method = EXPENSE_METHODS.find((option) => option.value === expense.method);
   return (
-    <li className={styles.row}>
+    <li className={cx(styles.row, 'enter')}>
       <span className={styles.emoji} aria-hidden="true">
         {category?.emoji}
       </span>

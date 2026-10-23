@@ -12,13 +12,24 @@ import {
   Package,
   Pencil,
   Percent,
+  RefreshCw,
   RotateCcw,
   Store,
   Sun,
   Wallet,
 } from 'lucide-react';
 import { PageHeader } from '@/components/layout';
-import { Button, Card, Chip, ChipGroup, Dialog, EmptyState, Skeleton, Switch } from '@/components/ui';
+import {
+  Button,
+  Card,
+  Chip,
+  ChipGroup,
+  Dialog,
+  LoadError,
+  Skeleton,
+  SkeletonGroup,
+  Switch,
+} from '@/components/ui';
 import { PAYMENT_METHOD_KEYS, PAYMENT_METHODS } from '@/domain/constants.js';
 import { formatBRL } from '@/domain/rules/money.js';
 import { canDisablePaymentMethod } from '@/domain/rules/settings.js';
@@ -73,11 +84,11 @@ export default function SettingsPage() {
     return (
       <>
         {header}
-        <div className={styles.sections} aria-busy="true" aria-label="Carregando os ajustes">
+        <SkeletonGroup label="Carregando os ajustes" className={styles.sections}>
           {Array.from({ length: 4 }, (_, index) => (
             <Skeleton key={index} shape="rect" height="10rem" />
           ))}
-        </div>
+        </SkeletonGroup>
       </>
     );
   }
@@ -86,19 +97,7 @@ export default function SettingsPage() {
     return (
       <>
         {header}
-        <Card>
-          <EmptyState
-            tone="danger"
-            emoji="📡"
-            title="Não deu para carregar os ajustes"
-            description="Confira a internet e tente de novo."
-            action={
-              <Button icon={RotateCcw} onClick={reload}>
-                Tentar de novo
-              </Button>
-            }
-          />
-        </Card>
+        <LoadError title="Não deu para carregar os ajustes" onRetry={reload} />
       </>
     );
   }
@@ -395,9 +394,14 @@ function AccessibilityCard() {
   );
 }
 
-/** Modo demonstração: simula internet lenta e falha (`configureApi`). */
+/**
+ * Modo demonstração: simula internet lenta e falha (`configureApi`). "Carregar tudo de novo"
+ * busca os dados outra vez, para as telas mostrarem o "carregando" ou o erro com "Tentar de novo".
+ * Os Ajustes continuam abertos mesmo com o erro (os dados de antes ficam na memória).
+ */
 function DemoCard() {
   const toast = useToast();
+  const { reload } = useDataStatus();
   const [api, setApi] = useState(getApiConfig);
 
   const change = (changes, message) => {
@@ -430,6 +434,13 @@ function DemoCard() {
           change({ failing: checked }, checked ? 'Falha de internet ligada' : 'Falha de internet desligada')
         }
       />
+      <p className={styles.muted}>
+        Os dados já carregados continuam na tela. Para ver as telas carregando ou com erro, carregue tudo de
+        novo.
+      </p>
+      <Button variant="secondary" icon={RefreshCw} onClick={reload} className={styles.edit}>
+        Carregar tudo de novo
+      </Button>
     </Card>
   );
 }

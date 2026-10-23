@@ -45,7 +45,7 @@ export function MovementHistory({ movements, unitShort, saleNumbers }) {
           const saleNumber = movement.saleId && saleNumbers.get(movement.saleId);
           const reason = LOSS_REASONS.find((r) => r.value === movement.reason)?.label;
           return (
-            <li key={movement.id} className={styles.item}>
+            <li key={movement.id} className={cx(styles.item, 'enter')}>
               <Icon className={cx(styles.icon, styles[ui.tone])} size={22} aria-hidden="true" />
               <span className={styles.text}>
                 <span className={styles.title}>{STOCK_MOVEMENT_TYPES[movement.type].label}</span>

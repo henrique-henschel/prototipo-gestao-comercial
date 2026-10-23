@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
-import { CircleAlert, NotebookText, RotateCcw, SearchX, Users, Wallet } from 'lucide-react';
+import { CircleAlert, NotebookText, SearchX, Users, Wallet } from 'lucide-react';
 import { ROUTES } from '@/app/routes.js';
 import { PageHeader } from '@/components/layout';
 import {
@@ -9,9 +9,11 @@ import {
   Chip,
   ChipGroup,
   EmptyState,
+  LoadError,
   SearchBar,
   Select,
   Skeleton,
+  SkeletonGroup,
   StatCard,
 } from '@/components/ui';
 import { FIADO_STATUS } from '@/domain/constants.js';
@@ -112,7 +114,7 @@ export default function FiadoPage() {
     return (
       <>
         {header}
-        <div className={styles.loading} aria-busy="true" aria-label="Carregando o fiado">
+        <SkeletonGroup label="Carregando o fiado" className={styles.loading}>
           <div className={styles.stats}>
             {Array.from({ length: 2 }, (_, index) => (
               <Skeleton key={index} shape="rect" height="6rem" />
@@ -121,7 +123,7 @@ export default function FiadoPage() {
           {Array.from({ length: 4 }, (_, index) => (
             <Skeleton key={index} shape="rect" height="7rem" />
           ))}
-        </div>
+        </SkeletonGroup>
       </>
     );
   }
@@ -130,19 +132,7 @@ export default function FiadoPage() {
     return (
       <>
         {header}
-        <Card>
-          <EmptyState
-            tone="danger"
-            emoji="📡"
-            title="Não deu para carregar o fiado"
-            description="Confira a internet e tente de novo."
-            action={
-              <Button icon={RotateCcw} onClick={reload}>
-                Tentar de novo
-              </Button>
-            }
-          />
-        </Card>
+        <LoadError title="Não deu para carregar o fiado" onRetry={reload} />
       </>
     );
   }

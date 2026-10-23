@@ -31,6 +31,7 @@ import {
   HelpTip,
   IconButton,
   Input,
+  LoadError,
   MoneyInput,
   PercentInput,
   ProgressBar,
@@ -40,6 +41,7 @@ import {
   SegmentedControl,
   Select,
   Skeleton,
+  SkeletonGroup,
   SpeakButton,
   StatCard,
   StatusPill,
@@ -620,7 +622,7 @@ function FeedbackSection() {
           </div>
         </Example>
         <Example title="Carregando" note="no formato do conteúdo real">
-          <div className="stack" aria-busy="true" aria-label="Carregando clientes">
+          <SkeletonGroup label="Carregando os clientes" className="stack">
             {[1, 2, 3].map((row) => (
               <div key={row} className={styles.skeletonRow}>
                 <Skeleton shape="circle" />
@@ -631,7 +633,7 @@ function FeedbackSection() {
                 <Skeleton width="4rem" />
               </div>
             ))}
-          </div>
+          </SkeletonGroup>
         </Example>
         <Example title="Vazio e erro">
           <div className="stack">
@@ -642,15 +644,13 @@ function FeedbackSection() {
               description="Cadastre o que você vende para vender mais rápido."
               action={<Button icon={Plus}>Adicionar produto</Button>}
             />
-            <EmptyState
-              compact
-              tone="danger"
-              icon={X}
-              title="Não conseguimos carregar"
-              description="Confira sua internet e tente de novo."
-              action={<Button variant="secondary">Tentar de novo</Button>}
-            />
           </div>
+        </Example>
+        <Example title="Erro ao carregar" note="LoadError: o mesmo em todas as telas, com “Tentar de novo”">
+          <LoadError
+            title="Não deu para carregar as vendas"
+            onRetry={() => toast.show({ message: 'Tentando de novo…', tone: 'info' })}
+          />
         </Example>
       </div>
     </Section>
@@ -724,7 +724,7 @@ function OverlaysSection() {
               </Button>
             }
           >
-            <DateShortcuts label="Quando ela vai pagar?" value={dueDate} onChange={setDueDate} />
+            <DateShortcuts label="Quando vai pagar?" value={dueDate} onChange={setDueDate} />
           </BottomSheet>
         </Example>
         <Example title="Ajuda no contexto">

@@ -7,6 +7,8 @@
 
   .input {
     inline-size: 100%;
+    /* Sem isto, a largura própria do campo (cerca de 20 letras) alarga a tela com texto Enorme. */
+    min-inline-size: 0;
     min-block-size: var(--tap-min);
     padding: var(--space-2) var(--space-4);
     border: var(--border-width-strong) solid var(--border-2);

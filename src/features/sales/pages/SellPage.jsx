@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router';
-import { ArrowRight, Pencil, RotateCcw } from 'lucide-react';
+import { ArrowRight, Pencil } from 'lucide-react';
 import { ROUTES } from '@/app/routes.js';
 import { PageHeader } from '@/components/layout';
-import { BottomSheet, Button, Card, EmptyState, Skeleton } from '@/components/ui';
+import { BottomSheet, Button, Card, LoadError, Skeleton, SkeletonGroup } from '@/components/ui';
 import { UNDO_WINDOW_MS, UNITS } from '@/domain/constants.js';
 import { formatBRL } from '@/domain/rules/money.js';
 import { topProducts } from '@/domain/rules/metrics.js';
@@ -90,19 +90,7 @@ export default function SellPage() {
     return (
       <>
         <PageHeader title="Vender" />
-        <Card>
-          <EmptyState
-            tone="danger"
-            emoji="📡"
-            title="Não deu para carregar os produtos"
-            description="Confira a internet e tente de novo."
-            action={
-              <Button icon={RotateCcw} onClick={reload}>
-                Tentar de novo
-              </Button>
-            }
-          />
-        </Card>
+        <LoadError title="Não deu para carregar os produtos" onRetry={reload} />
       </>
     );
   }
@@ -328,13 +316,13 @@ function OrderSummary({ lines, totals }) {
 /** Carregando: o formato da grade de produtos. */
 function SellSkeleton() {
   return (
-    <div aria-busy="true" aria-label="Carregando os produtos">
+    <SkeletonGroup label="Carregando os produtos">
       <PageHeader title="Vender" description="Toque nos produtos para montar a venda." />
       <div className={styles.skeletonGrid}>
         {Array.from({ length: 8 }, (_, index) => (
           <Skeleton key={index} shape="rect" height="10rem" />
         ))}
       </div>
-    </div>
+    </SkeletonGroup>
   );
 }
