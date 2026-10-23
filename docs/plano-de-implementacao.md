@@ -30,9 +30,9 @@ Decisões fechadas com o dono do produto:
 | 6    | Fiado e clientes                      | ✅ `4aad853` |
 | 7    | Estoque                               | ✅ `f78f19d` |
 | 8    | Caixa e despesas                      | ✅ `2710865` |
-| 9    | Dashboard                             | ✅           |
-| 10   | Relatórios                            | ⏳ próxima   |
-| 11   | Ajustes, acessibilidade, ajuda e tour | ⏳           |
+| 9    | Dashboard                             | ✅ `d0539ac` |
+| 10   | Relatórios                            | ✅           |
+| 11   | Ajustes, acessibilidade, ajuda e tour | ⏳ próxima   |
 | 12   | Polimento                             | ⏳           |
 
 Agrupamento sugerido por sessão de trabalho: **3+4** → **5** → **6+7** → **8+9** → **10+11** → **12**.
@@ -61,7 +61,7 @@ Ao concluir uma fase: marque aqui e no Roadmap do `README.md`, atualize a seçã
 ```
 src/
   app/            ✅ config.js, routes.js, router.js, providers.jsx, guards.jsx, RootLayout.jsx
-  styles/         index.css ✅, reset ✅, tokens ✅, base ✅, utilities ✅, animations ✅, print.css (Fase 10)
+  styles/         index.css ✅, reset ✅, tokens ✅, base ✅, utilities ✅, animations ✅, print.css ✅
   components/
     ui/           ✅ 25 primitivos + index.js (ver docs/design-system.md)
     layout/       ✅ AppShell, Sidebar, BottomNav, TopBar, PageHeader, CenteredLayout, Brand,
@@ -78,7 +78,7 @@ src/
     customers/    (Fase 6)
     inventory/    Produtos, ProdutoForm, Movimentacoes (Fase 7)
     cash/         CaixaDoDia, Despesas (Fase 8)
-    reports/      (Fase 10)
+    reports/      ✅ ReportsPage, ReportPreview, ReportTable, tabelas (CSV/tela/PDF), texto do resumo
     settings/     (Fase 11)
     help/         (Fase 11)
   domain/
@@ -90,7 +90,7 @@ src/
   store/          ✅ ToastProvider, PreferencesProvider, DataProvider, SessionProvider, CartProvider
   hooks/          useToast ✅, usePreferences ✅, useSpeech ✅, useData/useSales/useProducts/useCustomers/
                   useFiado/useCash/useSettings ✅, useSession/useLogout ✅, useCart/useMediaQuery/useVibrate ✅
-  lib/            cx ✅, date ✅, format ✅, id ✅, whatsapp ✅; csv, share
+  lib/            cx ✅, date ✅, format ✅, id ✅, whatsapp ✅, csv ✅, share ✅
 scripts/          screenshot.mjs ✅ (verificação visual)
 ```
 
@@ -292,7 +292,29 @@ Plano original da fase:
 
 Cards (StatCard), gráficos Recharts (vendas dos 7 dias, rosca por forma de pagamento, mais vendidos), avisos (fiados vencendo ou atrasados, estoque acabando) e atalhos. **Carregar a skill `dataviz` antes de escrever os gráficos.** Usar a paleta `--chart-*` já validada, com uma cor fixa por entidade, tabela alternativa e nenhum eixo duplo.
 
-### Fase 10: Relatórios
+### ✅ Fase 10: Relatórios
+
+Entregue:
+
+- **`/relatorios`** com filtros na barra de endereço (`?tipo=`, `?periodo=` e, em "Escolher datas", `?de=&ate=`): o tipo (`REPORT_TYPES`) em fichas e o período (`PERIOD_PRESETS`, "Este mês" por padrão) em fichas com duas datas no "Escolher datas". Fiado e estoque são uma foto de agora e escondem o período.
+- **Prévia de cada tipo** (`ReportPreview`): indicadores (`StatCard`), gráficos de `components/charts` com o valor escrito e a tabela (rosca das formas, colunas por dia, ranking dos mais vendidos e das despesas por tipo) e as tabelas do relatório (`ReportTable`), que viram blocos "rótulo: valor" no celular e mostram 10 linhas com "Ver todas".
+- **Levar o relatório**: "Baixar para o Excel" (a ação principal, `lib/csv.js`), "Imprimir ou salvar em PDF" (`window.print()` + `styles/print.css`, com o cabeçalho do negócio, o período e quando foi feito) e "Enviar resumo" (`lib/share.js`: menu de compartilhar do aparelho ou, sem ele, "Enviar resumo no WhatsApp").
+- **Estados**: carregando (esqueleto na primeira vez; depois, o relatório anterior apagado até o novo chegar), erro com "Tentar de novo" e vazio que ensina o próximo passo (e desliga as exportações).
+- **Regras novas**: `customPeriod` (datas trocadas, nada depois de hoje) e `expensesByCategory`. O `getReport` passou a devolver as linhas prontas para a tabela (nome do cliente na venda, fechamento de cada dia, valor parado de cada produto) e a comparação do resumo cortada na hora de agora.
+- **Testes**: regras novas, `formatPeriod`, `lib/csv.js` (formatos, aspas, fórmulas, BOM e download), `lib/share.js` e integração (resumo com os números das regras, filtros na URL, "Escolher datas", fiado sem período, planilha com BOM e cabeçalho, impressão e WhatsApp, erro com "Tentar de novo" e vazio).
+
+Decisões tomadas durante a fase:
+
+- **As mesmas tabelas para a tela, a planilha e o PDF** (`features/reports/reportTables.js`): cada coluna tem o tipo (`money`, `date`, `percent`...) e o valor cru; `lib/csv.js` formata para o Excel e `formatReportCell` para a tela. Assim os três sempre batem.
+- **"Este mês" é o período padrão**: relatório é para fechar as contas; o dia a dia já está no Início.
+- **Planilha (CSV) é a ação principal**; PDF e WhatsApp são secundárias. Sem nada no relatório, as três ficam desligadas, com o motivo escrito.
+- **Tabela vira lista no celular** (container query de 40rem, só na tela): com 8 colunas, a rolagem para o lado seria difícil para o público. No papel, a tabela fica sempre em colunas e com todas as linhas.
+- **Gráficos de relatório sem animação** (`animate={false}`) e encolhidos pelo `viewBox` na impressão: o Recharts só mede de novo depois que a folha já foi desenhada.
+- **Proteção contra fórmula no Excel**: textos que começam com `=`, `+`, `-` ou `@` (um nome de cliente, por exemplo) ganham um apóstrofo.
+- **Correção no design system**: no `ChipGroup` com `wrap`, um chip mais largo que a tela ("Produtos mais vendidos" com texto Enorme) quebra o próprio texto em vez de alargar a página.
+- **`npm run shot` imprime**: `--media print` emula a impressão e um nome terminado em `.pdf` salva o PDF da folha A4.
+
+Plano original da fase:
 
 Filtros de período e tipo, prévia, CSV (`lib/csv.js`), PDF (`styles/print.css` + `window.print()`) e compartilhamento (`lib/share.js`).
 

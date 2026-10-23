@@ -1,4 +1,5 @@
 import styles from './SkipLink.module.css';
+import { cx } from '@/lib/cx.js';
 
 /**
  * "Pular para o conteúdo": primeiro item do teclado, aparece só ao receber foco.
@@ -6,7 +7,7 @@ import styles from './SkipLink.module.css';
  */
 export function SkipLink({ targetId = 'conteudo' }) {
   return (
-    <a href={`#${targetId}`} className={styles.skipLink}>
+    <a href={`#${targetId}`} className={cx(styles.skipLink, 'no-print')}>
       Pular para o conteúdo
     </a>
   );

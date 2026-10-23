@@ -17,6 +17,15 @@ export function formatDate(iso) {
   return dateShort.format(parseISODate(iso));
 }
 
+/**
+ * Período em datas curtas, como nos relatórios: "01/10/2026 a 23/10/2026", ou só
+ * "23/10/2026" quando é um dia.
+ * @param {{ start: string, end: string }} period
+ */
+export function formatPeriod({ start, end }) {
+  return start === end ? formatDate(start) : `${formatDate(start)} a ${formatDate(end)}`;
+}
+
 /** "quarta-feira, 21 de outubro" */
 export function formatDateLong(iso) {
   return dateLong.format(parseISODate(iso));

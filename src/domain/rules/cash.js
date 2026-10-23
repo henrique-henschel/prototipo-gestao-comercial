@@ -92,6 +92,30 @@ export function validateExpense({ category, amountCents, method }) {
 }
 
 /**
+ * Despesas somadas por categoria, da maior para a menor (relatório de caixa e despesas).
+ * `share` é a fração do total (0.25 = 25%). Regra 8.
+ * @param {Expense[]} expenses
+ * @returns {{ category: string, amountCents: Cents, count: number, share: number }[]}
+ */
+export function expensesByCategory(expenses) {
+  const totalCents = sumCents(expenses.map((expense) => expense.amountCents));
+  const byCategory = new Map();
+  for (const expense of expenses) {
+    const entry = byCategory.get(expense.category) ?? {
+      category: expense.category,
+      amountCents: 0,
+      count: 0,
+    };
+    entry.amountCents += expense.amountCents;
+    entry.count += 1;
+    byCategory.set(expense.category, entry);
+  }
+  return [...byCategory.values()]
+    .map((entry) => ({ ...entry, share: totalCents > 0 ? entry.amountCents / totalCents : 0 }))
+    .sort((a, b) => b.amountCents - a.amountCents);
+}
+
+/**
  * Despesas só mudam com o dia aberto (ou ainda não aberto): o fechamento já conferiu a
  * gaveta. Para corrigir um dia fechado, reabra o dia. Regras 6.3 e 6.5.
  * @param {CashDay|null|undefined} cashDay

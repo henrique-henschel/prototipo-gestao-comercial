@@ -1,0 +1,155 @@
+@layer components {
+  .card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .header {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+  }
+
+  .summary,
+  .empty {
+    color: var(--text-2);
+
+    & strong {
+      color: var(--text-1);
+    }
+  }
+
+  .wrap {
+    container: report-table / inline-size;
+    min-inline-size: 0;
+    overflow-x: auto;
+  }
+
+  .table {
+    inline-size: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+
+    & th,
+    & td {
+      padding: var(--space-2) var(--space-3);
+      border-block-end: var(--border-width) solid var(--border-1);
+      text-align: start;
+      vertical-align: top;
+      overflow-wrap: break-word;
+    }
+
+    & thead th {
+      color: var(--text-2);
+      vertical-align: bottom;
+    }
+
+    & tbody th {
+      font-weight: var(--weight-bold);
+    }
+
+    & .numeric {
+      text-align: end;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    /* Títulos de coluna longos quebram linha; os valores, não. */
+    & thead .numeric {
+      white-space: normal;
+    }
+  }
+
+  /* Linhas além do limite: escondidas só na tela (a impressão mostra todas). */
+  @media screen {
+    .extra {
+      display: none;
+    }
+  }
+
+  .more {
+    justify-self: start;
+  }
+
+  /* Só na tela: no papel, a tabela fica sempre em colunas. */
+  @media screen {
+    /*
+     * Contêiner estreito (celular, texto grande): cada linha vira um bloco com
+     * "rótulo: valor", e a primeira coluna é o título do bloco. Em `rem`, a troca também
+     * acontece quando o texto cresce.
+     */
+    @container report-table (width < 40rem) {
+      .table {
+        &,
+        & tbody,
+        & tr,
+        & th,
+        & td {
+          display: block;
+        }
+
+        & thead {
+          position: absolute;
+          inline-size: 1px;
+          block-size: 1px;
+          overflow: hidden;
+          clip-path: inset(50%);
+          white-space: nowrap;
+        }
+
+        & tbody tr {
+          padding-block: var(--space-3);
+          border-block-end: var(--border-width) solid var(--border-1);
+        }
+
+        & tbody tr:first-child {
+          padding-block-start: 0;
+        }
+
+        & tbody tr:last-child {
+          border-block-end: 0;
+          padding-block-end: 0;
+        }
+
+        & th,
+        & td {
+          padding: 0;
+          border: 0;
+        }
+
+        & tbody th {
+          font-size: var(--text-md);
+          margin-block-end: var(--space-1);
+        }
+
+        & td {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: space-between;
+          gap: 0 var(--space-3);
+          padding-block: var(--space-1);
+
+          &::before {
+            content: attr(data-label);
+            color: var(--text-2);
+          }
+        }
+
+        & .numeric {
+          text-align: end;
+          white-space: normal;
+        }
+      }
+
+      .table tbody tr.extra {
+        display: none;
+      }
+    }
+  }
+}

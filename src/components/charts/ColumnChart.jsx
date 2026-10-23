@@ -15,8 +15,10 @@ import styles from './charts.module.css';
  * @param {(value: number) => string} props.formatValue valor completo (tooltip)
  * @param {(value: number) => string} props.formatTick valor curto (eixo Y)
  * @param {number} [props.height=240] altura total, já com a faixa do eixo X
+ * @param {boolean} [props.animate=true] falso em telas que podem ser impressas (relatórios): a
+ *   impressão redimensiona o gráfico, e a animação recomeçaria com ele vazio
  */
-export function ColumnChart({ data, seriesName, formatValue, formatTick, height = 240 }) {
+export function ColumnChart({ data, seriesName, formatValue, formatTick, height = 240, animate = true }) {
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
 
   return (
@@ -53,7 +55,7 @@ export function ColumnChart({ data, seriesName, formatValue, formatTick, height 
             fill="var(--chart-1)"
             maxBarSize={24}
             radius={[4, 4, 0, 0]}
-            isAnimationActive={!reducedMotion}
+            isAnimationActive={animate && !reducedMotion}
           />
         </BarChart>
       </ResponsiveContainer>

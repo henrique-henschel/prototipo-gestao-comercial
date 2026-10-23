@@ -7,6 +7,7 @@ import { today } from '@/lib/date.js';
 import { formatDateMedium } from '@/lib/format.js';
 import { Brand } from '../Brand/Brand.jsx';
 import styles from './TopBar.module.css';
+import { cx } from '@/lib/cx.js';
 
 /**
  * Barra de cima do celular: o nome do negócio, a data de hoje e o atalho da ajuda.
@@ -15,7 +16,7 @@ export function TopBar() {
   const { business } = useSettings();
 
   return (
-    <header className={styles.topbar}>
+    <header className={cx(styles.topbar, 'no-print')}>
       <Link to={ROUTES.home} className={styles.brandLink}>
         <Brand title={business?.name || undefined} subtitle={formatDateMedium(today())} wrap />
       </Link>

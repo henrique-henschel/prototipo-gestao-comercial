@@ -4,6 +4,7 @@ import {
   formatDateMedium,
   formatDayOfMonth,
   formatPercent,
+  formatPeriod,
   formatPhone,
   formatQuantity,
   formatRelativeDay,
@@ -41,6 +42,11 @@ describe('format', () => {
     expect(formatPercent(0.125)).toBe('12,5%');
     expect(formatWeekdayShort('2026-10-21')).toBe('qua');
     expect(formatDayOfMonth('2026-10-01')).toBe('1');
+  });
+
+  it('escreve o período dos relatórios', () => {
+    expect(formatPeriod({ start: '2026-10-01', end: '2026-10-23' })).toBe('01/10/2026 a 23/10/2026');
+    expect(formatPeriod({ start: '2026-10-23', end: '2026-10-23' })).toBe('23/10/2026');
   });
 
   it('descreve o dia relativo em linguagem simples', () => {

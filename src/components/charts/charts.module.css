@@ -152,6 +152,18 @@
     aspect-ratio: 1;
   }
 
+  /* No papel, a rosca tem tamanho fixo ao lado da legenda (a coluna `auto` encolhia). */
+  @media print {
+    .donut {
+      grid-template-columns: 12.5rem minmax(0, 1fr);
+      align-items: center;
+    }
+
+    .donutPlot {
+      inline-size: 12.5rem;
+    }
+  }
+
   .donutCenter {
     position: absolute;
     inset: 22%;

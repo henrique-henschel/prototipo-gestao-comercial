@@ -1,0 +1,24 @@
+@layer components {
+  .muted {
+    color: var(--text-2);
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(8.5rem, 100%), 1fr));
+    gap: var(--space-3);
+  }
+
+  .charts {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-4);
+  }
+
+  @media (width >= 64rem) {
+    .charts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+}

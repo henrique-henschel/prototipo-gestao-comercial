@@ -29,10 +29,25 @@
     }
   }
 
+  /*
+   * Grupo que quebra linha: um chip mais largo que a tela (texto Enorme a 360px) quebra o
+   * próprio texto em vez de alargar a página.
+   */
   .wrap {
     flex-wrap: wrap;
     overflow: visible;
     mask-image: none;
+
+    & > * {
+      flex-shrink: 1;
+      max-inline-size: 100%;
+    }
+
+    & .chip {
+      padding-block: var(--space-1);
+      white-space: normal;
+      overflow-wrap: break-word;
+    }
   }
 
   .chip {

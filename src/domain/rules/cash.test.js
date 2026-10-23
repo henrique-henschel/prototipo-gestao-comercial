@@ -2,6 +2,7 @@ import {
   cashDayClosing,
   closingDifference,
   expectedCash,
+  expensesByCategory,
   summarizeCashDay,
   validateCashDayChange,
   validateExpense,
@@ -113,5 +114,25 @@ describe('caixa do dia', () => {
     expect(validateCashDayChange(null)).toEqual([]);
     expect(validateCashDayChange({ closedAt: null })).toEqual([]);
     expect(validateCashDayChange({ closedAt: at(21, 20) })).toEqual(['caixa_fechado']);
+  });
+});
+
+describe('expensesByCategory (regra 8)', () => {
+  it('soma por categoria, da maior para a menor, com a parte de cada uma', () => {
+    const rows = expensesByCategory([
+      { category: 'transporte', amountCents: 2000 },
+      { category: 'alimentacao', amountCents: 1500 },
+      { category: 'transporte', amountCents: 1000 },
+      { category: 'outros', amountCents: 500 },
+    ]);
+    expect(rows).toEqual([
+      { category: 'transporte', amountCents: 3000, count: 2, share: 0.6 },
+      { category: 'alimentacao', amountCents: 1500, count: 1, share: 0.3 },
+      { category: 'outros', amountCents: 500, count: 1, share: 0.1 },
+    ]);
+  });
+
+  it('sem despesas, a lista fica vazia', () => {
+    expect(expensesByCategory([])).toEqual([]);
   });
 });

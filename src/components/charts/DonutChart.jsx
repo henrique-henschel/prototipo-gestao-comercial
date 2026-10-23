@@ -16,8 +16,10 @@ import styles from './charts.module.css';
  * @param {(value: number) => string} props.formatValue
  * @param {string} props.totalLabel ex.: "Total"
  * @param {string} props.legendLabel nome da lista da legenda, para o leitor de tela
+ * @param {boolean} [props.animate=true] falso em telas que podem ser impressas (relatórios): a
+ *   impressão redimensiona o gráfico, e a animação recomeçaria com ele vazio
  */
-export function DonutChart({ data, formatValue, totalLabel, legendLabel }) {
+export function DonutChart({ data, formatValue, totalLabel, legendLabel, animate = true }) {
   const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)');
   const slices = data.filter((item) => item.value > 0);
   const total = slices.reduce((sum, item) => sum + item.value, 0);
@@ -38,7 +40,7 @@ export function DonutChart({ data, formatValue, totalLabel, legendLabel }) {
               endAngle={-270}
               stroke="var(--surface-1)"
               strokeWidth={2}
-              isAnimationActive={!reducedMotion}
+              isAnimationActive={animate && !reducedMotion}
             >
               {slices.map((item) => (
                 <Cell key={item.key} fill={item.color} />

@@ -21,6 +21,7 @@
  *   --eval "<js>"     expressão JavaScript executada antes da captura (aceita await;
  *                     para vários passos use "(async () => { ...; return x })()"). O
  *                     valor retornado é impresso (útil para medir overflow etc.).
+ *   --media print     emula a impressão (print.css) na captura
  *   --wait <ms>       espera após carregar (padrão 1500)
  *   --base <url>      origem do app (padrão http://localhost:5173)
  *
@@ -29,7 +30,9 @@
  *   npm run shot -- celular.png vender --width 360 --height 800 --theme dark
  *   npm run shot -- valores.png design-system --eval "document.querySelector('#valores').scrollIntoView({ behavior: 'instant' })"
  *   npm run shot -- overflow.png --width 360 --eval "document.documentElement.scrollWidth"
+ *   npm run shot -- relatorio.pdf "entrar?voltar=/relatorios" --eval "..."   # PDF como na impressão (A4)
  *
+ * Com o nome terminando em .pdf, a saída é o PDF que o navegador imprimiria (Page.printToPDF).
  * Arquivos sem pasta são salvos em `shots/` (ignorada pelo git).
  * Se o Chrome não for encontrado, defina CHROME_PATH.
  */
@@ -170,6 +173,7 @@ async function main() {
       mobile: opts.width < 600,
     });
     await send('Emulation.setEmulatedMedia', {
+      media: opts.media ?? '',
       features: [{ name: 'prefers-color-scheme', value: opts.theme }],
     });
     await send('Page.enable');
@@ -188,6 +192,14 @@ async function main() {
         console.log('eval:', JSON.stringify(result.result.result.value));
       }
       await sleep(800); // deixa animações e transições terminarem
+    }
+
+    if (out.endsWith('.pdf')) {
+      const pdf = await send('Page.printToPDF', { preferCSSPageSize: true, printBackground: true });
+      writeFileSync(out, Buffer.from(pdf.result.data, 'base64'));
+      console.log(`PDF salvo em ${out}`);
+      ws.close();
+      return;
     }
 
     const params = { format: 'png' };

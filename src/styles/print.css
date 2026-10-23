@@ -1,0 +1,101 @@
+/*
+ * Impressão e PDF (`window.print()`, regra 8): só o conteúdo, em fundo branco e no tema
+ * claro, sem menus, avisos nem botões. Use `.no-print` no que não vai para o papel e
+ * `.print-only` no que só aparece nele (o cabeçalho do relatório).
+ */
+
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  /* Tema claro e texto normal no papel, qualquer que seja o tema e o tamanho escolhidos. */
+  :root,
+  :root[data-theme] {
+    color-scheme: light;
+    font-size: 10pt;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-shadow: none !important;
+    print-color-adjust: exact;
+  }
+
+  html,
+  body {
+    background: white;
+  }
+
+  .no-print,
+  dialog,
+  [popover] {
+    display: none !important;
+  }
+
+  /* Esqueleto do app: sem barra lateral nem barra de baixo, o conteúdo ocupa a folha. */
+  div:has(> #conteudo) {
+    display: block;
+    min-block-size: 0;
+  }
+
+  #conteudo {
+    padding: 0;
+
+    & > div {
+      max-inline-size: none;
+      padding: 0;
+    }
+  }
+
+  /* Gráficos e tabelas dos "Ver os números" (abertos na impressão pela tela). */
+  details > summary {
+    display: none;
+  }
+
+  /*
+   * A folha é mais estreita que a tela, e o Recharts só mede de novo depois: o gráfico
+   * encolhe pelo `viewBox` em vez de vazar para o lado.
+   */
+  .recharts-responsive-container > div {
+    inline-size: 100% !important;
+  }
+
+  .recharts-wrapper,
+  svg.recharts-surface {
+    max-inline-size: 100% !important;
+  }
+
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+
+  /*
+   * Um gráfico (com a legenda) nunca fica dividido entre duas folhas, nem separado do
+   * título; a tabela de baixo pode continuar na folha seguinte.
+   */
+  tr,
+  li,
+  ol,
+  section:has(.recharts-wrapper):not(:has(section)) > div:has(.recharts-wrapper) {
+    break-inside: avoid;
+  }
+
+  section:has(.recharts-wrapper):not(:has(section)) > header {
+    break-after: avoid;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+}

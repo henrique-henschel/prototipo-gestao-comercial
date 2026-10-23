@@ -28,4 +28,7 @@ npm run shot -- dialogo.png --eval "[...document.querySelectorAll('button')].fin
 - O `--eval` precisa ser **uma linha só** (quebras de linha dão `SyntaxError`). Para scripts longos, guarde num arquivo e passe `"$(tr '\n' ' ' < arquivo.js)"`.
 - Com `--full`, elementos fixos (como a `BottomNav`) aparecem no meio da imagem: é efeito da captura, não bug. Gráficos do Recharts saem vazios com `--full` (veja as lições do `CLAUDE.md`).
 - Mínimo por tela: 360px e 1440px, claro e escuro, e sem rolagem horizontal. Para telas novas, inclua também alto contraste com texto "Enorme".
+- **Impressão e PDF:** `--media print` emula a impressão (`print.css`) na captura; com o nome terminando em `.pdf`, a saída é o PDF A4 que o navegador imprimiria. O `beforeprint` não dispara sozinho na captura: chame `dispatchEvent(new Event('beforeprint'))` no `--eval` para abrir os "Ver os números".
+- **`voltar` com mais de um parâmetro:** o `&` da rota pedida vira parâmetro do `/entrar`. Use `encodeURIComponent` (ex.: `entrar?voltar=%2Frelatorios%3Ftipo%3Dcaixa%26periodo%3D7dias`).
+- **Porta ocupada:** se o `npm run dev` subir em outra porta (5174), passe `--base http://localhost:5174`.
 - Se o Claude in Chrome estiver conectado, ele também serve para interação real, mas o `npm run shot` não depende dele.

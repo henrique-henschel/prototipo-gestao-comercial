@@ -1,5 +1,6 @@
 import { useNavigation } from 'react-router';
 import styles from './NavigationProgress.module.css';
+import { cx } from '@/lib/cx.js';
 
 /**
  * Faixa fina no topo enquanto a próxima tela carrega (rotas carregadas sob demanda).
@@ -11,7 +12,7 @@ export function NavigationProgress() {
 
   return (
     <>
-      <div className={styles.bar} data-active={busy} aria-hidden="true" />
+      <div className={cx(styles.bar, 'no-print')} data-active={busy} aria-hidden="true" />
       <span role="status" className="visually-hidden">
         {busy ? 'Carregando…' : ''}
       </span>

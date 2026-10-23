@@ -1,4 +1,13 @@
-import { addDays, dateOf, diffInDays, endOfMonth, startOfMonth, today as todayISO } from '@/lib/date.js';
+import {
+  addDays,
+  dateOf,
+  diffInDays,
+  endOfMonth,
+  parseISODate,
+  startOfMonth,
+  toISODate,
+  today as todayISO,
+} from '@/lib/date.js';
 
 /**
  * Períodos de consulta (relatórios, métricas e comparativos), em dias civis inclusivos.
@@ -30,6 +39,28 @@ export function periodFromPreset(preset, today = todayISO()) {
     default:
       throw new Error(`Período desconhecido: ${preset}`);
   }
+}
+
+/** `AAAA-MM-DD` de um dia que existe (31/02 não passa). */
+function isValidDay(value) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(value ?? '') && toISODate(parseISODate(value)) === value;
+}
+
+/**
+ * Período escolhido à mão ("Escolher datas"). Regra 8 ("Períodos"): as datas podem vir
+ * trocadas (o início depois do fim) e o período nunca passa de hoje, porque não há
+ * registros no futuro. Devolve nulo se faltar uma das datas ou se o período começar
+ * depois de hoje.
+ * @param {string|null|undefined} start `AAAA-MM-DD`
+ * @param {string|null|undefined} end `AAAA-MM-DD`
+ * @param {string} [today]
+ * @returns {Period|null}
+ */
+export function customPeriod(start, end, today = todayISO()) {
+  if (!isValidDay(start) || !isValidDay(end)) return null;
+  const [first, last] = start <= end ? [start, end] : [end, start];
+  if (first > today) return null;
+  return { start: first, end: last > today ? today : last };
 }
 
 /**

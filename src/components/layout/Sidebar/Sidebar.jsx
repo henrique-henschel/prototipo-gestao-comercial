@@ -8,6 +8,7 @@ import { useSettings } from '@/hooks/useSettings.js';
 import { Brand } from '../Brand/Brand.jsx';
 import { NAV, SIDEBAR_FOOTER, SIDEBAR_MAIN } from '../navigation.js';
 import styles from './Sidebar.module.css';
+import { cx } from '@/lib/cx.js';
 
 function NavItem({ item }) {
   const Icon = item.icon;
@@ -31,7 +32,7 @@ export function Sidebar() {
   const logout = useLogout();
 
   return (
-    <aside className={styles.sidebar}>
+    <aside className={cx(styles.sidebar, 'no-print')}>
       <Link to={ROUTES.home} className={styles.brandLink}>
         <Brand subtitle={business?.name || undefined} />
       </Link>

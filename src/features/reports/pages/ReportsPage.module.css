@@ -1,0 +1,109 @@
+@layer components {
+  .muted {
+    color: var(--text-2);
+  }
+
+  .cardTitle {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+  }
+
+  /* ---------- Filtros e "Levar este relatório" ---------- */
+  .controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-4);
+    margin-block-end: var(--space-6);
+  }
+
+  .filters {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+
+  .group {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+
+  .groupLabel {
+    font-weight: var(--weight-bold);
+  }
+
+  .dates {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
+    gap: var(--space-3);
+    margin-block-start: var(--space-2);
+  }
+
+  .exports {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+  }
+
+  .actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
+    gap: var(--space-3);
+  }
+
+  /* ---------- Prévia ---------- */
+  .preview {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+    transition: opacity var(--dur-base) var(--ease-out);
+  }
+
+  /* O relatório anterior fica na tela, apagado, até o novo chegar. */
+  .stale {
+    opacity: 0.55;
+  }
+
+  .previewHeader {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .previewTitle {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+  }
+
+  .loading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .loadingStats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(8.5rem, 100%), 1fr));
+    gap: var(--space-3);
+  }
+
+  /* ---------- Cabeçalho do PDF (só na impressão) ---------- */
+  .printHeader {
+    display: grid;
+    gap: var(--space-1);
+    padding-block-end: var(--space-3);
+    margin-block-end: var(--space-4);
+    border-block-end: var(--border-width-strong) solid var(--text-1);
+  }
+
+  .printBusiness {
+    font-size: var(--text-xl);
+    font-weight: var(--weight-bold);
+  }
+
+  .printTitle {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+  }
+}

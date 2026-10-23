@@ -128,11 +128,18 @@ Formas: `dinheiro`, `pix`, `debito`, `credito`, `fiado`. Cada forma pode ser des
 
 ## 8. Relatórios e exportação
 
-- **Períodos**: hoje, ontem, últimos 7 dias, este mês, mês passado, personalizado.
-- **Tipos**: vendas (lista), por forma de pagamento, produtos mais vendidos, fiado/devedores, estoque (situação e valor em estoque), caixa e despesas, resumo geral.
-- **Excel (CSV)**: separador `;`, decimal com vírgula, BOM UTF-8 (para o Excel em português abrir corretamente), datas `dd/mm/aaaa`.
-- **PDF**: via impressão do navegador com folha de estilo própria (`print.css`), com cabeçalho do negócio, período e data de emissão.
-- **Compartilhar**: Web Share API quando disponível; senão, um link do WhatsApp com o resumo em texto.
+- **Períodos**: hoje, ontem, últimos 7 dias, este mês (o padrão da tela), mês passado e "Escolher datas". No período escolhido à mão, as datas trocadas são desinvertidas, o fim nunca passa de hoje (não há registros no futuro) e um período que começa depois de hoje, ou com uma data que falta ou não existe, não vale (`customPeriod`).
+- **Tipos**:
+  - **Resumo geral**: os indicadores da seção 7 comparados com o período anterior (cortado na hora de agora, como no Início), as formas de pagamento, os 5 mais vendidos e a foto de hoje do fiado (para receber e atrasado) e do estoque (valor parado pelo custo e pelo preço de venda).
+  - **Vendas**: todas as vendas do período, inclusive as canceladas (marcadas e fora do vendido), e o vendido de cada dia.
+  - **Formas de pagamento**: quanto entrou por forma e a parte de cada uma, mais o fiado vendido e as taxas da maquininha.
+  - **Produtos mais vendidos**: todos os produtos vendidos, pelo valor; itens de valor avulso ficam de fora.
+  - **Fiado e devedores** e **Estoque**: uma foto de agora, sem período. Os devedores vêm por urgência (seção 3) e os produtos com o que acabou e o que está acabando primeiro (seção 5), com o valor parado de cada um.
+  - **Caixa e despesas**: cada dia do período (vendido, entrou, despesas, esperado na gaveta, contado e o resultado do fechamento), as despesas somadas por tipo, da maior para a menor (`expensesByCategory`), e a lista das despesas.
+- **Relatório vazio** (nenhuma venda no período, ninguém devendo, nenhum produto ou nada no caixa): a tela ensina o próximo passo e não oferece exportar.
+- **Excel (CSV)**: separador `;`, decimal com vírgula e sem ponto de milhar, BOM UTF-8 (para o Excel em português abrir corretamente), datas `dd/mm/aaaa` (e `dd/mm/aaaa hh:mm` com hora) pelo dia civil local. No topo, o nome do negócio, o tipo, o período e quando foi feito; depois, cada tabela com o seu título. Textos que começam com `=`, `+`, `-` ou `@` ganham um apóstrofo, para o Excel não os ler como fórmula. A planilha, a tela e o PDF usam as mesmas tabelas.
+- **PDF**: via impressão do navegador com folha de estilo própria (`print.css`), com cabeçalho do negócio, período e data de emissão, no tema claro e com todas as linhas (a tela mostra as 10 primeiras e "Ver todas").
+- **Compartilhar**: Web Share API quando disponível; senão, um link do WhatsApp com o resumo em texto (o nome do negócio em negrito no topo, o tipo, o período, os números principais e quando foi feito).
 
 ## 9. Ajustes que alteram regras
 
@@ -159,9 +166,9 @@ Funções puras em `src/domain/rules/`, cada uma com testes ao lado (`*.test.js`
 | 3. Fiado      | `fiado.js`     | `accountStatus`, `customerFiadoSummary`, `fiadoAlerts`, `allocatePayment`, `receiveFiado`, `validateUndoFiadoPayment`, `customerTimeline`, `cancelSaleAccounts`, `compareUrgency`, `fiadoIndicators`                                                |
 | 4. Clientes   | `customers.js` | `validateCustomer`, `normalizePhone`, `validateCustomerDeletion`, `canDeleteCustomer`                                                                                                                                                               |
 | 5. Estoque    | `stock.js`     | `stockStatus`, `calcMargin`, `unitProfit`, `isSellingAtLoss`, `validateProduct`, `parseQuantityFromDigits`, `previewMovement`, `applyMovement`, `validateUndoMovement`, `revertMovement`, `compareStockUrgency`, `findStockShortages`, `stockValue` |
-| 6. Caixa      | `cash.js`      | `summarizeCashDay`, `expectedCash`, `closingDifference`, `cashDayClosing`, `validateExpense`, `validateCashDayChange`                                                                                                                               |
+| 6. Caixa      | `cash.js`      | `summarizeCashDay`, `expectedCash`, `closingDifference`, `cashDayClosing`, `validateExpense`, `validateCashDayChange`, `expensesByCategory`                                                                                                         |
 | 7. Métricas   | `metrics.js`   | `periodMetrics`, `compareWithPrevious` (com `now`), `dailySeries`, `paymentMix`, `topProducts`                                                                                                                                                      |
-| 8. Períodos   | `period.js`    | `periodFromPreset`, `previousPeriod`, `filterByPeriod`                                                                                                                                                                                              |
+| 8. Períodos   | `period.js`    | `periodFromPreset`, `customPeriod`, `previousPeriod`, `filterByPeriod`                                                                                                                                                                              |
 | 9. Ajustes    | `settings.js`  | `mergeSettings`, `validateSettings`                                                                                                                                                                                                                 |
 
 Os serviços (`src/services/`) aplicam essas regras antes de gravar e devolvem erros com códigos (`soma_diferente`, `cliente_obrigatorio`...) e mensagens em linguagem simples (`ERROR_MESSAGES` em `services/api.js`).

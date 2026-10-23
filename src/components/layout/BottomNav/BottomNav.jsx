@@ -12,7 +12,7 @@ export function BottomNav() {
   const insideMore = MORE_ITEMS.some((item) => matchPath({ path: item.to, end: false }, pathname));
 
   return (
-    <nav aria-label="Menu principal" className={styles.bottomNav}>
+    <nav aria-label="Menu principal" className={cx(styles.bottomNav, 'no-print')}>
       <ul role="list" className={styles.list}>
         {BOTTOM_NAV.map((item) => {
           const Icon = item.icon;
