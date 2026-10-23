@@ -32,6 +32,7 @@ import {
   IconButton,
   Input,
   MoneyInput,
+  PercentInput,
   ProgressBar,
   QuantityInput,
   QuantityStepper,
@@ -235,6 +236,7 @@ function MoneySection() {
   const [kg, setKg] = useState(1.5);
   const [received, setReceived] = useState(12);
   const [weight, setWeight] = useState(1.25);
+  const [rate, setRate] = useState(1.99);
 
   return (
     <Section
@@ -278,6 +280,15 @@ function MoneySection() {
               />
               <QuantityInput label="Peso" value={weight} onChange={setWeight} unit="kg" size="md" />
             </div>
+          </Example>
+          <Example title="Porcentagem digitada" note="taxas: 1, 9, 9 vira 1,99%">
+            <PercentInput
+              label="Taxa do débito"
+              value={rate}
+              onChange={setRate}
+              size="md"
+              hint="Digite só os números, sem vírgula."
+            />
           </Example>
           <Example title="Quantidade">
             <div className="stack">

@@ -3,6 +3,8 @@ import {
   formatDecimal,
   fromCents,
   parseCentsFromDigits,
+  parsePercentFromDigits,
+  percentDigits,
   percentOf,
   sumCents,
   toCents,
@@ -40,5 +42,20 @@ describe('money', () => {
     expect(sumCents([100, 250, undefined, 5])).toBe(355);
     expect(percentOf(1000, 3.5)).toBe(35);
     expect(percentOf(999, 10)).toBe(100);
+  });
+});
+
+describe('porcentagem digitada (taxas)', () => {
+  it('os dígitos entram pela direita, com 2 casas', () => {
+    expect(parsePercentFromDigits('199')).toBe(1.99);
+    expect(parsePercentFromDigits('3,49%')).toBe(3.49);
+    expect(parsePercentFromDigits('')).toBe(0);
+    expect(parsePercentFromDigits('123456')).toBe(99.99);
+  });
+
+  it('devolve os dígitos para continuar a digitação', () => {
+    expect(percentDigits(1.99)).toBe('199');
+    expect(percentDigits(4.9)).toBe('490');
+    expect(percentDigits(0)).toBe('');
   });
 });

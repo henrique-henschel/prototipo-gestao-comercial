@@ -11,6 +11,7 @@ const time = new Intl.DateTimeFormat(LOCALE, { hour: '2-digit', minute: '2-digit
 const number = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 3 });
 const fixed3 = new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 const percent = new Intl.NumberFormat(LOCALE, { style: 'percent', maximumFractionDigits: 1 });
+const rate = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 2 });
 
 /** "21/10/2026" */
 export function formatDate(iso) {
@@ -71,6 +72,11 @@ export function formatNumber(value) {
 export function formatQuantity(value, unitShort, { fixed = false } = {}) {
   const text = fixed ? fixed3.format(value) : number.format(value);
   return unitShort ? `${text} ${unitShort}` : text;
+}
+
+/** Taxa em por cento, com até 2 casas: 1.99 → "1,99%", 3 → "3%" */
+export function formatRate(percent) {
+  return `${rate.format(percent)}%`;
 }
 
 /** Recebe fração (0.125) e devolve "12,5%" */

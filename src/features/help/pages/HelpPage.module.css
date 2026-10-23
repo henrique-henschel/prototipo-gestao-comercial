@@ -1,0 +1,130 @@
+@layer components {
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+    max-inline-size: 48rem;
+  }
+
+  .muted {
+    color: var(--text-2);
+  }
+
+  /* ---------- Passo a passo ---------- */
+  .tour {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-3) var(--space-4);
+  }
+
+  .tourEmoji {
+    font-size: var(--text-2xl);
+  }
+
+  .tourText {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .tourTitle {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+  }
+
+  .tourButton {
+    grid-column: 1 / -1;
+  }
+
+  /* ---------- Assuntos ---------- */
+  .topicList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .topic {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-block-size: var(--tap-min);
+    padding-inline: var(--space-4);
+    border: var(--border-width-strong) solid var(--border-1);
+    border-radius: var(--radius-pill);
+    background: var(--surface-1);
+    color: var(--text-1);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    text-decoration: none;
+
+    &:hover {
+      background: var(--surface-2);
+    }
+  }
+
+  /* ---------- Perguntas ---------- */
+  .group {
+    display: grid;
+    gap: var(--space-2);
+    scroll-margin-block-start: calc(var(--topbar-height) + var(--space-4));
+  }
+
+  .groupTitle {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+  }
+
+  .questions {
+    display: grid;
+  }
+
+  .question {
+    border-block-end: var(--border-width) solid var(--border-1);
+
+    &:last-child {
+      border-block-end: 0;
+    }
+
+    & > summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--space-3);
+      min-block-size: var(--tap-min);
+      padding-block: var(--space-3);
+      font-weight: var(--weight-bold);
+      cursor: pointer;
+      list-style: none;
+
+      &::-webkit-details-marker {
+        display: none;
+      }
+    }
+
+    &[open] .chevron {
+      rotate: 180deg;
+    }
+  }
+
+  .chevron {
+    color: var(--text-2);
+    transition: rotate var(--dur-base) var(--ease-out);
+  }
+
+  .answer {
+    display: grid;
+    gap: var(--space-3);
+    padding-block-end: var(--space-4);
+    text-wrap: pretty;
+  }
+
+  .link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    justify-self: start;
+    min-block-size: var(--tap-min);
+    color: var(--color-primary-text);
+    font-weight: var(--weight-bold);
+  }
+}

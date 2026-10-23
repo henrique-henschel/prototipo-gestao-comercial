@@ -31,9 +31,9 @@ Decisões fechadas com o dono do produto:
 | 7    | Estoque                               | ✅ `f78f19d` |
 | 8    | Caixa e despesas                      | ✅ `2710865` |
 | 9    | Dashboard                             | ✅ `d0539ac` |
-| 10   | Relatórios                            | ✅           |
-| 11   | Ajustes, acessibilidade, ajuda e tour | ⏳ próxima   |
-| 12   | Polimento                             | ⏳           |
+| 10   | Relatórios                            | ✅ `202c1d5` |
+| 11   | Ajustes, acessibilidade, ajuda e tour | ✅           |
+| 12   | Polimento                             | ⏳ próxima   |
 
 Agrupamento sugerido por sessão de trabalho: **3+4** → **5** → **6+7** → **8+9** → **10+11** → **12**.
 
@@ -63,7 +63,7 @@ src/
   app/            ✅ config.js, routes.js, router.js, providers.jsx, guards.jsx, RootLayout.jsx
   styles/         index.css ✅, reset ✅, tokens ✅, base ✅, utilities ✅, animations ✅, print.css ✅
   components/
-    ui/           ✅ 25 primitivos + index.js (ver docs/design-system.md)
+    ui/           ✅ 27 primitivos + index.js (ver docs/design-system.md)
     layout/       ✅ AppShell, Sidebar, BottomNav, TopBar, PageHeader, CenteredLayout, Brand,
                   SkipLink, NavigationProgress, ComingSoon + navigation.js
     charts/       ChartCard, RevenueBarChart, PaymentDonut, TopProductsChart, Sparkline (Fase 9)
@@ -79,8 +79,8 @@ src/
     inventory/    Produtos, ProdutoForm, Movimentacoes (Fase 7)
     cash/         CaixaDoDia, Despesas (Fase 8)
     reports/      ✅ ReportsPage, ReportPreview, ReportTable, tabelas (CSV/tela/PDF), texto do resumo
-    settings/     (Fase 11)
-    help/         (Fase 11)
+    settings/     ✅ SettingsPage, janelas de edição e useSaveSettings (salvar com "Desfazer")
+    help/         ✅ HelpPage, perguntas frequentes (faq.js) e o tour (Tour, tourSteps.js)
   domain/
     models.js     ✅ @typedef JSDoc de todas as entidades
     constants.js  ✅ formas de pagamento, status, unidades, categorias, motivos, ajustes padrão
@@ -318,7 +318,29 @@ Plano original da fase:
 
 Filtros de período e tipo, prévia, CSV (`lib/csv.js`), PDF (`styles/print.css` + `window.print()`) e compartilhamento (`lib/share.js`).
 
-### Fase 11: Ajustes, acessibilidade, ajuda e tour
+### ✅ Fase 11: Ajustes, acessibilidade, ajuda e tour
+
+Entregue:
+
+- **`/ajustes`** em cartões: seu negócio (nome e WhatsApp), chave Pix, formas de pagamento (chaves, com a última travada), taxas da maquininha (teclado próprio, com o exemplo numa venda de R$ 100,00), prazo do fiado (7 a 60 dias), "Não vender o que acabou", troco inicial padrão, aparência e acessibilidade (cores da tela, tamanho do texto com amostra, vibrar e botões "Ouvir"), modo demonstração (internet lenta e falha, via `configureApi`) e "Restaurar dados de exemplo" (com confirmação). Estados carregando e erro com "Tentar de novo". Duas colunas a partir de 75rem.
+- **`/ajuda`**: "Ver o passo a passo de novo" (a ação principal), atalhos por assunto e 14 perguntas frequentes em `<details>`, cada uma com o caminho para a tela.
+- **Tour de primeiro uso** (`features/help/components/Tour.jsx`): 5 passos curtos numa janela, com "Pular", "Voltar" e "Passo 2 de 5". Abre no Início ao terminar as boas-vindas e pela Ajuda.
+- **Componente novo** `PercentInput` (porcentagem no teclado próprio, sem vírgula), com exemplo em `/design-system#valores`.
+- **Regras novas**: `validateSettings` passou a conferir taxas, prazo do fiado e troco inicial; `validateBusiness`, `canDisablePaymentMethod` e `parsePercentFromDigits`/`percentDigits`. O `updateBusiness` valida e guarda o WhatsApp só com os dígitos.
+- **"Ouvir" desligado esconde os botões**: `useSpeech` lê `preferences.speech` (antes a preferência não tinha efeito).
+- **Testes**: regras novas, `PercentInput`, `formatRate` e integração (forma de pagamento com "Desfazer", última forma travada, taxa pelo teclado, nome obrigatório, prazo, estoque e troco, falha voltando a tela, acessibilidade, modo demonstração, restaurar com confirmação, erro ao carregar; Ajuda, tour passo a passo e tour ao fim das boas-vindas).
+
+Decisões tomadas durante a fase:
+
+- **Sem botão "Salvar" na tela**: chaves e fichas salvam ao tocar (atualização otimista) e os valores abrem uma janela com a própria ação principal. Cada alteração tem "Desfazer" no aviso (`useSaveSettings` grava de volta os valores de antes); só restaurar os dados de exemplo pede confirmação.
+- **Aparência é do aparelho, ajustes são do negócio**: tema, texto, vibração e "Ouvir" ficam no `PreferencesProvider` e não passam pelo serviço; o cartão diz "Valem só para este aparelho".
+- **Fichas, e não `SegmentedControl`, para tema e tamanho do texto**: com texto Enorme o controle segmentado não quebra linha.
+- **Tour numa janela, sem "holofote" nos menus**: funciona igual no celular e no computador, com teclado e leitor de tela, e cita o nome de cada menu em negrito. Fica no estado da navegação (`state.tour` no Início), não num contexto: fechar troca a entrada do histórico, e o "voltar" não o reabre.
+- **Tour só para quem acabou de criar a conta**: a conta de demonstração já tem 90 dias de uso; quem quiser vê o tour pela Ajuda.
+- **Modo demonstração sem aviso global**: as próprias telas mostram o erro com "Tentar de novo", que é o que o modo quer mostrar; desligar fica nos Ajustes, que não precisam da internet para isso.
+- **Linha da taxa empilha em cartão estreito** (container query de 15rem): com texto Enorme, "Mudar" cobria o nome da taxa.
+
+Plano original da fase:
 
 Dados do negócio, chave Pix, formas e taxas, regras de estoque e de fiado, acessibilidade (tema, tamanho do texto, vibração e "Ouvir"), modo demonstração (lentidão e erro) e restaurar dados; FAQ em linguagem simples; tour de primeiro uso.
 

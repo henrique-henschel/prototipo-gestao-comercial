@@ -76,6 +76,10 @@ export const ERROR_MESSAGES = {
   caixa_fechado: 'O caixa desse dia já foi fechado.',
   caixa_nao_fechado: 'O caixa desse dia ainda está aberto.',
   caixa_inexistente: 'O caixa desse dia ainda não foi aberto.',
+  // Ajustes
+  taxa_invalida: 'Confira a taxa: ela vai de 0% a 99,99%.',
+  prazo_invalido: 'O prazo do fiado vai de 1 a 365 dias.',
+  troco_invalido: 'Confira o troco inicial.',
   // Acesso
   login_incompleto: 'Digite seu e-mail e sua senha.',
 };

@@ -1,4 +1,5 @@
-import { mergeSettings, validateSettings } from '@/domain/rules/settings.js';
+import { normalizePhone } from '@/domain/rules/customers.js';
+import { mergeSettings, validateBusiness, validateSettings } from '@/domain/rules/settings.js';
 import { resetDemo } from '@/mocks/db.js';
 import { ApiError, assertValid, request } from './api.js';
 
@@ -17,14 +18,17 @@ export function getBusiness() {
 }
 
 /**
- * PATCH /business
+ * PATCH /business. O WhatsApp é guardado só com os dígitos (com DDD).
  * @param {Partial<Omit<Business, 'id'|'createdAt'>>} changes
  * @returns {Promise<Business>}
  */
 export function updateBusiness(changes) {
   return request((db) => {
-    if (changes.name !== undefined && !changes.name.trim()) throw new ApiError('nome_obrigatorio');
-    db.business = { ...db.business, ...changes };
+    assertValid(validateBusiness(changes));
+    const next = { ...changes };
+    if (next.name !== undefined) next.name = next.name.trim();
+    if (next.phone !== undefined) next.phone = normalizePhone(next.phone);
+    db.business = { ...db.business, ...next };
     return db.business;
   });
 }

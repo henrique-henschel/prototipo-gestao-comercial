@@ -143,16 +143,20 @@ Formas: `dinheiro`, `pix`, `debito`, `credito`, `fiado`. Cada forma pode ser des
 
 ## 9. Ajustes que alteram regras
 
-Pelo menos uma forma de pagamento precisa ficar ativa.
+| Ajuste                                                           | Padrão    | Valores aceitos                                          | Regra afetada |
+| ---------------------------------------------------------------- | --------- | -------------------------------------------------------- | ------------- |
+| Formas de pagamento ativas                                       | todas     | pelo menos uma ligada (`forma_inativa`)                  | 2             |
+| Taxas da maquininha (débito, crédito à vista, crédito parcelado) | 0%        | de 0% a 99,99%, com 2 casas (`taxa_invalida`)            | 2.3, 7        |
+| Chave Pix                                                        | vazia     | qualquer texto (CPF, celular, e-mail ou chave aleatória) | 2.2           |
+| Vencimento padrão do fiado                                       | 30 dias   | dias inteiros, de 1 a 365 (`prazo_invalido`)             | 3.2           |
+| Bloquear venda sem estoque                                       | desligado | ligado ou desligado                                      | 1.9, 5.5      |
+| Troco inicial padrão                                             | R$ 0,00   | centavos inteiros, sem valor negativo (`troco_invalido`) | 6.1           |
 
-| Ajuste                                                           | Padrão    | Regra afetada |
-| ---------------------------------------------------------------- | --------- | ------------- |
-| Formas de pagamento ativas                                       | todas     | 2             |
-| Taxas da maquininha (débito, crédito à vista, crédito parcelado) | 0%        | 2.3, 7        |
-| Chave Pix                                                        | vazia     | 2.2           |
-| Vencimento padrão do fiado                                       | 30 dias   | 3.2           |
-| Bloquear venda sem estoque                                       | desligado | 1.9, 5.5      |
-| Troco inicial padrão                                             | R$ 0,00   | 6.1           |
+- **Dados do negócio**: o nome é obrigatório (`nome_obrigatorio`) e o WhatsApp é opcional, mas com DDD (`whatsapp_invalido`); ele é guardado só com os dígitos (`validateBusiness`).
+- **A última forma ligada não pode ser desligada** (`canDisablePaymentMethod`): a tela deixa a chave travada e explica por quê.
+- **Toda alteração vale na hora** e tem "Desfazer" no aviso (5 segundos), que grava de volta os valores de antes. Se o serviço recusar, a tela volta sozinha ao que era.
+- **Aparência e acessibilidade** (tema, tamanho do texto, vibração e botões "Ouvir") são do aparelho, e não do negócio: não passam pelo serviço.
+- **Restaurar os dados de exemplo** troca tudo (vendas, fiado, produtos, caixa e ajustes) pelos dados da Barraca da Rosa. Não tem volta, então é a única ação dos Ajustes que pede confirmação.
 
 ## Onde cada regra está implementada
 
@@ -160,7 +164,7 @@ Funções puras em `src/domain/rules/`, cada uma com testes ao lado (`*.test.js`
 
 | Seção         | Arquivo        | Principais funções                                                                                                                                                                                                                                  |
 | ------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Dinheiro      | `money.js`     | `toCents`, `formatBRL`, `parseCentsFromDigits`, `sumCents`, `percentOf`                                                                                                                                                                             |
+| Dinheiro      | `money.js`     | `toCents`, `formatBRL`, `parseCentsFromDigits`, `sumCents`, `percentOf`, `parsePercentFromDigits`                                                                                                                                                   |
 | 1. Vendas     | `sales.js`     | `calcSaleTotals`, `calcDiscount`, `validateSale`, `canUndoSale`, `validateCancellation`, `activeSales`                                                                                                                                              |
 | 2. Pagamentos | `payments.js`  | `calcChange`, `suggestCashAmounts`, `paymentProgress`, `validatePayments`, `calcFee`, `finalizePayments`                                                                                                                                            |
 | 3. Fiado      | `fiado.js`     | `accountStatus`, `customerFiadoSummary`, `fiadoAlerts`, `allocatePayment`, `receiveFiado`, `validateUndoFiadoPayment`, `customerTimeline`, `cancelSaleAccounts`, `compareUrgency`, `fiadoIndicators`                                                |
@@ -169,6 +173,6 @@ Funções puras em `src/domain/rules/`, cada uma com testes ao lado (`*.test.js`
 | 6. Caixa      | `cash.js`      | `summarizeCashDay`, `expectedCash`, `closingDifference`, `cashDayClosing`, `validateExpense`, `validateCashDayChange`, `expensesByCategory`                                                                                                         |
 | 7. Métricas   | `metrics.js`   | `periodMetrics`, `compareWithPrevious` (com `now`), `dailySeries`, `paymentMix`, `topProducts`                                                                                                                                                      |
 | 8. Períodos   | `period.js`    | `periodFromPreset`, `customPeriod`, `previousPeriod`, `filterByPeriod`                                                                                                                                                                              |
-| 9. Ajustes    | `settings.js`  | `mergeSettings`, `validateSettings`                                                                                                                                                                                                                 |
+| 9. Ajustes    | `settings.js`  | `mergeSettings`, `validateSettings`, `validateBusiness`, `canDisablePaymentMethod`                                                                                                                                                                  |
 
 Os serviços (`src/services/`) aplicam essas regras antes de gravar e devolvem erros com códigos (`soma_diferente`, `cliente_obrigatorio`...) e mensagens em linguagem simples (`ERROR_MESSAGES` em `services/api.js`).

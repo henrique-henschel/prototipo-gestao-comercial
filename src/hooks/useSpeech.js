@@ -1,16 +1,20 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { LOCALE } from '@/app/config.js';
+import { PreferencesContext } from '@/store/preferences-context.js';
 
 const supported = typeof window !== 'undefined' && 'speechSynthesis' in window;
 
 /**
  * Leitura em voz alta (Web Speech API), em português do Brasil.
- * Ajuda quem tem dificuldade de leitura a conferir valores e troco.
+ * Ajuda quem tem dificuldade de leitura a conferir valores e troco. Com "Ouvir" desligado
+ * nos Ajustes (`preferences.speech`), fica indisponível e os botões "Ouvir" somem.
  *
  * @returns {{ supported: boolean, speaking: boolean, speak: (text: string) => void, stop: () => void }}
  */
 export function useSpeech() {
   const [speaking, setSpeaking] = useState(false);
+  // Fora do PreferencesProvider (catálogo, testes de componente), fica ligado.
+  const enabled = useContext(PreferencesContext)?.preferences.speech ?? true;
 
   const stop = useCallback(() => {
     if (!supported) return;
@@ -34,5 +38,5 @@ export function useSpeech() {
 
   useEffect(() => stop, [stop]);
 
-  return { supported, speaking, speak, stop };
+  return { supported: supported && enabled, speaking, speak, stop };
 }

@@ -1,0 +1,18 @@
+@layer components {
+  .form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+
+  /* Exemplo da taxa: acima do teclado e com altura reservada (não pula ao digitar). */
+  .preview {
+    min-block-size: calc(2lh + var(--space-2));
+    color: var(--text-2);
+
+    & strong {
+      color: var(--text-1);
+      white-space: nowrap;
+    }
+  }
+}

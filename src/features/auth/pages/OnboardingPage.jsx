@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowRight, CircleAlert, PartyPopper, RotateCcw, Store } fro
 import { Navigate } from 'react-router';
 import { APP_NAME } from '@/app/config.js';
 import { ROUTES } from '@/app/routes.js';
+import { TOUR_STATE } from '@/features/help/tourSteps.js';
 import { CenteredLayout } from '@/components/layout';
 import {
   Button,
@@ -36,14 +37,19 @@ const METHOD_HINTS = {
 
 /**
  * Boas-vindas em 3 passos depois de criar a conta: nome do negócio, o que vende e
- * como recebe. No fim, dá para começar com os dados de exemplo ou do zero.
+ * como recebe. No fim, dá para começar com os dados de exemplo ou do zero, e o Início
+ * abre com o tour de primeiro uso.
  */
 export default function OnboardingPage() {
   const { session } = useSession();
   const { business, settings } = useSettings();
   const { status, reload } = useDataStatus();
+  // Acabou de concluir agora (e não só abriu a tela já tendo concluído): abre o tour.
+  const [finished, setFinished] = useState(false);
 
-  if (session?.onboarded) return <Navigate to={ROUTES.home} replace />;
+  if (session?.onboarded) {
+    return <Navigate to={ROUTES.home} replace state={finished ? TOUR_STATE : undefined} />;
+  }
 
   let content;
   if (status === 'error' && !business) {
@@ -72,7 +78,9 @@ export default function OnboardingPage() {
       </Card>
     );
   } else {
-    content = <OnboardingWizard business={business} settings={settings} />;
+    content = (
+      <OnboardingWizard business={business} settings={settings} onFinished={() => setFinished(true)} />
+    );
   }
 
   return (
@@ -84,9 +92,10 @@ export default function OnboardingPage() {
 }
 
 /**
- * @param {{ business: import('@/domain/models.js').Business, settings: import('@/domain/models.js').Settings }} props
+ * @param {{ business: import('@/domain/models.js').Business, settings: import('@/domain/models.js').Settings,
+ *   onFinished: () => void }} props
  */
-function OnboardingWizard({ business, settings }) {
+function OnboardingWizard({ business, settings, onFinished }) {
   const { user, markOnboarded } = useSession();
   const { completeOnboarding } = useSettings();
   const toast = useToast();
@@ -123,6 +132,7 @@ function OnboardingWizard({ business, settings }) {
     setPending(true);
     try {
       await completeOnboarding({ businessName, sells, paymentMethods: methods, keepSampleData });
+      onFinished();
       markOnboarded();
       toast.show({ message: 'Tudo pronto!', description: 'Agora é só começar a vender.' });
     } catch (caught) {

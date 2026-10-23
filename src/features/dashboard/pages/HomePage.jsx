@@ -1,4 +1,4 @@
-import { Link, useSearchParams } from 'react-router';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
 import {
   ChartColumn,
   ChevronRight,
@@ -40,6 +40,7 @@ import {
   formatWeekdayShort,
   plural,
 } from '@/lib/format.js';
+import { Tour } from '@/features/help/components/Tour.jsx';
 import { PAYMENT_ICONS } from '@/features/sales/paymentIcons.js';
 import { DASHBOARD_PERIODS, DEFAULT_DASHBOARD_PERIOD, deltaOf } from '../periods.js';
 import { useDashboard } from '../useDashboard.js';
@@ -61,10 +62,19 @@ const capitalize = (text) => text.charAt(0).toUpperCase() + text.slice(1);
  * precisa de atenção (fiado e estoque, com links), indicadores do período com a comparação
  * ao período anterior, vendas por dia, rosca por forma de pagamento, mais vendidos e
  * atalhos. O período fica na barra de endereço (`?periodo=`) e vale para tudo abaixo dele.
+ * Com `state.tour` (fim das boas-vindas ou "Ver o passo a passo de novo" na Ajuda), abre o
+ * tour de primeiro uso por cima.
  */
 export default function HomePage() {
   const { user } = useSession();
   const [params, setParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const showTour = Boolean(location.state?.tour);
+  // Fechar tira o tour do histórico: o "voltar" não o abre de novo.
+  const closeTour = () =>
+    navigate({ pathname: location.pathname, search: location.search }, { replace: true, state: null });
+  const tour = showTour && <Tour open onClose={closeTour} />;
   const { status, reload } = useDataStatus();
   const presetValue = params.get('periodo');
   const periodOption =
@@ -86,6 +96,7 @@ export default function HomePage() {
     return (
       <>
         {header}
+        {tour}
         <div className={styles.loading} aria-busy="true" aria-label="Carregando o início">
           <Skeleton shape="rect" height="12rem" />
           <div className={styles.stats}>
@@ -103,6 +114,7 @@ export default function HomePage() {
     return (
       <>
         {header}
+        {tour}
         <Card>
           <EmptyState
             tone="danger"
@@ -130,6 +142,7 @@ export default function HomePage() {
   return (
     <>
       {header}
+      {tour}
 
       <div className={styles.top}>
         <TodayCard metrics={data.todayMetrics} />

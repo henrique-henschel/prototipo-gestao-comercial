@@ -29,7 +29,7 @@ Para quem vende na rua, na feira, na barraca, no carrinho ou numa lojinha, e pre
 | **Relatórios**         | Por período e por tipo; exportação em Excel (CSV), PDF (impressão) e compartilhamento                                                                          |
 | **Ajustes**            | Dados do negócio, chave Pix, taxas da maquininha, regras de estoque, acessibilidade, modo demonstração                                                         |
 
-> As funcionalidades são entregues em fases (veja o [Roadmap](#roadmap)). As Fases 1 a 10 estão concluídas: fundação, design system, domínio e dados (regras testadas, dados de exemplo, serviços e estado global), a navegação (entrar, criar conta, boas-vindas, menus do celular e do computador), o fluxo de vender (PDV, carrinho, todas as formas de pagamento, venda concluída com "Desfazer", histórico e cancelamento), o fiado e os clientes, o estoque, o caixa do dia com despesas, o Início com gráficos e os relatórios (Excel, PDF e WhatsApp). As telas das outras áreas chegam a partir da Fase 11; o catálogo vivo de componentes fica em `/design-system`.
+> As funcionalidades são entregues em fases (veja o [Roadmap](#roadmap)). As Fases 1 a 11 estão concluídas: fundação, design system, domínio e dados (regras testadas, dados de exemplo, serviços e estado global), a navegação (entrar, criar conta, boas-vindas, menus do celular e do computador), o fluxo de vender (PDV, carrinho, todas as formas de pagamento, venda concluída com "Desfazer", histórico e cancelamento), o fiado e os clientes, o estoque, o caixa do dia com despesas, o Início com gráficos, os relatórios (Excel, PDF e WhatsApp), os ajustes (negócio, Pix, formas e taxas, regras, acessibilidade e modo demonstração), a ajuda e o tour de primeiro uso. A Fase 12 faz o polimento final; o catálogo vivo de componentes fica em `/design-system`.
 
 ## Como rodar
 
@@ -117,7 +117,7 @@ O detalhamento de cada fase está em [`docs/plano-de-implementacao.md`](./docs/p
 | 8    | Caixa e despesas: abrir, entradas, despesas, fechar e reabrir o dia  | ✅ Concluída |
 | 9    | Dashboard: hoje, avisos, indicadores, gráficos e atalhos             | ✅ Concluída |
 | 10   | Relatórios: filtros, prévia, Excel (CSV), PDF e compartilhar         | ✅ Concluída |
-| 11   | Ajustes, acessibilidade, ajuda e tour                                | ⏳           |
+| 11   | Ajustes, acessibilidade, ajuda e tour                                | ✅ Concluída |
 | 12   | Polimento, auditoria de acessibilidade, PWA básico                   | ⏳           |
 
 ## Limitações do protótipo

@@ -63,6 +63,11 @@ describe('rotas e sessão', () => {
     expect(router.state.location.pathname).toBe('/inicio');
     expect(screen.getByText(/Olá, Joana!/)).toBeInTheDocument();
     expect(await screen.findByText('Tudo pronto!')).toBeInTheDocument();
+
+    // O tour de primeiro uso abre por cima do Início e pode ser pulado.
+    const tour = await screen.findByRole('dialog', { name: 'Boas-vindas!' });
+    await user.click(within(tour).getByRole('button', { name: 'Pular' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 
   it('quem já entrou não vê a tela de entrar', async () => {

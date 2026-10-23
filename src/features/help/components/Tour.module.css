@@ -1,0 +1,44 @@
+@layer components {
+  .step {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-3);
+    text-align: center;
+  }
+
+  .emoji {
+    font-size: var(--text-3xl);
+    line-height: 1;
+  }
+
+  .text {
+    font-size: var(--text-lg);
+    line-height: var(--leading-normal);
+    text-wrap: pretty;
+  }
+
+  .progress {
+    color: var(--text-2);
+    font-size: var(--text-sm);
+  }
+
+  .dots {
+    display: flex;
+    gap: var(--space-2);
+    padding: 0;
+    list-style: none;
+
+    & li {
+      inline-size: var(--space-2);
+      block-size: var(--space-2);
+      border-radius: var(--radius-pill);
+      background: var(--border-2);
+      transition: inline-size var(--dur-base) var(--ease-out);
+    }
+
+    & li[data-current] {
+      inline-size: var(--space-6);
+      background: var(--color-primary);
+    }
+  }
+}

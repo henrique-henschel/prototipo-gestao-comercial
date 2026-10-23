@@ -5,6 +5,7 @@ import {
   formatDayOfMonth,
   formatPercent,
   formatPeriod,
+  formatRate,
   formatPhone,
   formatQuantity,
   formatRelativeDay,
@@ -42,6 +43,11 @@ describe('format', () => {
     expect(formatPercent(0.125)).toBe('12,5%');
     expect(formatWeekdayShort('2026-10-21')).toBe('qua');
     expect(formatDayOfMonth('2026-10-01')).toBe('1');
+  });
+
+  it('escreve a taxa da maquininha', () => {
+    expect(formatRate(1.99)).toBe('1,99%');
+    expect(formatRate(3)).toBe('3%');
   });
 
   it('escreve o período dos relatórios', () => {

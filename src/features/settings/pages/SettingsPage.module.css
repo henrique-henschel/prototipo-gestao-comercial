@@ -1,0 +1,164 @@
+@layer components {
+  .sections {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+    max-inline-size: 48rem;
+  }
+
+  /* Computador largo: duas colunas de cartões, na ordem de leitura de cada coluna. */
+  @media (width >= 75rem) {
+    .sections {
+      display: block;
+      columns: 2;
+      column-gap: var(--space-4);
+      max-inline-size: none;
+
+      & > * {
+        break-inside: avoid;
+        margin-block-end: var(--space-4);
+      }
+    }
+  }
+
+  .card {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+    container-type: inline-size;
+  }
+
+  .sectionHeader {
+    display: grid;
+    gap: var(--space-1);
+  }
+
+  .sectionTitle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-snug);
+
+    & svg {
+      flex-shrink: 0;
+      color: var(--color-primary-text);
+    }
+  }
+
+  .muted {
+    color: var(--text-2);
+  }
+
+  .value {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-bold);
+    overflow-wrap: break-word;
+  }
+
+  .number {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .edit {
+    justify-self: start;
+  }
+
+  /* ---------- Linhas "rótulo: valor" ---------- */
+  .rows {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0 var(--space-3);
+  }
+
+  .rowValue {
+    font-weight: var(--weight-bold);
+    overflow-wrap: break-word;
+    min-inline-size: 0;
+  }
+
+  .list {
+    display: grid;
+  }
+
+  /* ---------- Taxas ---------- */
+  .feeRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--space-2) var(--space-3);
+    padding-block: var(--space-3);
+    border-block-end: var(--border-width) solid var(--border-1);
+
+    &:first-child {
+      padding-block-start: 0;
+    }
+
+    &:last-child {
+      padding-block-end: 0;
+      border-block-end: 0;
+    }
+  }
+
+  /* Cartão estreito (texto grande): o "Mudar" desce para baixo do nome da taxa. */
+  @container (width < 15rem) {
+    .feeRow {
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: start;
+    }
+  }
+
+  .feeText {
+    display: grid;
+
+    & strong {
+      font-size: var(--text-lg);
+    }
+  }
+
+  /* ---------- Formas de pagamento ---------- */
+  .method {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-3);
+    padding-block: var(--space-2);
+    border-block-end: var(--border-width) solid var(--border-1);
+
+    &:last-child {
+      border-block-end: 0;
+    }
+  }
+
+  .methodIcon {
+    color: var(--text-2);
+  }
+
+  .methodSwitch {
+    min-inline-size: 0;
+  }
+
+  /* ---------- Acessibilidade ---------- */
+  .group {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-2);
+  }
+
+  .groupLabel {
+    font-weight: var(--weight-bold);
+  }
+
+  .sample {
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+  }
+}

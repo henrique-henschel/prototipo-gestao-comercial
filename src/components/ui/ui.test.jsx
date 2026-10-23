@@ -1,7 +1,15 @@
 import { useState } from 'react';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Button, MoneyInput, QuantityInput, QuantityStepper, StatusPill, Tabs } from '@/components/ui';
+import {
+  Button,
+  MoneyInput,
+  PercentInput,
+  QuantityInput,
+  QuantityStepper,
+  StatusPill,
+  Tabs,
+} from '@/components/ui';
 
 function ControlledMoney({ keypad = false }) {
   const [value, setValue] = useState(0);
@@ -12,6 +20,33 @@ function ControlledQuantity({ unit }) {
   const [value, setValue] = useState(0);
   return <QuantityInput label="Quantidade" value={value} onChange={setValue} unit={unit} keypad />;
 }
+
+function ControlledPercent() {
+  const [value, setValue] = useState(0);
+  return <PercentInput label="Taxa" value={value} onChange={setValue} keypad />;
+}
+
+describe('PercentInput', () => {
+  it('os dígitos entram pela direita com 2 casas, sem vírgula', async () => {
+    const user = userEvent.setup();
+    render(<ControlledPercent />);
+    const input = screen.getByLabelText('Taxa');
+    expect(input).toHaveValue('0,00%');
+    for (const digit of ['1', '9', '9']) await user.click(screen.getByRole('button', { name: digit }));
+    expect(input).toHaveValue('1,99%');
+    await user.click(screen.getByRole('button', { name: /^Apagar/ }));
+    expect(input).toHaveValue('0,19%');
+  });
+
+  it('não passa de 99,99%', async () => {
+    const user = userEvent.setup();
+    render(<ControlledPercent />);
+    const input = screen.getByLabelText('Taxa');
+    await user.click(input);
+    await user.keyboard('123456');
+    expect(input).toHaveValue('99,99%');
+  });
+});
 
 describe('QuantityInput', () => {
   it('em unidades inteiras, cada dígito é uma unidade', async () => {

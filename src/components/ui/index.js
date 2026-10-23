@@ -17,6 +17,7 @@ export { IconButton } from './IconButton/IconButton.jsx';
 export { Input, Select, Textarea } from './Input/Input.jsx';
 export { MoneyInput } from './MoneyInput/MoneyInput.jsx';
 export { NumericKeypad } from './NumericKeypad/NumericKeypad.jsx';
+export { PercentInput } from './PercentInput/PercentInput.jsx';
 export { ProgressBar } from './ProgressBar/ProgressBar.jsx';
 export { QuantityInput } from './QuantityInput/QuantityInput.jsx';
 export { QuantityStepper } from './QuantityStepper/QuantityStepper.jsx';

@@ -89,3 +89,26 @@ export function sumCents(values) {
 export function percentOf(cents, percent) {
   return Math.round((cents * percent) / 100);
 }
+
+/** Maior taxa que se digita (99,99%). */
+export const MAX_PERCENT = 99.99;
+
+/**
+ * Porcentagem digitada como na calculadora, com 2 casas e sem vírgula: os dígitos entram
+ * pela direita ("1", "9", "9" vira 1,99%). Usada nas taxas da maquininha.
+ * @param {string} text
+ * @param {{ max?: number }} [options] maior porcentagem aceita
+ * @returns {number} ex.: 1.99
+ */
+export function parsePercentFromDigits(text, { max = MAX_PERCENT } = {}) {
+  return parseCentsFromDigits(text, { max: Math.round(max * 100) }) / 100;
+}
+
+/**
+ * Os dígitos de uma porcentagem, para continuar a digitação: 1.99 → "199".
+ * @param {number} percent
+ */
+export function percentDigits(percent) {
+  const hundredths = Math.round((percent || 0) * 100);
+  return hundredths > 0 ? String(hundredths) : '';
+}
