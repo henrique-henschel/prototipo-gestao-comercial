@@ -307,6 +307,6 @@ Animações, estados vazio, carregando e erro em todas as telas, auditoria de ac
 ## 9. Verificação (toda fase)
 
 1. `npm run lint && npm test && npm run build` sem erros, e `npm run format:check`.
-2. Verificação visual com `npm run dev` + `npm run shot` (ver o `CLAUDE.md`): 360px e 1440px, claro e escuro, alto contraste com texto a 150% e ausência de rolagem horizontal (`--eval "document.documentElement.scrollWidth"` deve ser igual à largura).
+2. Verificação visual com `npm run dev` + `npm run shot` (skill `verificacao-visual`): 360px e 1440px, claro e escuro, alto contraste com texto a 150% e ausência de rolagem horizontal (`--eval "document.documentElement.scrollWidth"` deve ser igual à largura).
 3. Fluxo manual de ponta a ponta a partir da Fase 5: login demo → venda em dinheiro, Pix, fiado e dividida → desfazer → receber fiado parcial → entrada de estoque → fechar o dia → dashboard refletindo tudo → exportar CSV e imprimir PDF.
 4. Recarregar a página volta aos dados de exemplo (comportamento esperado).

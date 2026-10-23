@@ -29,34 +29,11 @@ npm run format       # Prettier (format:check só verifica)
 npm run shot -- <arquivo.png> [rota] [--width 360] [--theme dark] [--full] [--eval "js"]
 ```
 
-Antes de considerar uma tarefa concluída: `npm run lint && npm test && npm run build && npm run format:check` sem erros, mais a verificação visual abaixo.
+Antes de considerar uma tarefa concluída: `npm run lint && npm test && npm run build && npm run format:check` sem erros, mais a verificação visual (skill `verificacao-visual`).
 
 ## Verificação visual
 
-Toda mudança de interface é conferida em imagem, não só nos testes. Com `npm run dev` rodando, `npm run shot` (`scripts/screenshot.mjs`) abre o Chrome/Edge em modo headless e salva a captura em `shots/`, pasta ignorada pelo git. Depois, leia a imagem para conferir.
-
-```bash
-npm run shot -- inicio.png                                   # 1440px, tema claro
-npm run shot -- celular.png vender --width 360 --height 800 --theme dark
-npm run shot -- inteira.png design-system --full             # página inteira
-npm run shot -- secao.png design-system --eval "document.querySelector('#valores').scrollIntoView({ behavior: 'instant' })"
-npm run shot -- overflow.png --width 360 --eval "document.documentElement.scrollWidth"   # deve imprimir 360
-npm run shot -- dialogo.png --eval "[...document.querySelectorAll('button')].find((b) => b.textContent.includes('Vender fiado')).click()"
-```
-
-- No Git Bash, escreva a rota **sem barra inicial** (`vender`, não `/vender`), porque o MSYS converte `/x` em um caminho do Windows.
-- Âncoras `#secao` não rolam sozinhas: use `--eval` com `scrollIntoView`.
-- Tema alto contraste e tamanho do texto: abra `design-system`, clique nos rótulos do seletor (ex.: `--eval "(async () => { [...document.querySelectorAll('label')].find((l) => l.textContent.trim() === 'Contraste').click(); })()"`) e depois navegue dentro do app com `history.pushState(null, '', '/entrar?voltar=/fiado'); dispatchEvent(new PopStateEvent('popstate'))`. As preferências valem até recarregar a página.
-- **Telas logadas:** a sessão vive só em memória, então toda captura começa deslogada. Abra `entrar?voltar=/rota` e entre pela conta de demonstração no `--eval`; a guarda leva para a rota pedida:
-
-  ```bash
-  npm run shot -- fiado.png "entrar?voltar=/fiado" --width 360 --height 800 --eval "(async () => { [...document.querySelectorAll('button')].find((b) => b.textContent.includes('demonstração')).click(); await new Promise((r) => setTimeout(r, 2500)); return location.pathname + ' ' + document.documentElement.scrollWidth; })()"
-  ```
-
-- O `--eval` precisa ser **uma linha só** (quebras de linha dão `SyntaxError`). Para scripts longos, guarde num arquivo e passe `"$(tr '\n' ' ' < arquivo.js)"`.
-- Com `--full`, elementos fixos (como a `BottomNav`) aparecem no meio da imagem: é efeito da captura, não bug.
-- Mínimo por tela: 360px e 1440px, claro e escuro, e sem rolagem horizontal. Para telas novas, inclua também alto contraste com texto "Enorme".
-- Se o Claude in Chrome estiver conectado, ele também serve para interação real, mas o `npm run shot` não depende dele.
+Toda mudança de interface é conferida em imagem, não só nos testes: use a skill `verificacao-visual` (`.claude/skills/verificacao-visual/SKILL.md`), que explica o `npm run shot`, as telas logadas, o alto contraste e o texto Enorme. Mínimo por tela: 360px e 1440px, claro e escuro, e sem rolagem horizontal.
 
 ## Stack
 
@@ -64,36 +41,7 @@ Vite 8 · React 19 · React Router 8 (`react-router`, modo biblioteca com `creat
 
 **Sem Tailwind e sem bibliotecas de componentes/CSS-in-JS.** O design system é feito à mão com CSS moderno.
 
-## Estrutura
-
-```
-src/
-  app/           config.js (nome, locale), routes.js (caminhos), router.js, providers.jsx,
-                 guards.jsx (RequireAuth, RequireOnboarded, PublicOnly), RootLayout.jsx
-  styles/        index.css (ordem dos @layer), reset, tokens, base, utilities, animations, print
-  components/
-    ui/          primitivos do design system (Button, MoneyInput, NumericKeypad, Dialog, Toast...)
-    layout/      AppShell, Sidebar, BottomNav, TopBar, PageHeader, CenteredLayout, Brand...
-                 (índice em layout/index.js; itens de menu em layout/navigation.js)
-    charts/      wrappers do Recharts estilizados pelos tokens
-  features/      uma pasta por área: auth, dashboard, sales, fiado, customers, inventory,
-                 cash, reports, settings, help, more, errors, design-system
-                 (pages/, components/, *.module.css)
-  domain/
-    models.js    @typedef JSDoc de todas as entidades (contrato com o back-end futuro)
-    constants.js formas de pagamento, status, unidades, categorias
-    rules/       regras de negócio PURAS e testadas (money, sales, payments, fiado, stock, metrics)
-  mocks/         seed.js (dados determinísticos relativos a "hoje"), db.js (banco em memória)
-  services/      *.service.js — funções async sobre o db com latência simulada
-  store/         Context + useReducer (DataProvider, Cart, Session, Preferences, Toast)
-  hooks/         hooks reutilizáveis (useCart, useMediaQuery, useVibrate, useSpeech...)
-  lib/           format (Intl pt-BR), date, id, cx, whatsapp; csv, share (fases seguintes)
-  test/          setup do Vitest e renderApp.js (app inteiro num roteador em memória)
-docs/            plano-de-implementacao.md, regras-de-negocio.md, design-system.md
-scripts/         screenshot.mjs (verificação visual: npm run shot)
-```
-
-O import com alias `@/` aponta para `src/` (ex.: `import { APP_NAME } from '@/app/config.js'`).
+## Convenções de código
 
 - Primitivos de UI sempre pelo índice: `import { Button, MoneyInput } from '@/components/ui';`. O catálogo vivo de todos eles fica em `/design-system` (`src/features/design-system/`). Componente novo em `ui/` entra no índice **e** ganha exemplo no catálogo.
 - Contextos seguem três arquivos (exigência do Fast Refresh, que não aceita componente e não-componente no mesmo módulo): `store/x-context.js` (createContext + tipos), `store/XProvider.jsx` (estado) e `hooks/useX.js` (consumo). Exemplos: `ToastProvider`/`useToast`, `PreferencesProvider`/`usePreferences` e `CartProvider`/`useCart`.
@@ -172,9 +120,8 @@ Responsiva de 360px a desktop · tema claro, escuro e alto contraste · texto a 
 
 ## Estado atual e próximos passos
 
-- **Concluído:** Fases 1 (fundação), 2 (design system), 3 (domínio e dados), 4 (shell e navegação), 5 (vender), 6 (fiado e clientes), 7 (estoque), 8 (caixa e despesas) e 9 (dashboard). O app tem roteador, sessão simulada, boas-vindas, layout do celular e do computador, "Mais", 404, tela de erro, o fluxo completo de venda (`/vender`, `/vendas`, `/vendas/:id`), "Quem me deve" (`/fiado`), a conta do cliente com recebimento e cobrança (`/fiado/:customerId`), os clientes (`/clientes`), o estoque (`/estoque`, `/estoque/novo` e `/estoque/:productId`, com entrada, contagem, perda e histórico) o caixa do dia (`/caixa` e `/caixa?dia=AAAA-MM-DD`, com abertura, entradas, despesas, fechamento e reabertura) e o Início (`/inicio?periodo=`, com avisos, indicadores e gráficos). As áreas das fases seguintes já têm rota e arquivo em `features/<área>/pages/`, com o conteúdo provisório `ComingSoon`.
+- **Concluído:** Fases 1 (fundação), 2 (design system), 3 (domínio e dados), 4 (shell e navegação), 5 (vender), 6 (fiado e clientes), 7 (estoque), 8 (caixa e despesas) e 9 (dashboard). O app tem roteador, sessão simulada, boas-vindas, layout do celular e do computador, "Mais", 404, tela de erro, o fluxo completo de venda (`/vender`, `/vendas`, `/vendas/:id`), "Quem me deve" (`/fiado`), a conta do cliente com recebimento e cobrança (`/fiado/:customerId`), os clientes (`/clientes`), o estoque (`/estoque`, `/estoque/novo` e `/estoque/:productId`, com entrada, contagem, perda e histórico), o caixa do dia (`/caixa` e `/caixa?dia=AAAA-MM-DD`, com abertura, entradas, despesas, fechamento e reabertura) e o Início (`/inicio?periodo=`, com avisos, indicadores e gráficos). As áreas das fases seguintes já têm rota e arquivo em `features/<área>/pages/`, com o conteúdo provisório `ComingSoon`.
 - **Próxima:** Fase 10 (Relatórios): substituir `ReportsPage` (`features/reports`). Reaproveite `getReport` (`services/reports.service.js`), `periodFromPreset`/`PERIOD_PRESETS`, os gráficos de `components/charts/` (com `ChartCard` e tabela) e crie `lib/csv.js`, `lib/share.js` e `styles/print.css` (regra 8).
-- **Já pronto para reaproveitar:** `QuantityInput` (`components/ui`), `formatQuantity` (`lib/format.js`), `ProductRow`, `StockMovementSheet`, `MovementHistory` e `useStockMovement` (`features/inventory/`), `ChargeButton`, `ReceivePaymentSheet`, `DebtorRow` e `dueLabel` (`features/fiado/`), `CustomerFormSheet` (`features/customers/components/`), `useCash(date)` (resumo, despesas e histórico de qualquer dia), `useCashActions` e `ClosingResult` (`features/cash/`), os gráficos `ChartCard`, `ColumnChart`, `DonutChart` e `RankedBars` (`components/charts/`), `PAYMENT_RING_ORDER` e `deltaOf` (`features/dashboard/`), `formatWeekdayShort` e `formatDayOfMonth` (`lib/format.js`), `normalizeSearch` (`lib/text.js`), `formatPhone` (`lib/format.js`), `useCart`, `useMediaQuery`, `useVibrate`, o `ProductTile` (prévia do card na Fase 7), regras em `domain/rules/` (mapa em `docs/regras-de-negocio.md`), constantes em `domain/constants.js`, serviços em `services/` (com `ApiError` e `configureApi`), o `DataProvider` e os hooks `useSales`, `useProducts`, `useCustomers`, `useFiado`, `useCash`, `useSettings`, `useDataStatus`, `useSession` e `useLogout`; `ROUTES` (`app/routes.js`); o layout (`PageHeader`, `CenteredLayout`...); `lib/date.js`, `lib/format.js`, `lib/id.js`, `lib/cx.js`, os presets de status em `components/ui/StatusPill/statusPresets.js`, `useToast`, `usePreferences` e `useSpeech`.
 - Ao concluir cada fase: atualize esta seção, o status em `docs/plano-de-implementacao.md` e o Roadmap do `README.md`, e faça **um commit por fase**.
 
 ## Documentação relacionada
