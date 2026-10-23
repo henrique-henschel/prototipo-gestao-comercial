@@ -28,9 +28,9 @@ Decisões fechadas com o dono do produto:
 | 4    | Shell e navegação                     | ✅ `4a01170` |
 | 5    | Vender                                | ✅ `101823a` |
 | 6    | Fiado e clientes                      | ✅ `4aad853` |
-| 7    | Estoque                               | ✅           |
-| 8    | Caixa e despesas                      | ⏳ próxima   |
-| 9    | Dashboard                             | ⏳           |
+| 7    | Estoque                               | ✅ `f78f19d` |
+| 8    | Caixa e despesas                      | ✅           |
+| 9    | Dashboard                             | ⏳ próxima   |
 | 10   | Relatórios                            | ⏳           |
 | 11   | Ajustes, acessibilidade, ajuda e tour | ⏳           |
 | 12   | Polimento                             | ⏳           |
@@ -245,7 +245,22 @@ Plano original da fase:
 
 Lista com filtros e situação, formulário com prévia do card (emoji, cor e margem), entrada rápida de mercadoria, ajuste e perda, e histórico de movimentações.
 
-### Fase 8: Caixa e despesas
+### ✅ Fase 8: Caixa e despesas
+
+Entregue: `/caixa` com o selo da situação (aberto desde, fechado às, ainda não aberto), indicadores (vendido, entrou, vendido fiado e despesas), "Abrir o caixa" com o troco inicial no teclado próprio (o padrão vem dos Ajustes) e "Mudar" o troco inicial; o cartão "Dinheiro na gaveta" com o valor esperado, uma frase em linguagem simples e a conta linha a linha (troco inicial + vendas em dinheiro + fiado recebido em dinheiro − despesas da gaveta); "O que entrou" por forma de pagamento, com o fiado à parte como "vendido a receber" e os recebimentos de fiado; despesas com categoria, valor, "de onde saiu o dinheiro" e descrição, o lembrete da regra 6.3 ao escolher "Mercadoria", e "Desfazer" ao lançar e ao apagar; "Fechar o dia" com a contagem e o resultado ao vivo ("Sobrou", "Faltou", "Bateu certinho"), "Desfazer" no aviso e "Reabrir o dia"; "Dias anteriores" com o vendido e o resultado do fechamento, abrindo cada dia em `/caixa?dia=AAAA-MM-DD` (só para ver, com "Voltar para hoje"). Testes: regras novas, serviço (despesa devolvida e dia fechado) e integração (abrir, corrigir o troco inicial, lançar e desfazer, apagar e desfazer, fechar e reabrir, consultar um dia anterior).
+
+Decisões tomadas durante a fase:
+
+- **Dia fechado não muda despesas** (`validateCashDayChange`, código `caixa_fechado`): a gaveta já foi conferida. Para corrigir, reabra o dia. Despesas só são lançadas hoje (o serviço usa a hora atual).
+- **"Desfazer" de apagar devolve a mesma despesa** (`restoreExpense`, `PUT /expenses/:id`), com o mesmo id e horário, em vez de criar outra.
+- **Fechar tem "Desfazer"** no aviso (reabre o dia), além do botão "Reabrir o dia"; nada pede "Tem certeza?".
+- **"Entrou" no resumo do dia** (`receivedCents` em `summarizeCashDay`) usa a fórmula do "Recebido" da regra 7, para a tela não refazer a conta.
+- **Explicação visível, não escondida**: o dinheiro esperado tem uma frase e a conta linha a linha no próprio cartão; um `HelpTip` no cabeçalho espremia o título com texto Enorme.
+- **Resultado da contagem acima do teclado**: no celular, abaixo dele, o "Sobrou/Faltou" ficava fora da tela.
+- **Se o esperado mudar depois de fechar** (venda nova, fiado recebido), o cartão avisa e sugere reabrir, sem mexer no fechamento guardado.
+- **Dias anteriores numa lista com link**, e não num seletor: cada linha já mostra o vendido e se sobrou ou faltou; "Ver mais dias" mostra mais 7 por vez.
+
+Plano original da fase:
 
 Caixa do dia (troco inicial, entradas por forma de pagamento, recebimentos de fiado), despesas, fechar o dia com conferência e reabertura.
 

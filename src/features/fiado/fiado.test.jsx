@@ -85,7 +85,17 @@ describe('quem me deve', () => {
     const picker = await screen.findByRole('dialog', { name: 'Quem está pagando?' });
     // Só quem deve aparece, e não há cadastro rápido.
     expect(within(picker).queryByRole('button', { name: /Cadastrar cliente novo/ })).not.toBeInTheDocument();
-    expect(within(picker).queryByRole('button', { name: /Luciana Ferreira/ })).not.toBeInTheDocument();
+    // Os dados de exemplo dependem do dia: escolhe alguém que não deve nada hoje.
+    const nonDebtor = db.customers.find(
+      (customer) =>
+        !customer.archived &&
+        db.fiadoAccounts.every(
+          (account) => account.customerId !== customer.id || accountBalance(account) === 0,
+        ),
+    );
+    expect(
+      within(picker).queryByRole('button', { name: new RegExp(nonDebtor.name) }),
+    ).not.toBeInTheDocument();
     await user.click(within(picker).getByRole('button', { name: /Maria das Graças/ }));
 
     await screen.findByRole('heading', { level: 1, name: 'Maria das Graças' });

@@ -2,7 +2,15 @@ import { accountBalance } from '@/domain/rules/fiado.js';
 import { resetDemo } from '@/mocks/db.js';
 import { ApiError, configureApi } from './api.js';
 import { login, signup } from './auth.service.js';
-import { closeCashDay, createExpense, listCashDays, reopenCashDay } from './cash.service.js';
+import {
+  closeCashDay,
+  createExpense,
+  deleteExpense,
+  listCashDays,
+  listExpenses,
+  reopenCashDay,
+  restoreExpense,
+} from './cash.service.js';
 import { createCustomer, deleteCustomer, listCustomers } from './customers.service.js';
 import {
   listFiadoAccounts,
@@ -266,6 +274,22 @@ describe('serviços de cadastro, estoque e caixa', () => {
     await expectApiError(closeCashDay(date, { countedCents: 0 }), 'caixa_fechado');
     const reopened = await reopenCashDay(date);
     expect(reopened).toMatchObject({ closedAt: null, countedCents: null });
+  });
+
+  it('despesa apagada volta igual pelo "Desfazer", e dia fechado não muda despesas', async () => {
+    const expense = await createExpense({ category: 'outros', amountCents: 300, method: 'outro' });
+    expect(expense.description).toBe('Outros');
+    await deleteExpense(expense.id);
+    expect((await listExpenses()).some((item) => item.id === expense.id)).toBe(false);
+    await expect(restoreExpense(expense)).resolves.toEqual(expense);
+    expect((await listExpenses()).filter((item) => item.id === expense.id)).toEqual([expense]);
+
+    await closeCashDay(today(), { countedCents: 0 });
+    await expectApiError(deleteExpense(expense.id), 'caixa_fechado');
+    await expectApiError(
+      createExpense({ category: 'outros', amountCents: 100, method: 'dinheiro' }),
+      'caixa_fechado',
+    );
   });
 
   it('monta os relatórios de todos os tipos', async () => {

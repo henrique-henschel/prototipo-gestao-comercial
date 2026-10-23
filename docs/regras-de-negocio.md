@@ -109,9 +109,12 @@ Formas: `dinheiro`, `pix`, `debito`, `credito`, `fiado`. Cada forma pode ser des
 1. O **caixa do dia** é aberto com um **troco inicial** (opcional, padrão R$ 0,00) na primeira venda do dia ou manualmente.
 2. **Entradas**: vendas por forma de pagamento (fiado aparece separado, como "vendido a receber") e recebimentos de fiado.
 3. **Despesas**: descrição, categoria (mercadoria, transporte/gasolina, alimentação, ponto/aluguel, taxas, outros), valor e forma (dinheiro ou outra). Só as despesas pagas em dinheiro saem da gaveta. Sem descrição, a despesa leva o nome da categoria.
-   - **Compra de mercadoria para revender é entrada de estoque, não despesa**: o custo dela já entra no lucro quando o produto é vendido (seção 7). A categoria "mercadoria" é para insumos que não viram estoque (gelo, sacolas, gás); lançar a compra também como despesa contaria o custo duas vezes.
+   - **Compra de mercadoria para revender é entrada de estoque, não despesa**: o custo dela já entra no lucro quando o produto é vendido (seção 7). A categoria "mercadoria" é para insumos que não viram estoque (gelo, sacolas, gás); lançar a compra também como despesa contaria o custo duas vezes. A tela lembra disso ao escolher "Mercadoria".
+   - Lançar e apagar despesas tem "Desfazer" no aviso (5 segundos, `UNDO_WINDOW_MS`); o "Desfazer" de apagar devolve a mesma despesa, com o mesmo horário.
+   - Com o dia **fechado**, as despesas dele não mudam (código `caixa_fechado`): para corrigir, reabra o dia.
 4. **Dinheiro esperado na gaveta** = troco inicial + vendas em dinheiro (já descontado o troco) + recebimentos de fiado em dinheiro − despesas em dinheiro.
-5. **Fechar o dia**: o vendedor informa quanto contou. Diferença = contado − esperado, exibida como "sobrou" ou "faltou". Um dia fechado pode ser reaberto.
+5. **Fechar o dia**: o vendedor informa quanto contou. Diferença = contado − esperado, exibida como "sobrou", "faltou" ou "bateu certinho". O esperado é guardado no fechamento, para o histórico não mudar. Um dia fechado pode ser reaberto (o fechamento tem "Desfazer" no aviso, que reabre o dia); se o esperado mudar depois de fechar (uma venda nova, por exemplo), a tela avisa e sugere reabrir.
+6. **Entrou no dia** = vendido − parte em fiado + fiado recebido (o "Recebido" da seção 7, para um dia).
 
 ## 7. Métricas e lucro
 
@@ -156,7 +159,7 @@ Funções puras em `src/domain/rules/`, cada uma com testes ao lado (`*.test.js`
 | 3. Fiado      | `fiado.js`     | `accountStatus`, `customerFiadoSummary`, `fiadoAlerts`, `allocatePayment`, `receiveFiado`, `validateUndoFiadoPayment`, `customerTimeline`, `cancelSaleAccounts`, `compareUrgency`, `fiadoIndicators`                                                |
 | 4. Clientes   | `customers.js` | `validateCustomer`, `normalizePhone`, `validateCustomerDeletion`, `canDeleteCustomer`                                                                                                                                                               |
 | 5. Estoque    | `stock.js`     | `stockStatus`, `calcMargin`, `unitProfit`, `isSellingAtLoss`, `validateProduct`, `parseQuantityFromDigits`, `previewMovement`, `applyMovement`, `validateUndoMovement`, `revertMovement`, `compareStockUrgency`, `findStockShortages`, `stockValue` |
-| 6. Caixa      | `cash.js`      | `summarizeCashDay`, `expectedCash`, `closingDifference`, `validateExpense`                                                                                                                                                                          |
+| 6. Caixa      | `cash.js`      | `summarizeCashDay`, `expectedCash`, `closingDifference`, `cashDayClosing`, `validateExpense`, `validateCashDayChange`                                                                                                                               |
 | 7. Métricas   | `metrics.js`   | `periodMetrics`, `compareWithPrevious`, `dailySeries`, `paymentMix`, `topProducts`                                                                                                                                                                  |
 | 8. Períodos   | `period.js`    | `periodFromPreset`, `previousPeriod`, `filterByPeriod`                                                                                                                                                                                              |
 | 9. Ajustes    | `settings.js`  | `mergeSettings`, `validateSettings`                                                                                                                                                                                                                 |

@@ -57,15 +57,20 @@ export function summarizeCashDay({ date, sales, fiadoPayments, expenses, cashDay
     cashExpensesCents,
   });
 
+  const soldCents = sumCents(daySales.map((sale) => sale.totalCents));
+  const fiadoReceivedCents = sumCents(dayFiado.map((payment) => payment.amountCents));
+
   return {
     date,
     salesCount: daySales.length,
-    soldCents: sumCents(daySales.map((sale) => sale.totalCents)),
+    soldCents,
     salesByMethod,
     /** Vendido a receber: aparece separado das entradas. */
     fiadoSoldCents: salesByMethod.fiado,
-    fiadoReceivedCents: sumCents(dayFiado.map((payment) => payment.amountCents)),
+    fiadoReceivedCents,
     fiadoReceivedByMethod,
+    /** O que entrou de verdade (regra 7, "Recebido"): vendas sem o fiado + fiado recebido. */
+    receivedCents: soldCents - salesByMethod.fiado + fiadoReceivedCents,
     expensesCents: sumCents(dayExpenses.map((expense) => expense.amountCents)),
     cashExpensesCents,
     openingCents,
@@ -84,6 +89,30 @@ export function validateExpense({ category, amountCents, method }) {
   if (!EXPENSE_CATEGORIES.some((option) => option.value === category)) errors.push('categoria_invalida');
   if (!EXPENSE_METHODS.some((option) => option.value === method)) errors.push('forma_invalida');
   return errors;
+}
+
+/**
+ * Despesas só mudam com o dia aberto (ou ainda não aberto): o fechamento já conferiu a
+ * gaveta. Para corrigir um dia fechado, reabra o dia. Regras 6.3 e 6.5.
+ * @param {CashDay|null|undefined} cashDay
+ * @returns {('caixa_fechado')[]}
+ */
+export function validateCashDayChange(cashDay) {
+  return cashDay?.closedAt ? ['caixa_fechado'] : [];
+}
+
+/**
+ * Resultado do fechamento de um dia (nulo se o dia não foi fechado). Regra 6.5.
+ * @param {CashDay|null|undefined} cashDay
+ * @returns {{ countedCents: Cents, expectedCents: Cents, differenceCents: Cents, result: 'certo'|'sobrou'|'faltou' }|null}
+ */
+export function cashDayClosing(cashDay) {
+  if (!cashDay?.closedAt || cashDay.countedCents === null || cashDay.expectedCents === null) return null;
+  return {
+    countedCents: cashDay.countedCents,
+    expectedCents: cashDay.expectedCents,
+    ...closingDifference(cashDay.countedCents, cashDay.expectedCents),
+  };
 }
 
 /**

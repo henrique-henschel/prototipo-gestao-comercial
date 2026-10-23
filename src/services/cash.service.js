@@ -1,7 +1,7 @@
-import { summarizeCashDay, validateExpense } from '@/domain/rules/cash.js';
+import { summarizeCashDay, validateCashDayChange, validateExpense } from '@/domain/rules/cash.js';
 import { filterByPeriod } from '@/domain/rules/period.js';
 import { EXPENSE_CATEGORIES } from '@/domain/constants.js';
-import { today } from '@/lib/date.js';
+import { dateOf, today } from '@/lib/date.js';
 import { createId } from '@/lib/id.js';
 import { ApiError, assertValid, findOrFail, nowISO, request } from './api.js';
 
@@ -16,6 +16,11 @@ function findCashDay(db, date) {
   const cashDay = db.cashDays.find((cash) => cash.date === date);
   if (!cashDay) throw new ApiError('caixa_inexistente');
   return cashDay;
+}
+
+/** Despesas de um dia fechado não mudam (regras 6.3 e 6.5). */
+function assertDayOpen(db, date) {
+  assertValid(validateCashDayChange(db.cashDays.find((cash) => cash.date === date)));
 }
 
 function saveCashDay(db, cashDay) {
@@ -124,6 +129,8 @@ export function listExpenses({ period } = {}) {
 export function createExpense(input) {
   return request((db) => {
     assertValid(validateExpense(input));
+    const createdAt = nowISO();
+    assertDayOpen(db, dateOf(createdAt));
     const category = EXPENSE_CATEGORIES.find((option) => option.value === input.category);
     /** @type {Expense} */
     const expense = {
@@ -132,7 +139,7 @@ export function createExpense(input) {
       category: input.category,
       amountCents: input.amountCents,
       method: input.method,
-      createdAt: nowISO(),
+      createdAt,
     };
     db.expenses = [...db.expenses, expense];
     return expense;
@@ -146,8 +153,25 @@ export function createExpense(input) {
  */
 export function deleteExpense(id) {
   return request((db) => {
-    findOrFail(db.expenses, id);
-    db.expenses = db.expenses.filter((expense) => expense.id !== id);
+    const expense = findOrFail(db.expenses, id);
+    assertDayOpen(db, dateOf(expense.createdAt));
+    db.expenses = db.expenses.filter((item) => item.id !== id);
     return { expenseId: id };
+  });
+}
+
+/**
+ * PUT /expenses/:id — devolve uma despesa apagada, com o mesmo id e a mesma hora
+ * (o "Desfazer" de apagar).
+ * @param {Expense} expense
+ * @returns {Promise<Expense>}
+ */
+export function restoreExpense(expense) {
+  return request((db) => {
+    assertValid(validateExpense(expense));
+    assertDayOpen(db, dateOf(expense.createdAt));
+    const others = db.expenses.filter((item) => item.id !== expense.id);
+    db.expenses = [...others, expense].sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+    return expense;
   });
 }

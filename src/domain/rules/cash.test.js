@@ -1,4 +1,11 @@
-import { closingDifference, expectedCash, summarizeCashDay, validateExpense } from './cash.js';
+import {
+  cashDayClosing,
+  closingDifference,
+  expectedCash,
+  summarizeCashDay,
+  validateCashDayChange,
+  validateExpense,
+} from './cash.js';
 
 /** Instante local num dia, para o teste não depender do fuso. */
 const at = (day, hour = 10) => new Date(2026, 9, day, hour).toISOString();
@@ -68,6 +75,7 @@ describe('caixa do dia', () => {
       fiadoSoldCents: 1500,
       fiadoReceivedCents: 1200,
       fiadoReceivedByMethod: { dinheiro: 800, pix: 400 },
+      receivedCents: 4200,
       expensesCents: 6200,
       cashExpensesCents: 1200,
       openingCents: 5000,
@@ -88,5 +96,22 @@ describe('caixa do dia', () => {
       'categoria_invalida',
       'forma_invalida',
     ]);
+  });
+
+  it('6.5 guarda o resultado do fechamento só de dias fechados', () => {
+    expect(cashDayClosing(null)).toBeNull();
+    expect(cashDayClosing({ closedAt: null, countedCents: null, expectedCents: null })).toBeNull();
+    expect(cashDayClosing({ closedAt: at(21, 20), countedCents: 6000, expectedCents: 6600 })).toEqual({
+      countedCents: 6000,
+      expectedCents: 6600,
+      differenceCents: -600,
+      result: 'faltou',
+    });
+  });
+
+  it('6.3 e 6.5 só mudam despesas de um dia que não foi fechado', () => {
+    expect(validateCashDayChange(null)).toEqual([]);
+    expect(validateCashDayChange({ closedAt: null })).toEqual([]);
+    expect(validateCashDayChange({ closedAt: at(21, 20) })).toEqual(['caixa_fechado']);
   });
 });

@@ -161,6 +161,7 @@ export function createDataActions(dispatch) {
       optimistic({ op: 'remove', slice: 'expenses', id }, () => cashService.deleteExpense(id), {
         keepResult: false,
       }),
+    restoreExpense: (expense) => confirmedUpsert('expenses', cashService.restoreExpense(expense)),
 
     // Negócio e ajustes
     updateSettings: (changes) =>
