@@ -7,6 +7,7 @@ const dateDayMonth = new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 's
 const dateMedium = new Intl.DateTimeFormat(LOCALE, { weekday: 'short', day: 'numeric', month: 'short' });
 const time = new Intl.DateTimeFormat(LOCALE, { hour: '2-digit', minute: '2-digit' });
 const number = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 3 });
+const fixed3 = new Intl.NumberFormat(LOCALE, { minimumFractionDigits: 3, maximumFractionDigits: 3 });
 const percent = new Intl.NumberFormat(LOCALE, { style: 'percent', maximumFractionDigits: 1 });
 
 /** "21/10/2026" */
@@ -37,6 +38,18 @@ export function formatTime(isoDateTime) {
 /** Números com até 3 casas (quantidades em kg): 1,25 */
 export function formatNumber(value) {
   return number.format(value);
+}
+
+/**
+ * Quantidade com a unidade: "12 un", "1,25 kg". Com `fixed`, mantém as 3 casas
+ * ("1,500 kg"), como no campo de quantidade enquanto se digita.
+ * @param {number} value
+ * @param {string} [unitShort] ex.: "un", "kg" (`UNITS[unit].short`)
+ * @param {{ fixed?: boolean }} [options]
+ */
+export function formatQuantity(value, unitShort, { fixed = false } = {}) {
+  const text = fixed ? fixed3.format(value) : number.format(value);
+  return unitShort ? `${text} ${unitShort}` : text;
 }
 
 /** Recebe fração (0.125) e devolve "12,5%" */

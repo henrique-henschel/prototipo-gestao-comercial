@@ -1,0 +1,201 @@
+@layer components {
+  /* Celular: prévia em cima, formulário embaixo. Computador: formulário | prévia fixa. */
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: var(--space-4);
+  }
+
+  @media (width >= 64rem) {
+    .layout {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    }
+
+    .aside {
+      position: sticky;
+      inset-block-start: var(--space-4);
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .form {
+      grid-column: 1;
+      grid-row: 1;
+    }
+  }
+
+  .previewCard {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .tile {
+    inline-size: min(11rem, 100%);
+    margin-inline: auto;
+  }
+
+  .form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .section {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-5);
+  }
+
+  .fieldset {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-3);
+    min-inline-size: 0;
+    padding: 0;
+    margin: 0;
+    border: 0;
+  }
+
+  .legend {
+    margin-block-end: var(--space-2);
+    font-weight: var(--weight-bold);
+  }
+
+  /* ---------- Emoji ---------- */
+  .emojis {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--tap-min), 1fr));
+    gap: var(--space-2);
+  }
+
+  .emojiOption {
+    /* Ancora o rádio escondido (absoluto) dentro da opção. */
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-block-size: var(--tap-min);
+    border: var(--border-width-strong) solid var(--border-1);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--border-2);
+    }
+
+    &:has(input:checked) {
+      border-color: var(--color-primary);
+      background: var(--color-primary-soft);
+      box-shadow: inset 0 0 0 1px var(--color-primary);
+    }
+
+    &:has(input:focus-visible) {
+      outline: 3px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  .more {
+    justify-self: start;
+  }
+
+  /* ---------- Cor ---------- */
+  .colors {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(7.5rem, 100%), 1fr));
+    gap: var(--space-2);
+  }
+
+  .colorOption {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-block-size: var(--tap-min);
+    padding: var(--space-2) var(--space-3);
+    border: var(--border-width-strong) solid var(--border-1);
+    border-radius: var(--radius-md);
+    background: var(--surface-1);
+    font-weight: var(--weight-bold);
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--border-2);
+    }
+
+    &:has(input:checked) {
+      border-color: var(--color-primary);
+      box-shadow: inset 0 0 0 1px var(--color-primary);
+    }
+
+    &:has(input:focus-visible) {
+      outline: 3px solid var(--focus-ring);
+      outline-offset: 2px;
+    }
+  }
+
+  .swatch {
+    flex-shrink: 0;
+    inline-size: 1.5rem;
+    aspect-ratio: 1;
+    border: var(--border-width) solid var(--border-2);
+    border-radius: var(--radius-pill);
+    background: var(--swatch);
+  }
+
+  /* ---------- Preço e quantidades ---------- */
+  .money {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(12rem, 100%), 1fr));
+    gap: var(--space-4);
+  }
+
+  .note {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    line-height: var(--leading-snug);
+
+    & > svg {
+      flex-shrink: 0;
+      margin-block-start: 0.1em;
+    }
+  }
+
+  .info {
+    background: var(--color-info-soft);
+
+    & > svg {
+      color: var(--color-info-text);
+    }
+  }
+
+  .success {
+    background: var(--color-success-soft);
+
+    & > svg {
+      color: var(--color-success-text);
+    }
+  }
+
+  .danger {
+    background: var(--color-danger-soft);
+    color: var(--color-danger-text);
+  }
+
+  .submit {
+    justify-self: stretch;
+  }
+
+  @media (forced-colors: active) {
+    .emojiOption:has(input:checked),
+    .colorOption:has(input:checked) {
+      border-color: Highlight;
+    }
+  }
+}

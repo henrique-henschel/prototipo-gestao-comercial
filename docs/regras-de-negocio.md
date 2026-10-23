@@ -81,7 +81,7 @@ Formas: `dinheiro`, `pix`, `debito`, `credito`, `fiado`. Cada forma pode ser des
 ## 5. Estoque
 
 1. **Produto**: nome, emoji ou foto, cor do card, categoria, unidade (`un`, `kg`, `g`, `l`, `pacote`, `caixa`, `duzia`), preço de venda, custo (opcional), quantidade, estoque mínimo, código (opcional), "controlar estoque" (sim/não), ativo/inativo.
-2. **Margem** = (preço − custo) ÷ preço. Fica sem valor quando não há custo. Se o preço for menor que o custo, a interface mostra um alerta de "vendendo no prejuízo".
+2. **Margem** = (preço − custo) ÷ preço, e **lucro por unidade** = preço − custo. Ficam sem valor quando não há custo (custo zerado no formulário conta como "não sei"). Se o preço for menor que o custo, a interface mostra um alerta de "vendendo no prejuízo" com quanto se perde em cada um.
 3. **Movimentações** (histórico imutável):
 
    | Tipo      | Efeito na quantidade                               |
@@ -91,13 +91,16 @@ Formas: `dinheiro`, `pix`, `debito`, `credito`, `fiado`. Cada forma pode ser des
    | `estorno` | soma (cancelamento de venda)                       |
    | `ajuste`  | define a quantidade contada (registra a diferença) |
    | `perda`   | subtrai; motivo: vencido, quebrado, outro          |
+   - Quantidades são digitadas no teclado próprio, sem vírgula: em `kg` e `l` os dígitos entram pela direita com 3 casas ("1500" = 1,5 kg).
+   - A entrada guarda o custo que o produto tinha antes (`previousCostCents`).
+   - **Desfazer**: uma entrada, contagem ou perda feita à mão pode ser desfeita nos 5 segundos seguintes (`UNDO_WINDOW_MS`, contados até o toque), desde que seja a última do produto: ela some do histórico e a quantidade e o custo voltam ao que eram. Depois disso o histórico é imutável, e um engano se corrige com uma contagem.
 
 4. **Situação do estoque** (calculada):
    - `acabou`: quantidade ≤ 0;
    - `acabando`: quantidade ≤ estoque mínimo;
    - `ok`: nos demais casos.
 
-   Produtos sem controle de estoque não têm situação.
+   Produtos sem controle de estoque não têm situação. A lista do estoque mostra primeiro o que acabou, depois o que está acabando e, em cada grupo, segue pelo nome.
 
 5. A quantidade pode ficar negativa só quando a venda sem estoque é permitida. Nesse caso a interface mostra "acabou" e sugere fazer uma entrada.
 
@@ -145,17 +148,17 @@ Pelo menos uma forma de pagamento precisa ficar ativa.
 
 Funções puras em `src/domain/rules/`, cada uma com testes ao lado (`*.test.js`) que citam o número da regra.
 
-| Seção         | Arquivo        | Principais funções                                                                                                                                                                                   |
-| ------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Dinheiro      | `money.js`     | `toCents`, `formatBRL`, `parseCentsFromDigits`, `sumCents`, `percentOf`                                                                                                                              |
-| 1. Vendas     | `sales.js`     | `calcSaleTotals`, `calcDiscount`, `validateSale`, `canUndoSale`, `validateCancellation`, `activeSales`                                                                                               |
-| 2. Pagamentos | `payments.js`  | `calcChange`, `suggestCashAmounts`, `paymentProgress`, `validatePayments`, `calcFee`, `finalizePayments`                                                                                             |
-| 3. Fiado      | `fiado.js`     | `accountStatus`, `customerFiadoSummary`, `fiadoAlerts`, `allocatePayment`, `receiveFiado`, `validateUndoFiadoPayment`, `customerTimeline`, `cancelSaleAccounts`, `compareUrgency`, `fiadoIndicators` |
-| 4. Clientes   | `customers.js` | `validateCustomer`, `normalizePhone`, `validateCustomerDeletion`, `canDeleteCustomer`                                                                                                                |
-| 5. Estoque    | `stock.js`     | `stockStatus`, `calcMargin`, `isSellingAtLoss`, `validateProduct`, `applyMovement`, `findStockShortages`, `stockValue`                                                                               |
-| 6. Caixa      | `cash.js`      | `summarizeCashDay`, `expectedCash`, `closingDifference`, `validateExpense`                                                                                                                           |
-| 7. Métricas   | `metrics.js`   | `periodMetrics`, `compareWithPrevious`, `dailySeries`, `paymentMix`, `topProducts`                                                                                                                   |
-| 8. Períodos   | `period.js`    | `periodFromPreset`, `previousPeriod`, `filterByPeriod`                                                                                                                                               |
-| 9. Ajustes    | `settings.js`  | `mergeSettings`, `validateSettings`                                                                                                                                                                  |
+| Seção         | Arquivo        | Principais funções                                                                                                                                                                                                                                  |
+| ------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dinheiro      | `money.js`     | `toCents`, `formatBRL`, `parseCentsFromDigits`, `sumCents`, `percentOf`                                                                                                                                                                             |
+| 1. Vendas     | `sales.js`     | `calcSaleTotals`, `calcDiscount`, `validateSale`, `canUndoSale`, `validateCancellation`, `activeSales`                                                                                                                                              |
+| 2. Pagamentos | `payments.js`  | `calcChange`, `suggestCashAmounts`, `paymentProgress`, `validatePayments`, `calcFee`, `finalizePayments`                                                                                                                                            |
+| 3. Fiado      | `fiado.js`     | `accountStatus`, `customerFiadoSummary`, `fiadoAlerts`, `allocatePayment`, `receiveFiado`, `validateUndoFiadoPayment`, `customerTimeline`, `cancelSaleAccounts`, `compareUrgency`, `fiadoIndicators`                                                |
+| 4. Clientes   | `customers.js` | `validateCustomer`, `normalizePhone`, `validateCustomerDeletion`, `canDeleteCustomer`                                                                                                                                                               |
+| 5. Estoque    | `stock.js`     | `stockStatus`, `calcMargin`, `unitProfit`, `isSellingAtLoss`, `validateProduct`, `parseQuantityFromDigits`, `previewMovement`, `applyMovement`, `validateUndoMovement`, `revertMovement`, `compareStockUrgency`, `findStockShortages`, `stockValue` |
+| 6. Caixa      | `cash.js`      | `summarizeCashDay`, `expectedCash`, `closingDifference`, `validateExpense`                                                                                                                                                                          |
+| 7. Métricas   | `metrics.js`   | `periodMetrics`, `compareWithPrevious`, `dailySeries`, `paymentMix`, `topProducts`                                                                                                                                                                  |
+| 8. Períodos   | `period.js`    | `periodFromPreset`, `previousPeriod`, `filterByPeriod`                                                                                                                                                                                              |
+| 9. Ajustes    | `settings.js`  | `mergeSettings`, `validateSettings`                                                                                                                                                                                                                 |
 
 Os serviços (`src/services/`) aplicam essas regras antes de gravar e devolvem erros com códigos (`soma_diferente`, `cliente_obrigatorio`...) e mensagens em linguagem simples (`ERROR_MESSAGES` em `services/api.js`).

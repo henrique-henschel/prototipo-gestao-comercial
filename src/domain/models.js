@@ -176,6 +176,7 @@
  * @property {number} delta variação aplicada na quantidade (negativa para saídas)
  * @property {number} balanceAfter quantidade depois do movimento
  * @property {Cents|null} unitCostCents entrada: custo pago por unidade
+ * @property {Cents|null} previousCostCents entrada: custo do produto antes dela (para o "Desfazer")
  * @property {string|null} reason perda: uma das chaves de `LOSS_REASONS`
  * @property {string|null} saleId venda ou estorno
  * @property {string} note

@@ -133,6 +133,8 @@ export function createDataActions(dispatch) {
     },
     addStockMovement: (productId, input) =>
       confirmed('stock/adjusted', productsService.addStockMovement(productId, input)),
+    undoStockMovement: (movementId) =>
+      confirmed('stock/movementUndone', productsService.undoStockMovement(movementId)),
 
     // Clientes
     createCustomer: (input) => confirmedUpsert('customers', customersService.createCustomer(input)),

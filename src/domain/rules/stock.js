@@ -1,4 +1,4 @@
-import { PRODUCT_CATEGORIES, STOCK_STATUS, UNITS } from '../constants.js';
+import { PRODUCT_CATEGORIES, STOCK_STATUS, UNDO_WINDOW_MS, UNITS } from '../constants.js';
 import { sumCents } from './money.js';
 import { quantitiesByProduct } from './sales.js';
 
@@ -79,6 +79,57 @@ export function validateProduct({
 }
 
 /**
+ * Quantidade digitada no teclado próprio, sem vírgula (como o dinheiro): nas unidades
+ * fracionadas (kg, L) os dígitos entram pela direita com 3 casas ("1500" = 1,5 kg);
+ * nas inteiras, cada dígito é uma unidade ("12" = 12 un).
+ * @param {string|number|null|undefined} text
+ * @param {{ decimal?: boolean, max?: number }} [options]
+ * @returns {number}
+ */
+export function parseQuantityFromDigits(text, { decimal = false, max = 99_999 } = {}) {
+  const digits = String(text ?? '')
+    .replace(/\D/g, '')
+    .slice(-9);
+  if (!digits) return 0;
+  const value = Number.parseInt(digits, 10) / (decimal ? 1000 : 1);
+  return Math.min(roundQuantity(value), max);
+}
+
+/**
+ * Dígitos de uma quantidade (o inverso de `parseQuantityFromDigits`): 1,5 kg → "1500".
+ * @param {number} quantity
+ * @param {{ decimal?: boolean }} [options]
+ */
+export function quantityDigits(quantity, { decimal = false } = {}) {
+  return String(Math.round(Math.max(quantity, 0) * (decimal ? 1000 : 1)));
+}
+
+/**
+ * Lucro de cada unidade vendida (preço − custo); sem custo, não há como saber. Regra 5.2.
+ * @param {Cents} priceCents
+ * @param {Cents|null|undefined} costCents
+ * @returns {Cents|null}
+ */
+export function unitProfit(priceCents, costCents) {
+  if (costCents == null) return null;
+  return priceCents - costCents;
+}
+
+/** Gravidade da situação do estoque (maior = precisa repor antes). */
+const STOCK_SEVERITY = { acabou: 3, acabando: 2, ok: 1 };
+
+/**
+ * Ordem da lista do estoque: o que acabou, depois o que está acabando, depois o resto;
+ * em cada grupo, pelo nome. Regra 5.4.
+ * @param {Product} a
+ * @param {Product} b
+ */
+export function compareStockUrgency(a, b) {
+  const severity = (product) => STOCK_SEVERITY[stockStatus(product)] ?? 0;
+  return severity(b) - severity(a) || a.name.localeCompare(b.name, 'pt-BR');
+}
+
+/**
  * Variação que um movimento causa na quantidade. Regra 5.3.
  * `quantity` é sempre positiva, exceto no `ajuste`, em que é a quantidade contada.
  * @param {StockMovementType} type
@@ -98,6 +149,18 @@ export function movementDelta(type, quantity, currentQuantity) {
     default:
       throw new Error(`Tipo de movimento desconhecido: ${type}`);
   }
+}
+
+/**
+ * Prévia de um movimento antes de gravar: quanto muda e com quanto o produto fica.
+ * @param {Pick<Product, 'quantity'>} product
+ * @param {StockMovementType} type
+ * @param {number} quantity
+ * @returns {{ delta: number, balanceAfter: number }}
+ */
+export function previewMovement(product, type, quantity) {
+  const delta = movementDelta(type, quantity, product.quantity);
+  return { delta, balanceAfter: roundQuantity(product.quantity + delta) };
 }
 
 /**
@@ -132,6 +195,7 @@ export function applyMovement(product, input) {
     delta,
     balanceAfter,
     unitCostCents,
+    previousCostCents: input.type === 'entrada' ? product.costCents : null,
     reason: input.reason ?? null,
     saleId: input.saleId ?? null,
     note: input.note ?? '',
@@ -144,6 +208,39 @@ export function applyMovement(product, input) {
     updatedAt: input.createdAt,
   };
   return { product: updated, movement };
+}
+
+/**
+ * Pode desfazer esta movimentação? Só entrada, ajuste ou perda feita à mão, só a última
+ * do produto e só nos 5 segundos seguintes (como a venda, regra 1.7). Depois disso o
+ * histórico é imutável, e um engano se corrige com uma contagem (ajuste). Regra 5.3.
+ * @param {StockMovement} movement
+ * @param {StockMovement[]} movements movimentações (o filtro por produto é feito aqui)
+ * @param {number} [now] instante do toque em "Desfazer", em ms
+ * @returns {('prazo_desfazer_movimento')[]}
+ */
+export function validateUndoMovement(movement, movements, now = Date.now()) {
+  const manual = ['entrada', 'ajuste', 'perda'].includes(movement.type);
+  const last = movements.filter((m) => m.productId === movement.productId).at(-1);
+  const inTime = now - new Date(movement.createdAt).getTime() <= UNDO_WINDOW_MS;
+  return manual && last?.id === movement.id && inTime ? [] : ['prazo_desfazer_movimento'];
+}
+
+/**
+ * Desfaz o efeito de uma movimentação no produto: a quantidade volta e, numa entrada,
+ * o custo também volta ao que era antes.
+ * @param {Product} product
+ * @param {StockMovement} movement
+ * @param {string} updatedAt
+ * @returns {Product}
+ */
+export function revertMovement(product, movement, updatedAt) {
+  return {
+    ...product,
+    quantity: roundQuantity(product.quantity - movement.delta),
+    costCents: movement.type === 'entrada' ? movement.previousCostCents : product.costCents,
+    updatedAt,
+  };
 }
 
 /**

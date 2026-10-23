@@ -33,6 +33,7 @@ import {
   Input,
   MoneyInput,
   ProgressBar,
+  QuantityInput,
   QuantityStepper,
   SearchBar,
   SegmentedControl,
@@ -230,6 +231,8 @@ function MoneySection() {
   const [fee, setFee] = useState(0);
   const [qty, setQty] = useState(2);
   const [kg, setKg] = useState(1.5);
+  const [received, setReceived] = useState(12);
+  const [weight, setWeight] = useState(1.25);
 
   return (
     <Section
@@ -261,6 +264,18 @@ function MoneySection() {
               size="md"
               hint="Digite só os números: 1, 5, 0 vira R$ 1,50."
             />
+          </Example>
+          <Example title="Quantidade digitada" note="sem vírgula: em kg, 1, 2, 5, 0 vira 1,250">
+            <div className="stack">
+              <QuantityInput
+                label="Quantas chegaram?"
+                value={received}
+                onChange={setReceived}
+                unit="un"
+                size="md"
+              />
+              <QuantityInput label="Peso" value={weight} onChange={setWeight} unit="kg" size="md" />
+            </div>
           </Example>
           <Example title="Quantidade">
             <div className="stack">

@@ -1,4 +1,10 @@
-import { applyMovement, validateMovement, validateProduct } from '@/domain/rules/stock.js';
+import {
+  applyMovement,
+  revertMovement,
+  validateMovement,
+  validateProduct,
+  validateUndoMovement,
+} from '@/domain/rules/stock.js';
 import { createId } from '@/lib/id.js';
 import { ApiError, assertValid, findOrFail, nowISO, request } from './api.js';
 
@@ -115,5 +121,24 @@ export function addStockMovement(productId, input) {
     db.products = db.products.map((product) => (product.id === productId ? result.product : product));
     db.stockMovements = [...db.stockMovements, result.movement];
     return result;
+  });
+}
+
+/**
+ * DELETE /stock-movements/:id — "Desfazer" de uma entrada, ajuste ou perda nos 5 segundos
+ * seguintes (`validateUndoMovement`): a movimentação some do histórico e o produto volta
+ * à quantidade (e, numa entrada, ao custo) de antes. O prazo conta a partir do toque.
+ * @param {string} movementId
+ * @returns {Promise<{ movementId: string, product: Product }>}
+ */
+export function undoStockMovement(movementId) {
+  const requestedAt = Date.now();
+  return request((db) => {
+    const movement = findOrFail(db.stockMovements, movementId);
+    assertValid(validateUndoMovement(movement, db.stockMovements, requestedAt));
+    const product = revertMovement(findOrFail(db.products, movement.productId), movement, nowISO());
+    db.products = db.products.map((p) => (p.id === product.id ? product : p));
+    db.stockMovements = db.stockMovements.filter((m) => m.id !== movementId);
+    return { movementId, product };
   });
 }

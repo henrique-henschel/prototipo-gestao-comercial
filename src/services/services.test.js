@@ -10,7 +10,13 @@ import {
   receiveFiadoPayment,
   undoFiadoPayment,
 } from './fiado.service.js';
-import { addStockMovement, createProduct, listProducts } from './products.service.js';
+import {
+  addStockMovement,
+  createProduct,
+  listProducts,
+  listStockMovements,
+  undoStockMovement,
+} from './products.service.js';
 import { getReport } from './reports.service.js';
 import { cancelSale, createSale, listSales, undoSale } from './sales.service.js';
 import { completeOnboarding, getBusiness, updateSettings } from './settings.service.js';
@@ -223,6 +229,15 @@ describe('serviços de cadastro, estoque e caixa', () => {
     await expectApiError(addStockMovement(product.id, { type: 'venda', quantity: 1 }), 'movimento_invalido');
     const ajuste = await addStockMovement(product.id, { type: 'ajuste', quantity: 4 });
     expect(ajuste.product.quantity).toBe(4);
+
+    // "Desfazer" da última entrada: quantidade e custo voltam, e a movimentação some.
+    const entrada = await addStockMovement(product.id, { type: 'entrada', quantity: 6, unitCostCents: 350 });
+    expect(entrada.product).toMatchObject({ quantity: 10, costCents: 350 });
+    const undone = await undoStockMovement(entrada.movement.id);
+    expect(undone.product).toMatchObject({ quantity: 4, costCents: 300 });
+    const history = await listStockMovements({ productId: product.id });
+    expect(history.map((m) => m.id)).not.toContain(entrada.movement.id);
+    await expectApiError(undoStockMovement(movement.id), 'prazo_desfazer_movimento');
   });
 
   it('cliente com saldo não pode ser apagado', async () => {

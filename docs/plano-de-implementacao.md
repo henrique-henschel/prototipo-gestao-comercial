@@ -27,9 +27,9 @@ Decisões fechadas com o dono do produto:
 | 3    | Domínio e dados                       | ✅ `7794f72` |
 | 4    | Shell e navegação                     | ✅ `4a01170` |
 | 5    | Vender                                | ✅ `101823a` |
-| 6    | Fiado e clientes                      | ✅           |
-| 7    | Estoque                               | ⏳ próxima   |
-| 8    | Caixa e despesas                      | ⏳           |
+| 6    | Fiado e clientes                      | ✅ `4aad853` |
+| 7    | Estoque                               | ✅           |
+| 8    | Caixa e despesas                      | ⏳ próxima   |
 | 9    | Dashboard                             | ⏳           |
 | 10   | Relatórios                            | ⏳           |
 | 11   | Ajustes, acessibilidade, ajuda e tour | ⏳           |
@@ -227,7 +227,21 @@ Plano original da fase:
 
 "Quem me deve" (ordenado por urgência, totais e filtros), conta do cliente, receber pagamento (FIFO), limite e bloqueio com alerta na venda, cobrança por WhatsApp (`lib/whatsapp.js`) e CRUD simulado de clientes.
 
-### Fase 7: Estoque
+### ✅ Fase 7: Estoque
+
+Entregue: `/estoque` com indicadores (precisa repor e valor parado no estoque, pelo custo), o que acabou e o que está acabando primeiro, filtros de situação (acabando, acabou, sem controle, fora da venda) e de categoria na URL, busca por nome ou código e "Entrada" em cada linha. `/estoque/novo` e `/estoque/:productId` com o formulário (nome, categoria, emoji sugerido pela categoria, cor do card, unidade, preço, custo, controle de estoque, quantidade inicial, aviso de "acabando", código e "À venda"), a prévia viva do `ProductTile` e o lucro por unidade com o alerta de "vendendo no prejuízo"; na edição, quanto tem agora, entrada de mercadoria (com custo), contagem (ajuste) e perda com motivo, todas com prévia ("16 un → 14 un") e "Desfazer", e o histórico de movimentações com link para a venda. Novo componente `QuantityInput` no design system. Testes: regras novas, `QuantityInput`, `formatQuantity`, serviço de desfazer e integração (ordem e filtros, entrada rápida com desfazer, cadastro com validação, prévia, prejuízo e estoque inicial, perda com motivo, contagem e histórico, tirar da venda).
+
+Decisões tomadas durante a fase:
+
+- **Quantidade no teclado próprio** (`QuantityInput` + `parseQuantityFromDigits`), como o dinheiro: sem vírgula, com 3 casas em kg e litro. O `QuantityStepper` continua no carrinho, onde o comum é somar de um em um.
+- **"Desfazer" de movimentação por 5 segundos** (`validateUndoMovement`, `revertMovement`, `undoStockMovement`), só para a última do produto: igual à venda, a movimentação some como se não tivesse existido. A entrada passou a guardar `previousCostCents` para o custo também voltar. Depois do prazo, o histórico é imutável.
+- **Custo zerado é "não sei"**: o formulário manda `null`, e a margem fica sem valor (o lucro seria enganoso).
+- **Uma ação principal por tela**: na edição, "Salvar alterações" é a principal; entrada, contagem e perda são secundárias.
+- **Emoji sugerido pela categoria** enquanto a pessoa não escolhe um, 12 sugestões com "Ver mais emojis" (com texto Enorme, a grade inteira virava 18 linhas) e "Outro emoji" para o teclado do celular.
+- **Prévia no topo no celular e fixa à direita no computador**; o `ProductTile` fica `inert` (na prévia, não é botão).
+- **Linha do produto como a do devedor**: link (emoji, nome, preço) em cima e rodapé com quantidade, situação e "Entrada", para a seta não cair sozinha numa linha no celular.
+
+Plano original da fase:
 
 Lista com filtros e situação, formulário com prévia do card (emoji, cor e margem), entrada rápida de mercadoria, ajuste e perda, e histórico de movimentações.
 

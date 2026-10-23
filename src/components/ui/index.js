@@ -18,6 +18,7 @@ export { Input, Select, Textarea } from './Input/Input.jsx';
 export { MoneyInput } from './MoneyInput/MoneyInput.jsx';
 export { NumericKeypad } from './NumericKeypad/NumericKeypad.jsx';
 export { ProgressBar } from './ProgressBar/ProgressBar.jsx';
+export { QuantityInput } from './QuantityInput/QuantityInput.jsx';
 export { QuantityStepper } from './QuantityStepper/QuantityStepper.jsx';
 export { SearchBar } from './SearchBar/SearchBar.jsx';
 export { SegmentedControl } from './SegmentedControl/SegmentedControl.jsx';

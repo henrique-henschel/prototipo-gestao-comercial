@@ -185,6 +185,14 @@ export function dataReducer(state, action) {
         stockMovements: movement ? [...state.stockMovements, movement] : state.stockMovements,
       };
     }
+    case 'stock/movementUndone': {
+      const { movementId, product } = action.result;
+      return {
+        ...state,
+        products: upsertBy(state.products, [product]),
+        stockMovements: removeBy(state.stockMovements, [movementId]),
+      };
+    }
     default:
       throw new Error(`Ação desconhecida: ${action.type}`);
   }

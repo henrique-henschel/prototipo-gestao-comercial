@@ -1,14 +1,21 @@
 import {
   applyMovement,
   calcMargin,
+  compareStockUrgency,
   findStockShortages,
   isSellingAtLoss,
   movementDelta,
+  parseQuantityFromDigits,
+  previewMovement,
+  quantityDigits,
+  revertMovement,
   roundQuantity,
   stockStatus,
   stockValue,
+  unitProfit,
   validateMovement,
   validateProduct,
+  validateUndoMovement,
 } from './stock.js';
 
 const product = {
@@ -133,5 +140,70 @@ describe('estoque', () => {
       { ...product, id: 'p4', active: false },
     ];
     expect(stockValue(products)).toEqual({ costCents: 2500, saleCents: 7200, missingCostCount: 1 });
+  });
+
+  it('lê a quantidade do teclado próprio, sem vírgula', () => {
+    expect(parseQuantityFromDigits('12')).toBe(12);
+    expect(parseQuantityFromDigits('1500', { decimal: true })).toBe(1.5);
+    expect(parseQuantityFromDigits('5', { decimal: true })).toBe(0.005);
+    expect(parseQuantityFromDigits('1.250 kg', { decimal: true })).toBe(1.25);
+    expect(parseQuantityFromDigits('')).toBe(0);
+    expect(parseQuantityFromDigits('999999', { max: 9999 })).toBe(9999);
+    expect(quantityDigits(1.5, { decimal: true })).toBe('1500');
+    expect(quantityDigits(12)).toBe('12');
+  });
+
+  it('5.2 calcula o lucro por unidade, que fica negativo no prejuízo', () => {
+    expect(unitProfit(600, 250)).toBe(350);
+    expect(unitProfit(200, 250)).toBe(-50);
+    expect(unitProfit(600, null)).toBeNull();
+  });
+
+  it('5.3 mostra a prévia do movimento antes de gravar', () => {
+    expect(previewMovement({ quantity: 10 }, 'entrada', 12)).toEqual({ delta: 12, balanceAfter: 22 });
+    expect(previewMovement({ quantity: 10 }, 'perda', 2)).toEqual({ delta: -2, balanceAfter: 8 });
+    expect(previewMovement({ quantity: 10 }, 'ajuste', 7)).toEqual({ delta: -3, balanceAfter: 7 });
+    expect(previewMovement({ quantity: 0.3 }, 'entrada', 0.1)).toEqual({ delta: 0.1, balanceAfter: 0.4 });
+  });
+
+  it('5.4 ordena o que acabou, depois o que está acabando, depois pelo nome', () => {
+    const items = [
+      { ...product, name: 'Bala', quantity: 20 },
+      { ...product, name: 'Água', quantity: 20 },
+      { ...product, name: 'Coxinha', quantity: 3 },
+      { ...product, name: 'Café', trackStock: false },
+      { ...product, name: 'Pastel', quantity: 0 },
+    ];
+    expect(items.sort(compareStockUrgency).map((p) => p.name)).toEqual([
+      'Pastel',
+      'Coxinha',
+      'Água',
+      'Bala',
+      'Café',
+    ]);
+  });
+
+  it('5.3 desfaz só a última movimentação manual do produto, nos 5 segundos', () => {
+    const at = '2026-10-21T10:00:00.000Z';
+    const now = new Date(at).getTime();
+    const { product: after, movement } = applyMovement(product, {
+      id: 'm2',
+      type: 'entrada',
+      quantity: 12,
+      unitCostCents: 300,
+      createdAt: at,
+    });
+    expect(movement.previousCostCents).toBe(250);
+    const older = { id: 'm1', productId: 'p1', type: 'perda', createdAt: '2026-10-21T09:59:58.000Z' };
+    const history = [older, movement];
+    expect(validateUndoMovement(movement, history, now + 4000)).toEqual([]);
+    expect(validateUndoMovement(movement, history, now + 6000)).toEqual(['prazo_desfazer_movimento']);
+    expect(validateUndoMovement(older, history, now)).toEqual(['prazo_desfazer_movimento']);
+    expect(
+      validateUndoMovement({ ...movement, type: 'venda' }, [{ ...movement, type: 'venda' }], now),
+    ).toEqual(['prazo_desfazer_movimento']);
+
+    const reverted = revertMovement(after, movement, at);
+    expect(reverted).toMatchObject({ quantity: 10, costCents: 250 });
   });
 });

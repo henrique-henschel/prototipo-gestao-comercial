@@ -69,6 +69,7 @@ export const ERROR_MESSAGES = {
   quantidade_invalida: 'Confira a quantidade.',
   movimento_invalido: 'Esse tipo de movimento não pode ser feito à mão.',
   sem_controle_estoque: 'Esse produto não tem controle de estoque.',
+  prazo_desfazer_movimento: 'Já passou o tempo de desfazer. Se precisar, faça uma contagem do estoque.',
   // Caixa
   forma_invalida: 'Escolha como a despesa foi paga.',
   caixa_ja_aberto: 'O caixa desse dia já está aberto.',

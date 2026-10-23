@@ -1,0 +1,58 @@
+@layer components {
+  .loading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .stock {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-block-end: var(--space-4);
+  }
+
+  .stockNow {
+    display: grid;
+    justify-items: start;
+    gap: var(--space-2);
+    min-inline-size: 0;
+  }
+
+  .stockLabel {
+    color: var(--text-2);
+    font-weight: var(--weight-bold);
+  }
+
+  .stockValue {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-bold);
+    line-height: var(--leading-tight);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stockActions {
+    display: flex;
+    flex: 1 1 18rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-2);
+
+    & > * {
+      flex: 1 1 10rem;
+    }
+  }
+
+  .muted {
+    color: var(--text-2);
+    font-size: var(--text-sm);
+  }
+
+  .history {
+    display: grid;
+    gap: var(--space-4);
+    margin-block-start: var(--space-4);
+  }
+}

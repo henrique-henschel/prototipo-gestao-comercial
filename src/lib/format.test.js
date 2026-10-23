@@ -4,6 +4,7 @@ import {
   formatDateMedium,
   formatPercent,
   formatPhone,
+  formatQuantity,
   formatRelativeDay,
   plural,
 } from './format.js';
@@ -58,5 +59,12 @@ describe('format', () => {
     expect(formatPhone('1133334444')).toBe('(11) 3333-4444');
     expect(formatPhone('123')).toBe('123');
     expect(formatPhone(null)).toBe('');
+  });
+
+  it('formata quantidades com a unidade', () => {
+    expect(formatQuantity(12, 'un')).toBe('12 un');
+    expect(formatQuantity(1.25, 'kg')).toBe('1,25 kg');
+    expect(formatQuantity(1.5, 'kg', { fixed: true })).toBe('1,500 kg');
+    expect(formatQuantity(-2)).toBe('-2');
   });
 });

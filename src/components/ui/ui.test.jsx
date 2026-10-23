@@ -1,12 +1,39 @@
 import { useState } from 'react';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Button, MoneyInput, QuantityStepper, StatusPill, Tabs } from '@/components/ui';
+import { Button, MoneyInput, QuantityInput, QuantityStepper, StatusPill, Tabs } from '@/components/ui';
 
 function ControlledMoney({ keypad = false }) {
   const [value, setValue] = useState(0);
   return <MoneyInput label="Valor recebido" value={value} onChange={setValue} keypad={keypad} />;
 }
+
+function ControlledQuantity({ unit }) {
+  const [value, setValue] = useState(0);
+  return <QuantityInput label="Quantidade" value={value} onChange={setValue} unit={unit} keypad />;
+}
+
+describe('QuantityInput', () => {
+  it('em unidades inteiras, cada dígito é uma unidade', async () => {
+    const user = userEvent.setup();
+    render(<ControlledQuantity unit="un" />);
+    await user.click(screen.getByRole('button', { name: '1' }));
+    await user.click(screen.getByRole('button', { name: '2' }));
+    expect(screen.getByLabelText('Quantidade')).toHaveValue('12 un');
+    await user.click(screen.getByRole('button', { name: /^Apagar/ }));
+    expect(screen.getByLabelText('Quantidade')).toHaveValue('1 un');
+  });
+
+  it('em kg, os dígitos entram pela direita com 3 casas', async () => {
+    const user = userEvent.setup();
+    render(<ControlledQuantity unit="kg" />);
+    const input = screen.getByLabelText('Quantidade');
+    expect(input).toHaveValue('0,000 kg');
+    await user.click(input);
+    await user.keyboard('1500');
+    expect(input).toHaveValue('1,500 kg');
+  });
+});
 
 describe('MoneyInput', () => {
   it('digita como calculadora: os números entram pela direita', async () => {
